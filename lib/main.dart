@@ -128,10 +128,11 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               children: [
                 UserAccountsDrawerHeader(
-                    accountEmail: Text('Email: $email \nUsername: $username'),
-                    accountName: Text('$nama_depan $nama_belakang'),
-                    currentAccountPicture: CircleAvatar(
-                        backgroundImage: Image.memory(avatar).image)),
+                  accountEmail: Text('Email: $email \nUsername: $username'),
+                  accountName: Text('$nama_depan $nama_belakang'),
+                  currentAccountPicture:
+                      CircleAvatar(backgroundImage: Image.memory(avatar).image, ),
+                ),
                 ExpansionTile(
                   title: const Text("Personnel"),
                   leading: const Icon(Icons.person),
@@ -195,8 +196,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 ListTile(
                   tileColor: Colors.blue,
-                  title: const Text("Logout", style: TextStyle(color: Colors.white),),
-                  leading: const Icon(Icons.logout, color: Colors.white,),
+                  title: const Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  leading: const Icon(
+                    Icons.logout,
+                    color: Colors.white,
+                  ),
                   onTap: () {
                     doLogout();
                   },

@@ -42,6 +42,7 @@ class _PersonelDataState extends State<PersonelData> {
     return temp;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +68,10 @@ class _PersonelDataState extends State<PersonelData> {
                                 backgroundColor:
                                     Color.fromARGB(255, 248, 172, 49)),
                             onPressed: () {
-                              CreateAccount();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CreateAccount()));
                             },
                             child: Text(
                               "Add New Personnel",
@@ -93,11 +97,12 @@ class _PersonelDataState extends State<PersonelData> {
                 Container(
                   alignment: Alignment.topCenter,
                   width: 600,
+                  height: MediaQuery.of(context).size.height,
                   child: GridView.count(
-                      crossAxisCount: 3,
+                      crossAxisCount: 2,
                       crossAxisSpacing: 4.0,
                       mainAxisSpacing: 8.0,
-                      children: []),
+                      children: cats()),
                 )
               ],
             ),

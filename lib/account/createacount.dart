@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
-import 'package:pt_coronet_crown/account/login.dart';
+import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/class/cabang.dart';
 import '../main.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +21,8 @@ class CreateAccount extends StatefulWidget {
   }
 }
 
+const List<String> genderList = <String>['pria', 'wanita'];
+
 class _CreateAccountState extends State<CreateAccount> {
   String _username = "",
       _password = "",
@@ -28,8 +30,9 @@ class _CreateAccountState extends State<CreateAccount> {
       _namaDepan = "",
       _namaBelakang = "",
       _email = "",
-      select_file = "",
-      cabang = "";
+      cabang = "",
+      gender = genderList.first,
+      nomor_telepon = "";
   int _jabatan = 1;
   var _avatar = null;
   var _avatar_proses = null;
@@ -78,19 +81,20 @@ class _CreateAccountState extends State<CreateAccount> {
           'email': _email,
           'password': _password,
           'avatar': base64Image,
+          'gender': gender,
+          'no_telp': nomor_telepon,
           'jabatan': "1",
-          'cabang': "JTM-SDJ-TAMAN",
+          'cabang': cabang,
           'grup': 'JTM-SDJ-TAMAN-1'
         });
     if (response.statusCode == 200) {
-      print(response.body);
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Login()));
+            context, MaterialPageRoute(builder: (context) => PersonelData()));
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -173,7 +177,6 @@ class _CreateAccountState extends State<CreateAccount> {
         img.Image? temp = img.decodeImage(_avatar!);
         img.Image temp2 = img.copyResize(temp!, width: 480, height: 640);
         _avatar_proses = Uint8List.fromList(img.encodeJpg(temp2));
-
       });
     }
   }
@@ -228,7 +231,6 @@ class _CreateAccountState extends State<CreateAccount> {
                                 : Image.memory(_avatar_proses!),
                             // : Image.file(_avatar_proses!),
                           ))),
-                  
                   Padding(
                       padding: EdgeInsets.all(10),
                       child: TextFormField(
@@ -299,6 +301,22 @@ class _CreateAccountState extends State<CreateAccount> {
                       padding: EdgeInsets.all(10),
                       child: TextFormField(
                         decoration: const InputDecoration(
+                          labelText: 'Nomor Telepon',
+                        ),
+                        onChanged: (value) {
+                          nomor_telepon = value;
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nomor telepon tidak boleh kosong';
+                          }
+                          return null;
+                        },
+                      )),
+                  Padding(
+                      padding: EdgeInsets.all(10),
+                      child: TextFormField(
+                        decoration: const InputDecoration(
                           labelText: 'Nama Depan',
                         ),
                         onChanged: (value) {
@@ -327,6 +345,24 @@ class _CreateAccountState extends State<CreateAccount> {
                           return null;
                         },
                       )),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: DropdownButton<String>(
+                      value: gender,
+                      items: genderList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          gender = value!;
+                        });
+                      },
+                    ),
+                  ),
                   Padding(padding: EdgeInsets.all(10), child: comboCabang),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
