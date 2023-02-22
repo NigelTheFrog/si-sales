@@ -120,32 +120,7 @@ class _LoginState extends State<Login> {
                           if (error_login != "")
                             Text(error_login,
                                 style: TextStyle(color: Colors.red)),
-                          // Padding(
-                          //     padding: const EdgeInsets.all(10),
-                          //     child: Container(
-                          //       height: 50,
-                          //       width: 300,
-                          //       child: ElevatedButton(
-                          //         style: ElevatedButton.styleFrom(
-                          //             backgroundColor: Colors.white,
-                          //             side: const BorderSide(
-                          //               width: 1.0,
-                          //               color: Colors.blue,
-                          //             )),
-                          //         onPressed: () {
-                          //           Navigator.push(
-                          //               context,
-                          //               MaterialPageRoute(
-                          //                   builder: (context) =>
-                          //                       CreateAccount()));
-                          //         },
-                          //         child: const Text(
-                          //           'Create Account',
-                          //           style: TextStyle(
-                          //               color: Colors.blue, fontSize: 16),
-                          //         ),
-                          //       ),
-                          //     )),
+                          
                           Padding(
                               padding: const EdgeInsets.all(10),
                               child: Container(

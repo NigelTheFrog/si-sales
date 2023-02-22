@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'dart:html';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/account/createacount.dart';
+import 'package:pt_coronet_crown/class/personaldata.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../main.dart';
 
@@ -20,9 +23,8 @@ class _PersonelDataState extends State<PersonelData> {
   String _txtcari = "";
 
   Future<String> fetchData() async {
-    final response = await http.post(
-        Uri.parse("https://ubaya.fun/flutter/160419017/movielist.php"),
-        body: {'cari': _txtcari});
+    final response = await http.post(Uri.parse(
+        "http://localhost/magang/admin/personel/personeldata/daftarpersoneldata.php"));
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -30,18 +32,61 @@ class _PersonelDataState extends State<PersonelData> {
     }
   }
 
-  List<Widget> cats() {
+  List<Widget> listPersonel(data) {
     List<Widget> temp = [];
-    int i = 0;
-    while (i < 15) {
-      Widget w = Image.network(
-          "https://placekitten.com/120/120?image=" + i.toString());
+    List<Person> person2 = [];
+    Map json = jsonDecode(data);
+    for (var pers in json['data']) {
+      Person person = Person.fromJson(pers);
+      person2.add(person);
+    }
+    var idx = 0;
+    while (idx < person2.length) {
+      // print(person2[idx].username);
+      Widget w = Container(
+          width: 250,
+          height: 100,
+          child: Card(
+              child: Row(children: [
+            Container(
+                alignment: Alignment.topLeft,
+                width: 100,
+                height: 200,
+                child: Image.memory(base64Decode(person2[idx].avatar))),
+            Container(
+                padding: EdgeInsets.all(5),
+                width: 270,
+                child: Column(
+                  children: [
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                    Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(person2[idx].username)),
+                    Row(children: [
+                      Icon(Icons.mail),
+                      Text(person2[idx].email, textAlign: TextAlign.left)
+                    ]),
+                    Row(children: [
+                      Icon(Icons.phone),
+                      Text(person2[idx].no_telp, textAlign: TextAlign.left)
+                    ]),
+                    Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text("Group : " + person2[idx].nama_grup,
+                            textAlign: TextAlign.left))
+                  ],
+                ))
+          ])));
       temp.add(w);
-      i++;
+      idx++;
     }
     return temp;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -95,15 +140,28 @@ class _PersonelDataState extends State<PersonelData> {
                       ]),
                 ),
                 Container(
-                  alignment: Alignment.topCenter,
-                  width: 600,
-                  height: MediaQuery.of(context).size.height,
-                  child: GridView.count(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 4.0,
-                      mainAxisSpacing: 8.0,
-                      children: cats()),
-                )
+                    alignment: Alignment.topCenter,
+                    width: 800,
+                    height: MediaQuery.of(context).size.height,
+                    child: FutureBuilder(
+                        future: fetchData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return GridView.count(
+                                crossAxisCount: kIsWeb
+                                    ? window.screen!.width! >= 870
+                                        ? 2
+                                        : 1
+                                    : 1,
+                                crossAxisSpacing: 4.0,
+                                mainAxisSpacing: 8.0,
+                                children:
+                                    listPersonel(snapshot.data.toString()));
+                          } else {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          ;
+                        }))
               ],
             ),
           ),
