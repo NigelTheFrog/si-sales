@@ -33,7 +33,6 @@ class _CreateAccountState extends State<CreateAccount> {
   int _jabatan = 1;
   var _avatar = null;
   var _avatar_proses = null;
-  String error_picture = "", error_username = "";
 
   final picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
@@ -87,9 +86,6 @@ class _CreateAccountState extends State<CreateAccount> {
       print(response.body);
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
-        setState(() {
-          error_picture = "";
-        });
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
@@ -232,8 +228,7 @@ class _CreateAccountState extends State<CreateAccount> {
                                 : Image.memory(_avatar_proses!),
                             // : Image.file(_avatar_proses!),
                           ))),
-                  if (error_picture != "")
-                    Text(error_picture, style: TextStyle(color: Colors.red)),
+                  
                   Padding(
                       padding: EdgeInsets.all(10),
                       child: TextFormField(
