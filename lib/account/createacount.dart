@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -9,6 +10,7 @@ import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/class/cabang.dart';
+import 'package:pt_coronet_crown/class/jabatan.dart';
 import '../main.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -21,9 +23,10 @@ class CreateAccount extends StatefulWidget {
   }
 }
 
-const List<String> genderList = <String>['pria', 'wanita'];
+const List<String> genderList = <String>['Pria', 'Wanita'];
 
 class _CreateAccountState extends State<CreateAccount> {
+  late Timer timer;
   String _username = "",
       _password = "",
       _passwordCheck = "",
@@ -31,9 +34,11 @@ class _CreateAccountState extends State<CreateAccount> {
       _namaBelakang = "",
       _email = "",
       cabang = "",
-      gender = genderList.first,
-      nomor_telepon = "";
-  int _jabatan = 1;
+      gender = genderList.first.toString(),
+      nomor_telepon = "",
+      controllerCabang = "",
+      controllerJabatan = "",
+      _jabatan = "";
   var _avatar = null;
   var _avatar_proses = null;
 
@@ -43,7 +48,21 @@ class _CreateAccountState extends State<CreateAccount> {
   Future<List> daftarCabang() async {
     Map json;
     final response = await http.post(
-      Uri.parse("http://localhost/magang/cabang/daftarcabang.php"),
+      Uri.parse("http://localhost/magang/admin/cabang/daftarcabang.php"),
+    );
+
+    if (response.statusCode == 200) {
+      json = jsonDecode(response.body);
+      return json['data'];
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  Future<List> daftarJabatan() async {
+    Map json;
+    final response = await http.post(
+      Uri.parse("http://localhost/magang/admin/jabatan/daftarjabatan.php"),
     );
 
     if (response.statusCode == 200) {
@@ -112,42 +131,85 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 
   Widget comboCabang = Text("");
+  Widget comboJabatan = Text("");
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      generatDaftarCabang();
-    });
+      timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
+        setState(() {
+          generatDaftarCabang();
+          generatDaftarJabatan();
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    timer.cancel();
+    super.dispose();
   }
 
   void generatDaftarCabang() {
     List<Cabang> cabangs;
     var data = daftarCabang();
     data.then((value) {
-      print(value);
       cabangs = List<Cabang>.from(value.map((i) {
         return Cabang.fromJson(i);
       }));
       setState(() {
-        comboCabang = DropdownButton(
-            dropdownColor: Colors.grey[100],
-            hint: Text("Daftar Cabang"),
-            isDense: false,
-            items: cabangs.map((cabang) {
-              return DropdownMenuItem(
-                child: Column(children: <Widget>[
-                  Text(cabang.nama_cabang, overflow: TextOverflow.visible),
-                ]),
-                value: cabang.id,
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                cabang = value!;
-              });
-            });
+        comboCabang = DropdownButtonHideUnderline(
+            child: DropdownButton(
+                dropdownColor: Colors.grey[100],
+                hint: controllerCabang == ""
+                    ? Text("Daftar Cabang")
+                    : Text(controllerCabang),
+                isDense: false,
+                items: cabangs.map((cabang) {
+                  return DropdownMenuItem(
+                    child: Text(cabang.nama_cabang),
+                    value: [cabang.id, cabang.nama_cabang],
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    cabang = value![0];
+                    controllerCabang = value[1].toString();
+                  });
+                }));
+      });
+    });
+  }
+
+  void generatDaftarJabatan() {
+    List<Jabatan> jabatans;
+    var data = daftarJabatan();
+    data.then((value) {
+      jabatans = List<Jabatan>.from(value.map((i) {
+        return Jabatan.fromJson(i);
+      }));
+      setState(() {
+        comboJabatan = DropdownButtonHideUnderline(
+            child: DropdownButton(
+                dropdownColor: Colors.grey[100],
+                hint: controllerJabatan == ""
+                    ? Text("Daftar Jabatan")
+                    : Text(controllerJabatan),
+                isDense: false,
+                items: jabatans.map((jabatan) {
+                  return DropdownMenuItem(
+                    child: Text(jabatan.jabatan),
+                    value: [jabatan.id, jabatan.jabatan],
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _jabatan = value![0].toString();
+                    controllerJabatan = value[1].toString();
+                  });
+                }));
       });
     });
   }
@@ -162,8 +224,6 @@ class _CreateAccountState extends State<CreateAccount> {
       img.Image temp2 = img.copyResize(temp!, width: 480, height: 640);
       setState(() {
         _avatar_proses = Uint8List.fromList(img.encodeJpg(temp2));
-        // List<int> imageBytes = _avatar_proses!.readAsBytesSync();
-        // _avatar_proses = imageBytes;
       });
     });
   }
@@ -346,24 +406,41 @@ class _CreateAccountState extends State<CreateAccount> {
                         },
                       )),
                   Padding(
-                    padding: EdgeInsets.all(10),
-                    child: DropdownButton<String>(
-                      value: gender,
-                      items: genderList
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          gender = value!;
-                        });
-                      },
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.all(10), child: comboCabang),
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                          height: 50,
+                          width: 500,
+                          child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                            hint: Text("Gender"),
+                            value: gender,
+                            items: genderList
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? value) {
+                              setState(() {
+                                gender = value!;
+                              });
+                            },
+                          )))),
+                  Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                        height: 50,
+                        width: 500,
+                        child: comboCabang,
+                      )),
+                      Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                        height: 50,
+                        width: 500,
+                        child: comboJabatan,
+                      )),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Container(

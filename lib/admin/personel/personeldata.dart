@@ -44,44 +44,46 @@ class _PersonelDataState extends State<PersonelData> {
     while (idx < person2.length) {
       // print(person2[idx].username);
       Widget w = Container(
-          width: 250,
-          height: 100,
           child: Card(
               child: Row(children: [
-            Container(
-                alignment: Alignment.topLeft,
+        Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+                margin: EdgeInsets.only(top: 1),
                 width: 100,
-                height: 200,
-                child: Image.memory(base64Decode(person2[idx].avatar))),
-            Container(
-                padding: EdgeInsets.all(5),
-                width: 270,
-                child: Column(
-                  children: [
-                    Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(person2[idx].username)),
-                    Row(children: [
-                      Icon(Icons.mail),
-                      Text(person2[idx].email, textAlign: TextAlign.left)
-                    ]),
-                    Row(children: [
-                      Icon(Icons.phone),
-                      Text(person2[idx].no_telp, textAlign: TextAlign.left)
-                    ]),
-                    Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Text("Group : " + person2[idx].nama_grup,
-                            textAlign: TextAlign.left))
-                  ],
-                ))
-          ])));
+                height: 131,
+                child: Image.memory(
+                  base64Decode(person2[idx].avatar),
+                ))),
+        Container(
+            padding: EdgeInsets.all(5),
+            width: 270,
+            child: Column(
+              children: [
+                Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "${person2[idx].nama_depan} ${person2[idx].nama_belakang} - ${person2[idx].jabatan} ${person2[idx].nama_cabang}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(person2[idx].username)),
+                Row(children: [
+                  Icon(Icons.mail),
+                  Text(person2[idx].email, textAlign: TextAlign.left)
+                ]),
+                Row(children: [
+                  Icon(Icons.phone),
+                  Text(person2[idx].no_telp, textAlign: TextAlign.left)
+                ]),
+                Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text("Group : " + person2[idx].nama_grup,
+                        textAlign: TextAlign.left))
+              ],
+            ))
+      ])));
       temp.add(w);
       idx++;
     }
@@ -90,6 +92,12 @@ class _PersonelDataState extends State<PersonelData> {
 
   @override
   Widget build(BuildContext context) {
+    var ratio = MediaQuery.of(context).size;
+
+    /*24 is for notification bar on Android*/
+    final double itemHeight = (ratio.height - kToolbarHeight - 24) / 1.2;
+    final double itemWidth = ratio.width;
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Personnel Data"),
@@ -141,26 +149,27 @@ class _PersonelDataState extends State<PersonelData> {
                 ),
                 Container(
                     alignment: Alignment.topCenter,
-                    width: 800,
                     height: MediaQuery.of(context).size.height,
+                    width: 800,
                     child: FutureBuilder(
                         future: fetchData(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return GridView.count(
                                 crossAxisCount: kIsWeb
-                                    ? window.screen!.width! >= 870
+                                    ? MediaQuery.of(context).size.width >= 870
                                         ? 2
                                         : 1
                                     : 1,
                                 crossAxisSpacing: 4.0,
+                                childAspectRatio:
+                                    (800 / (MediaQuery.of(context).size.height/2.3)),
                                 mainAxisSpacing: 8.0,
                                 children:
                                     listPersonel(snapshot.data.toString()));
                           } else {
                             return Center(child: CircularProgressIndicator());
                           }
-                          ;
                         }))
               ],
             ),
