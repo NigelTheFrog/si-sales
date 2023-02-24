@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/account/login.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
+import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String active_user = "",
@@ -100,6 +101,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'Home'),
       routes: {
         "personeldata": (context) => PersonelData(),
+        "personelgroup": (context) => PersonelGroup(),
         // "mycreation": (context) => MyCreation(),
         // "setting": (context) => Setting(),
         // "leaderboard": (context) => LeaderBoard()
@@ -148,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       title: const Text("Personel Group"),
                       leading: const Icon(Icons.group),
                       onTap: () {
-                        Navigator.popAndPushNamed(context, "home");
+                        Navigator.popAndPushNamed(context, "personelgroup");
                       },
                     ),
                   ],

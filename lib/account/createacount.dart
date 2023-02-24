@@ -102,7 +102,7 @@ class _CreateAccountState extends State<CreateAccount> {
           'avatar': base64Image,
           'gender': gender,
           'no_telp': nomor_telepon,
-          'jabatan': "1",
+          'jabatan': _jabatan,
           'cabang': cabang,
           'grup': 'JTM-SDJ-TAMAN-1'
         });
@@ -112,8 +112,7 @@ class _CreateAccountState extends State<CreateAccount> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PersonelData()));
+        Navigator.of(context).pop();
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -137,12 +136,12 @@ class _CreateAccountState extends State<CreateAccount> {
   void initState() {
     // TODO: implement initState
     super.initState();
-      timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
-        setState(() {
-          generatDaftarCabang();
-          generatDaftarJabatan();
-        });
+    timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
+      setState(() {
+        generatDaftarCabang();
+        generatDaftarJabatan();
       });
+    });
   }
 
   @override
@@ -434,7 +433,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         width: 500,
                         child: comboCabang,
                       )),
-                      Padding(
+                  Padding(
                       padding: EdgeInsets.all(10),
                       child: Container(
                         height: 50,

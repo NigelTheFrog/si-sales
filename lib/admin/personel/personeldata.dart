@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:html';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/account/createacount.dart';
-import 'package:pt_coronet_crown/class/personaldata.dart';
+import 'package:pt_coronet_crown/class/personel/personel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -43,47 +42,78 @@ class _PersonelDataState extends State<PersonelData> {
     var idx = 0;
     while (idx < person2.length) {
       // print(person2[idx].username);
-      Widget w = Container(
-          child: Card(
-              child: Row(children: [
-        Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-                margin: EdgeInsets.only(top: 1),
-                width: 100,
-                height: 131,
-                child: Image.memory(
-                  base64Decode(person2[idx].avatar),
-                ))),
-        Container(
-            padding: EdgeInsets.all(5),
-            width: 270,
+      Widget w = Card(
+          child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topRight,
             child: Column(
               children: [
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      "${person2[idx].nama_depan} ${person2[idx].nama_belakang} - ${person2[idx].jabatan} ${person2[idx].nama_cabang}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(person2[idx].username)),
-                Row(children: [
-                  Icon(Icons.mail),
-                  Text(person2[idx].email, textAlign: TextAlign.left)
-                ]),
-                Row(children: [
-                  Icon(Icons.phone),
-                  Text(person2[idx].no_telp, textAlign: TextAlign.left)
-                ]),
-                Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text("Group : " + person2[idx].nama_grup,
-                        textAlign: TextAlign.left))
+                Tooltip(
+                  message: 'Personnel attendance',
+                  child: IconButton(
+                    icon: Icon(Icons.zoom_in),
+                    onPressed: () {},
+                  ),
+                ),
+                Tooltip(
+                  message: 'Edit data personnel',
+                  child: IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {},
+                  ),
+                ),
+                Tooltip(
+                  message: 'Delete Personnel',
+                  child: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {},
+                  ),
+                )
               ],
-            ))
-      ])));
+            ),
+          ),
+          Row(children: [
+            Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                    margin: EdgeInsets.only(top: 1),
+                    width: 100,
+                    height: 131,
+                    child: Image.memory(
+                      base64Decode(person2[idx].avatar),
+                    ))),
+            Container(
+                padding: EdgeInsets.all(5),
+                width: 220,
+                child: Column(
+                  children: [
+                    Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(
+                          "${person2[idx].nama_depan} ${person2[idx].nama_belakang} - ${person2[idx].jabatan} \n${person2[idx].nama_cabang}",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                    Align(
+                        alignment: Alignment.topLeft,
+                        child: Text(person2[idx].username)),
+                    Row(children: [
+                      Icon(Icons.mail),
+                      Text(person2[idx].email, textAlign: TextAlign.left)
+                    ]),
+                    Row(children: [
+                      Icon(Icons.phone),
+                      Text(person2[idx].no_telp, textAlign: TextAlign.left)
+                    ]),
+                    Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text("Group : " + person2[idx].nama_grup,
+                            textAlign: TextAlign.left)),
+                  ],
+                )),
+          ]),
+        ],
+      ));
       temp.add(w);
       idx++;
     }
@@ -92,12 +122,6 @@ class _PersonelDataState extends State<PersonelData> {
 
   @override
   Widget build(BuildContext context) {
-    var ratio = MediaQuery.of(context).size;
-
-    /*24 is for notification bar on Android*/
-    final double itemHeight = (ratio.height - kToolbarHeight - 24) / 1.2;
-    final double itemWidth = ratio.width;
-
     return Scaffold(
         appBar: AppBar(
           title: Text("Personnel Data"),
@@ -162,8 +186,9 @@ class _PersonelDataState extends State<PersonelData> {
                                         : 1
                                     : 1,
                                 crossAxisSpacing: 4.0,
-                                childAspectRatio:
-                                    (800 / (MediaQuery.of(context).size.height/2.3)),
+                                childAspectRatio: (800 /
+                                    (MediaQuery.of(context).size.height /
+                                        2.63)),
                                 mainAxisSpacing: 8.0,
                                 children:
                                     listPersonel(snapshot.data.toString()));
@@ -174,11 +199,6 @@ class _PersonelDataState extends State<PersonelData> {
               ],
             ),
           ),
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: _incrementCounter,
-          //   tooltip: 'Increment',
-          //   child: const Icon(Icons.add),
-          // ), // This trailing comma makes auto-formatting nicer for build methods.
         ));
   }
 }
