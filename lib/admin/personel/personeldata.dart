@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/class/personel/personel.dart';
+import 'package:pt_coronet_crown/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -126,6 +127,7 @@ class _PersonelDataState extends State<PersonelData> {
         appBar: AppBar(
           title: Text("Personnel Data"),
         ),
+        drawer: MyDrawer(),
         body: Container(
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(

@@ -11,7 +11,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/class/cabang.dart';
 import 'package:pt_coronet_crown/class/jabatan.dart';
-import '../main.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -112,7 +111,9 @@ class _CreateAccountState extends State<CreateAccount> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
-        Navigator.of(context).pop();
+        dispose();
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => PersonelData()));
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -161,10 +162,12 @@ class _CreateAccountState extends State<CreateAccount> {
       setState(() {
         comboCabang = DropdownButtonHideUnderline(
             child: DropdownButton(
-                dropdownColor: Colors.grey[100],
                 hint: controllerCabang == ""
                     ? Text("Daftar Cabang")
-                    : Text(controllerCabang),
+                    : Text(
+                        controllerCabang,
+                        style: TextStyle(color: Colors.black),
+                      ),
                 isDense: false,
                 items: cabangs.map((cabang) {
                   return DropdownMenuItem(
@@ -192,10 +195,12 @@ class _CreateAccountState extends State<CreateAccount> {
       setState(() {
         comboJabatan = DropdownButtonHideUnderline(
             child: DropdownButton(
-                dropdownColor: Colors.grey[100],
                 hint: controllerJabatan == ""
                     ? Text("Daftar Jabatan")
-                    : Text(controllerJabatan),
+                    : Text(
+                        controllerJabatan,
+                        style: TextStyle(color: Colors.black),
+                      ),
                 isDense: false,
                 items: jabatans.map((jabatan) {
                   return DropdownMenuItem(

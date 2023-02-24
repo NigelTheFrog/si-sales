@@ -4,8 +4,10 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/account/createacount.dart';
+import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
 import 'package:pt_coronet_crown/class/personel/personel.dart';
 import 'package:pt_coronet_crown/class/personel/personelgrup.dart';
+import 'package:pt_coronet_crown/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -50,6 +52,9 @@ class _PersonelGroupState extends State<PersonelGroup> {
         grup2.add(grup);
       }
       return ListView.builder(
+          scrollDirection: MediaQuery.of(context).size.width >= 725
+              ? Axis.vertical
+              : Axis.horizontal,
           itemCount: 1,
           itemBuilder: (BuildContext ctxt, int index) {
             return Container(
@@ -79,18 +84,21 @@ class _PersonelGroupState extends State<PersonelGroup> {
                         .map<DataRow>((element) => DataRow(cells: [
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.nama_grup))),
+                                  child: Text(element.nama_grup,
+                                      textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: Text(
-                                      "${element.nama_depan} ${element.nama_belakang}"))),
+                                      "${element.nama_depan} ${element.nama_belakang}",
+                                      textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child:
-                                      Text(element.jumlah_pegawai.toString()))),
+                                  child: Text(element.jumlah_pegawai.toString(),
+                                      textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.nama_cabang))),
+                                  child: Text(element.nama_cabang,
+                                      textAlign: TextAlign.center))),
                               DataCell(
                                 Align(
                                     alignment: Alignment.center,
@@ -131,9 +139,11 @@ class _PersonelGroupState extends State<PersonelGroup> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Personnel Data"),
+          title: Text("Personnel Group"),
         ),
+        drawer: MyDrawer(),
         body: Container(
+          
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
             child: Column(
@@ -155,10 +165,10 @@ class _PersonelGroupState extends State<PersonelGroup> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => CreateAccount()));
+                                      builder: (context) => CreateGroup()));
                             },
                             child: Text(
-                              "Add New Personnel",
+                              "Add New Group",
                               style:
                                   TextStyle(color: Colors.black, fontSize: 16),
                             )),
@@ -168,7 +178,7 @@ class _PersonelGroupState extends State<PersonelGroup> {
                           child: TextFormField(
                             decoration: const InputDecoration(
                               icon: Icon(Icons.search),
-                              labelText: 'Search Personnel',
+                              labelText: 'Cari Group',
                             ),
                             onChanged: (value) {
                               _txtcari = value;
@@ -181,7 +191,7 @@ class _PersonelGroupState extends State<PersonelGroup> {
                 Container(
                     alignment: Alignment.topCenter,
                     height: MediaQuery.of(context).size.height,
-                    width: 600,
+                    width: 800,
                     child: FutureBuilder(
                         future: fetchData(),
                         builder: (context, snapshot) {
