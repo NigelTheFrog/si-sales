@@ -55,7 +55,7 @@ class _LoginState extends State<Login> {
         prefs.setString("email", json["email"]);
         prefs.setString("tanggal_gabung", json["tanggal_gabung"]);
         prefs.setString("avatar", json["avatar"]);
-        prefs.setInt("idJabatan", json["id_jabatan"]);
+        prefs.setString("idJabatan", json["id_jabatan"].toString());
         prefs.setString("jabatan", json["jabatan"]);
         prefs.setString("idCabang", json["id_cabang"]);
         prefs.setString("cabang", json["cabang"]);

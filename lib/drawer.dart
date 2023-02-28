@@ -6,12 +6,7 @@ import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:pt_coronet_crown/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String username = "",
-    nama_depan = "",
-    nama_belakang = "",
-    email = "",
-    jabatan = "",
-    tanggal_gabung = "";
+String nama_depan = "", nama_belakang = "", email = "", jabatan = "";
 var avatar;
 
 class MyDrawer extends StatefulWidget {
@@ -24,14 +19,12 @@ class MyDrawer extends StatefulWidget {
 class _MyDrawerState extends State<MyDrawer> {
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (username != prefs.getString("username") ||
-        nama_depan != prefs.getString("nama_depan") ||
+    if (nama_depan != prefs.getString("nama_depan") ||
         nama_belakang != prefs.getString("nama_belakang") ||
         email != prefs.getString("email") ||
         avatar != prefs.getString("avatar") ||
         jabatan != prefs.getString("jabatan")) {
       setState(() {
-        username = prefs.getString("username") ?? '';
         nama_depan = prefs.getString("nama_depan") ?? '';
         nama_belakang = prefs.getString("nama_belakang") ?? '';
         email = prefs.getString("email") ?? '';
@@ -66,7 +59,7 @@ class _MyDrawerState extends State<MyDrawer> {
             child: Column(
               children: [
                 UserAccountsDrawerHeader(
-                  accountEmail: Text('Email: $email \nUsername: $username'),
+                  accountEmail: Text('Email: $email \nRole: $jabatan'),
                   accountName: Text('$nama_depan $nama_belakang'),
                   currentAccountPicture: CircleAvatar(
                     backgroundImage: Image.memory(base64Decode(avatar)).image,

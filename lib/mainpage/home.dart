@@ -2,11 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
+import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
+import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String user_id = "", meme_id = "";
+String nama_depan = "", nama_belakang = "", username = "", id_jabatan = "";
 
 class Home extends StatefulWidget {
+  Home({Key? key}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
     return _HomeState();
@@ -14,202 +18,214 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  bool isLiked = false;
-  String color = "0xffC0C0C0";
-
-  Future<String> fetchData() async {
-    final response = await http
-        .get(Uri.https("ubaya.fun", "/flutter/160419017/memelist.php"));
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      throw Exception('Failed to read API');
-    }
+  _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString("username") ?? '';
+      id_jabatan = prefs.getString("idJabatan") ?? '';
+      nama_depan = prefs.getString("nama_depan") ?? '';
+      nama_belakang = prefs.getString("nama_belakang") ?? '';
+    });
   }
-
-  Future<String> isLike() async {
-    final response = await http
-        .get(Uri.https("ubaya.fun", "/flutter/160419017/memelist.php"));
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      throw Exception('Failed to read API');
-    }
-  }
-
-  // void _creatememe() {
-  //   Navigator.push(context,
-  //       MaterialPageRoute(builder: (context) => CreateMeme(userid: user_id)));
-  // }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    loaddata();
+    _loadData();
   }
-
-  void likeButton(String meme_id) async {
-    
-    if (isLiked == true) {
-      final response = await http.post(
-          Uri.parse("https://ubaya.fun/flutter/160419017/minuslikepost.php"),
-          body: {'user_id': user_id, 'meme_id': meme_id});
-      if (response.statusCode == 200) {
-        Map json = jsonDecode(response.body);
-      }
-      setState(() {
-        isLiked = false;
-        color = "0xffC0C0C0";
-      });
-    } else if (isLiked == false) {
-      final response = await http.post(
-          Uri.parse("https://ubaya.fun/flutter/160419017/addlikepost.php"),
-          body: {'user_id': user_id, 'meme_id': meme_id, });
-      if (response.statusCode == 200) {
-        Map json = jsonDecode(response.body);
-      }
-      setState(() {
-        isLiked = true;
-        color = "0xffff0000";
-      });
-    }
-    ;
-  }
-
-  loaddata() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      user_id = (prefs.getString('user_id') ?? '');
-    });
-
-    return user_id;
-  }
-
-  // Widget daftarmeme(data) {
-  //   List<Meme> meme2 = [];
-  //   Map json = jsonDecode(data);
-  //   for (var mov in json['data']) {
-  //     Meme meme = Meme.fromJson(mov);
-  //     meme2.add(meme);
-  //   }
-  //   return ListView.builder(
-  //       itemCount: meme2.length,
-  //       itemBuilder: (BuildContext ctxt, int index) {
-  //         return Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: <Widget>[
-  //             Card(
-  //                 child: Container(
-  //                     width: 300,
-  //                     height: 250,
-  //                     child: Column(children: [
-  //                       Container(
-  //                         width: 300,
-  //                         height: 200,
-  //                         alignment: Alignment.topCenter,
-  //                         child: Stack(children: [
-  //                           Align(
-  //                               alignment: Alignment.center,
-  //                               child: Container(
-  //                                   decoration: BoxDecoration(
-  //                                       image: DecorationImage(
-  //                                 image: NetworkImage(meme2[index].picture),
-  //                                 fit: BoxFit.fill,
-  //                                 // alignment: Alignment.topCenter,
-  //                               )))),
-  //                           Align(
-  //                             alignment: Alignment.topCenter,
-  //                             child: Text(meme2[index].toptext,
-  //                                 textAlign: TextAlign.center,
-  //                                 style: TextStyle(
-  //                                     color: Colors.white,
-  //                                     fontSize: 20,
-  //                                     fontWeight: FontWeight.bold)),
-  //                           ),
-  //                           Align(
-  //                               alignment: Alignment.bottomCenter,
-  //                               child: Text(meme2[index].bottomtext,
-  //                                   textAlign: TextAlign.center,
-  //                                   style: TextStyle(
-  //                                       color: Colors.white,
-  //                                       fontSize: 20,
-  //                                       fontWeight: FontWeight.bold))),
-  //                         ]),
-  //                       ),
-  //                       Row(
-  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                         children: [
-  //                           Row(
-  //                             children: [
-  //                               IconButton(
-  //                                 icon: const Icon(Icons.favorite),
-  //                                 color: Color(int.parse(color)),
-  //                                 tooltip: 'Like',
-  //                                 onPressed: () {
-  //                                   setState(() {
-  //                                     likeButton(meme2[index].id);
-  //                                   });
-  //                                 },
-  //                               ),
-  //                               TextButton(
-  //                                   style: ElevatedButton.styleFrom(
-  //                                     backgroundColor: Colors.white,
-  //                                   ),
-  //                                   onPressed: (() {}),
-  //                                   child: Text(
-  //                                     'Like ${meme2[index].likes.toString()}',
-  //                                     style: TextStyle(
-  //                                         color: Color(0xffC0C0C0),
-  //                                         fontSize: 16),
-  //                                   ))
-  //                             ],
-  //                           ),
-  //                           IconButton(
-  //                             icon: const Icon(Icons.chat),
-  //                             color: Colors.blue,
-  //                             tooltip: 'Comment',
-  //                             onPressed: () {
-  //                               setState(() {
-  //                                 Navigator.push(
-  //                                   context,
-  //                                   MaterialPageRoute(
-  //                                     builder: (context) =>
-  //                                         DetailMeme(meme_id: meme2[index].id),
-  //                                   ),
-  //                                 );
-  //                               });
-  //                             },
-  //                           )
-  //                         ],
-  //                       )
-  //                     ])))
-  //           ],
-  //         );
-  //       });
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: ListView(children: <Widget>[
-        // Container(
-        //     height: MediaQuery.of(context).size.height,
-        //     child: FutureBuilder(
-        //         future: fetchData(),
-        //         builder: (context, snapshot) {
-        //           if (snapshot.hasData) {
-        //             return daftarmeme(snapshot.data.toString());
-        //           } else {
-        //             return Center(child: CircularProgressIndicator());
-        //           }
-        //         }))
-      ]),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _creatememe,
-      //   child: const Icon(Icons.add),
-      // ),
+      body: Center(
+          child: SingleChildScrollView(
+              child: Column(children: <Widget>[
+        Text(
+          "\nSelamat datang $nama_depan $nama_belakang \n",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Container(
+            height: MediaQuery.of(context).size.height,
+            width: 700,
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 4.0,
+              childAspectRatio: 2 / 1.5,
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => DetailSensor(
+                      //       sensor_id: sensor2[index].sensor_id,
+                      //     ),
+                      //   ),
+                      // );
+                    },
+                    child: Card(
+                        child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.check_rounded,
+                                  size: 60,
+                                ),
+                                Text(
+                                  "Absen hadir",
+                                  style: TextStyle(fontSize: 16),
+                                )
+                              ],
+                            )))),
+                GestureDetector(
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => DetailSensor(
+                      //       sensor_id: sensor2[index].sensor_id,
+                      //     ),
+                      //   ),
+                      // );
+                    },
+                    child: Card(
+                        child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.exit_to_app,
+                                  size: 60,
+                                ),
+                                Text(
+                                  "Absen pulang",
+                                  style: TextStyle(fontSize: 16),
+                                )
+                              ],
+                            )))),
+                GestureDetector(
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => DetailSensor(
+                      //       sensor_id: sensor2[index].sensor_id,
+                      //     ),
+                      //   ),
+                      // );
+                    },
+                    child: Card(
+                        child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: id_jabatan == "3"
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        size: 60,
+                                      ),
+                                      Text(
+                                        "Kunjungan Masuk",
+                                        style: TextStyle(fontSize: 16),
+                                      )
+                                    ],
+                                  )
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Clippy.clippy,
+                                        size: 60,
+                                      ),
+                                      Text(
+                                        "\nLaporan pembelian",
+                                        style: TextStyle(fontSize: 16),
+                                      )
+                                    ],
+                                  )))),
+                GestureDetector(
+                    onTap: () {
+                      if (id_jabatan == "3") {
+                      } else {}
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => DetailSensor(
+                      //       sensor_id: sensor2[index].sensor_id,
+                      //     ),
+                      //   ),
+                      // );
+                    },
+                    child: Card(
+                        child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: id_jabatan == "3"
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.location_off,
+                                        size: 60,
+                                      ),
+                                      Text(
+                                        "Kunjungan keluar",
+                                        style: TextStyle(fontSize: 16),
+                                      )
+                                    ],
+                                  )
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        ClipBoardCheck.clipboard_check,
+                                        size: 60,
+                                      ),
+                                      Text(
+                                        "\nLaporan Penjualan",
+                                        style: TextStyle(fontSize: 16),
+                                      )
+                                    ],
+                                  )))),
+                GestureDetector(
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => DetailSensor(
+                      //       sensor_id: sensor2[index].sensor_id,
+                      //     ),
+                      //   ),
+                      // );
+                    },
+                    child: Card(
+                        child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  EventChart.chart_line,
+                                  size: 60,
+                                ),
+                                Text(
+                                  "\nLaporan Event",
+                                  style: TextStyle(fontSize: 16),
+                                )
+                              ],
+                            )))),
+              ],
+            ))
+      ]))),
     );
   }
 }

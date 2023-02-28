@@ -1,5 +1,6 @@
 class Cabang {
   final String id, nama_cabang, alamat, kodePos, idkota, kota;
+  int? stock;
 
   Cabang(
       {required this.id,
@@ -7,7 +8,7 @@ class Cabang {
       required this.alamat,
       required this.kodePos,
       required this.idkota,
-      required this.kota});
+      required this.kota, this.stock});
 
   factory Cabang.fromJson(Map<String, dynamic> json) {
     return Cabang(
@@ -17,6 +18,7 @@ class Cabang {
       kodePos: json['kodepos'] as String,
       idkota: json['id_kota'] as String,
       kota: json['kota'] as String,
+      stock: json['stock'] as int
     );
   }
 }

@@ -1,27 +1,50 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
-import 'package:pt_coronet_crown/class/personel/personelgrup.dart';
+import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
+import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/mainpage/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../main.dart';
 
-class PersonelGroup extends StatefulWidget {
-  PersonelGroup({Key? key}) : super(key: key);
+String nama_depan = "", nama_belakang = "", username = "", id_jabatan = "";
+
+class DaftarPenjualan extends StatefulWidget {
+  DaftarPenjualan({Key? key}) : super(key: key);
   @override
-  _PersonelGroupState createState() {
-    return _PersonelGroupState();
+  _DaftarPenjualanState createState() {
+    return _DaftarPenjualanState();
   }
 }
 
-class _PersonelGroupState extends State<PersonelGroup> {
+class _DaftarPenjualanState extends State<DaftarPenjualan> {
   String _txtcari = "";
 
+  _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString("username") ?? '';
+      id_jabatan = prefs.getString("idjabatan") ?? '';
+      nama_depan = prefs.getString("nama_depan") ?? '';
+      nama_belakang = prefs.getString("nama_belakang") ?? '';
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadData();
+  }
+
   Future<String> fetchData() async {
-    final response = await http.post(Uri.parse(
-        "http://localhost/magang/admin/personel/personelgroup/daftarpersonelgroup.php"));
+    final response = await http.post(
+        Uri.parse(
+            "http://localhost/magang/admin/personel/personelgroup/daftarpersonelgroup.php"),
+        body: {'id_jabatan': id_jabatan});
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -30,21 +53,22 @@ class _PersonelGroupState extends State<PersonelGroup> {
   }
 
   Widget daftargrup(data) {
-    List<Grup> grup2 = [];
+    List<Penjualan> penjualan2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
       return Container(
           child: DataTable(columns: [
-        DataColumn(label: Text("Nama")),
-        DataColumn(label: Text("Admin")),
-        DataColumn(label: Text("Total pegawai")),
-        DataColumn(label: Text("Cabang")),
-        DataColumn(label: Text("Action")),
+        DataColumn(label: Text("ID Laporan")),
+        DataColumn(label: Text("Tanggal")),
+        DataColumn(label: Text("Waktu")),
+        DataColumn(label: Text("Jumlah barang")),
+        DataColumn(label: Text("Total Penjualan")),
+        DataColumn(label: Text("Penjual")),
       ], rows: []));
     } else {
-      for (var gru in json['data']) {
-        Grup grup = Grup.fromJson(gru);
-        grup2.add(grup);
+      for (var pen in json['data']) {
+        Penjualan penjualan = Penjualan.fromJson(pen);
+        penjualan2.add(penjualan);
       }
       return ListView.builder(
           scrollDirection: MediaQuery.of(context).size.width >= 725
@@ -58,72 +82,62 @@ class _PersonelGroupState extends State<PersonelGroup> {
                   DataColumn(
                       label: Expanded(
                           child: Text(
-                    "Nama",
+                    "ID Laporan",
                     textAlign: TextAlign.center,
                   ))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Leader", textAlign: TextAlign.center))),
+                          child: Text("Tanggal", textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Jumlah \nPegawai",
+                          child: Text("Waktu", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Jumlah barang",
                               textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Cabang", textAlign: TextAlign.center))),
+                          child: Text("Total Penjualan",
+                              textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Action", textAlign: TextAlign.center))),
+                          child: Text("Laba", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Penjual", textAlign: TextAlign.center))),
                 ],
-                    rows: grup2
+                    rows: penjualan2
                         .map<DataRow>((element) => DataRow(cells: [
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.nama_grup,
+                                  child: Text(element.id,
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(element.tanggal,
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(element.waktu,
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(element.jumlah_barang.toString(),
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      element.total_penjualan.toString(),
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(element.laba.toString(),
                                       textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: Text(
                                       "${element.nama_depan} ${element.nama_belakang}",
                                       textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.jumlah_pegawai.toString(),
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.nama_cabang,
-                                      textAlign: TextAlign.center))),
-                              DataCell(
-                                Align(
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                        child: Row(
-                                      children: [
-                                        Tooltip(
-                                          message: 'Assign Personnel',
-                                          child: IconButton(
-                                            icon: Icon(Icons.person_add),
-                                            onPressed: () {},
-                                          ),
-                                        ),
-                                        Tooltip(
-                                          message: 'Edit group',
-                                          child: IconButton(
-                                            icon: Icon(Icons.edit),
-                                            onPressed: () {},
-                                          ),
-                                        ),
-                                        Tooltip(
-                                          message: 'Delete group',
-                                          child: IconButton(
-                                            icon: Icon(Icons.delete),
-                                            onPressed: () {},
-                                          ),
-                                        ),
-                                      ],
-                                    ))),
-                              )
                             ]))
                         .toList()));
           });
@@ -134,11 +148,10 @@ class _PersonelGroupState extends State<PersonelGroup> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Personnel Group"),
+          title: Text("Daftar Penjualan"),
         ),
         drawer: MyDrawer(),
         body: Container(
-          
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
             child: Column(
@@ -156,14 +169,9 @@ class _PersonelGroupState extends State<PersonelGroup> {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor:
                                     Color.fromARGB(255, 248, 172, 49)),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => CreateGroup()));
-                            },
+                            onPressed: () {},
                             child: Text(
-                              "Add New Group",
+                              "Tambah Pembelian",
                               style:
                                   TextStyle(color: Colors.black, fontSize: 16),
                             )),
@@ -173,7 +181,7 @@ class _PersonelGroupState extends State<PersonelGroup> {
                           child: TextFormField(
                             decoration: const InputDecoration(
                               icon: Icon(Icons.search),
-                              labelText: 'Cari Group',
+                              labelText: 'Cari Nota',
                             ),
                             onChanged: (value) {
                               _txtcari = value;
