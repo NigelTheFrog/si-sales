@@ -103,7 +103,7 @@ class _CreateAccountState extends State<CreateAccount> {
           'no_telp': nomor_telepon,
           'jabatan': _jabatan,
           'cabang': cabang,
-          'grup': 'JTM-SDJ-TAMAN-1'
+          'grup': '-'
         });
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);

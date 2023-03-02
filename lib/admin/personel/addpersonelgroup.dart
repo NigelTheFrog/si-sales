@@ -35,7 +35,6 @@ class _CreateGroupState extends State<CreateGroup> {
     final response = await http.post(
       Uri.parse("http://localhost/magang/admin/cabang/daftarcabang.php"),
     );
-
     if (response.statusCode == 200) {
       json = jsonDecode(response.body);
       return json['data'];

@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
 import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
 import 'package:pt_coronet_crown/drawer.dart';
-import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 

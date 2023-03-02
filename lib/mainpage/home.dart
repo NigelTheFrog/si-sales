@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
 import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
 import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
+import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
+import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String nama_depan = "", nama_belakang = "", username = "", id_jabatan = "";
@@ -111,14 +113,12 @@ class _HomeState extends State<Home> {
                             )))),
                 GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => DetailSensor(
-                      //       sensor_id: sensor2[index].sensor_id,
-                      //     ),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DaftarPembelian(),
+                        ),
+                      );
                     },
                     child: Card(
                         child: Container(
@@ -155,14 +155,12 @@ class _HomeState extends State<Home> {
                     onTap: () {
                       if (id_jabatan == "3") {
                       } else {}
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => DetailSensor(
-                      //       sensor_id: sensor2[index].sensor_id,
-                      //     ),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DaftarPenjualan()
+                        ),
+                      );
                     },
                     child: Card(
                         child: Container(

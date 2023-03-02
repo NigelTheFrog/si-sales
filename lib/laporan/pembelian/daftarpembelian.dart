@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
 import 'package:pt_coronet_crown/drawer.dart';
-import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -40,10 +39,10 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
   }
 
   Future<String> fetchData() async {
-    final response = await http.post(Uri.parse(
-        "http://localhost/magang/admin/personel/personelgroup/daftarpersonelgroup.php"), body: {
-          'id_jabatan':id_jabatan
-        });
+    final response = await http.post(
+      Uri.parse(
+          "http://localhost/magang/laporan/pembelian/daftarpembelian.php"),
+    );
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -56,15 +55,16 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
       return Container(
-          child:  DataTable(columns: [
-                  DataColumn(label: Text("ID Laporan")),
-                  DataColumn(label: Text("Tanggal")),
-                  DataColumn(label: Text("Waktu")),
-                  DataColumn(label: Text("Jumlah barang")),
-                  DataColumn(label: Text("Total Pembelian")),
-                ], rows: []));
+          child: DataTable(columns: [
+        DataColumn(label: Text("ID Laporan")),
+        DataColumn(label: Text("Tanggal")),
+        DataColumn(label: Text("Waktu")),
+        DataColumn(label: Text("Jumlah barang")),
+        DataColumn(label: Text("Total Pembelian")),
+      ], rows: []));
     } else {
       for (var pem in json['data']) {
+        print(pem);
         Pembelian pembelian = Pembelian.fromJson(pem);
         pembelian2.add(pembelian);
       }
@@ -118,7 +118,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                                       textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.total_pembelian.toString(),
+                                  child: Text("Rp. ${element.total_pembelian}",
                                       textAlign: TextAlign.center))),
                             ]))
                         .toList()));

@@ -18,7 +18,7 @@ class Cabang {
       kodePos: json['kodepos'] as String,
       idkota: json['id_kota'] as String,
       kota: json['kota'] as String,
-      stock: json['stock'] as int
+      stock: json['stock'] as int?
     );
   }
 }

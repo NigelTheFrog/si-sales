@@ -20,8 +20,10 @@ class _PersonelDataState extends State<PersonelData> {
   String _txtcari = "";
 
   Future<String> fetchData() async {
-    final response = await http.post(Uri.parse(
-        "http://localhost/magang/admin/personel/personeldata/daftarpersoneldata.php"));
+    final response = await http.post(
+        Uri.parse(
+            "http://localhost/magang/admin/personel/personeldata/daftarpersoneldata.php"),
+        body: {"cari": _txtcari});
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -33,87 +35,92 @@ class _PersonelDataState extends State<PersonelData> {
     List<Widget> temp = [];
     List<Person> person2 = [];
     Map json = jsonDecode(data);
-    for (var pers in json['data']) {
-      Person person = Person.fromJson(pers);
-      person2.add(person);
-    }
-    var idx = 0;
-    while (idx < person2.length) {
-      // print(person2[idx].username);
-      Widget w = Card(
-          child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.topRight,
-            child: Column(
-              children: [
-                Tooltip(
-                  message: 'Personnel attendance',
-                  child: IconButton(
-                    icon: Icon(Icons.zoom_in),
-                    onPressed: () {},
-                  ),
-                ),
-                Tooltip(
-                  message: 'Edit data personnel',
-                  child: IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {},
-                  ),
-                ),
-                Tooltip(
-                  message: 'Delete Personnel',
-                  child: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {},
-                  ),
-                )
-              ],
-            ),
-          ),
-          Row(children: [
+    Widget w = Text("");
+    if (json['result'] == "error") {
+      w = Text("");
+    } else {
+      for (var pers in json['data']) {
+        Person person = Person.fromJson(pers);
+        person2.add(person);
+      }
+      var idx = 0;
+      while (idx < person2.length) {
+        // print(person2[idx].username);
+        w = Card(
+            child: Stack(
+          children: [
             Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                    margin: EdgeInsets.only(top: 1),
-                    width: 100,
-                    height: 131,
-                    child: Image.memory(
-                      base64Decode(person2[idx].avatar),
-                    ))),
-            Container(
-                padding: EdgeInsets.all(5),
-                width: 220,
-                child: Column(
-                  children: [
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "${person2[idx].nama_depan} ${person2[idx].nama_belakang} - ${person2[idx].jabatan} \n${person2[idx].nama_cabang}",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(person2[idx].username)),
-                    Row(children: [
-                      Icon(Icons.mail),
-                      Text(person2[idx].email, textAlign: TextAlign.left)
-                    ]),
-                    Row(children: [
-                      Icon(Icons.phone),
-                      Text(person2[idx].no_telp, textAlign: TextAlign.left)
-                    ]),
-                    Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Text("Group : " + person2[idx].nama_grup,
-                            textAlign: TextAlign.left)),
-                  ],
-                )),
-          ]),
-        ],
-      ));
-      temp.add(w);
-      idx++;
+              alignment: Alignment.topRight,
+              child: Column(
+                children: [
+                  Tooltip(
+                    message: 'Personnel attendance',
+                    child: IconButton(
+                      icon: Icon(Icons.zoom_in),
+                      onPressed: () {},
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Edit data personnel',
+                    child: IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {},
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Delete Personnel',
+                    child: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {},
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Row(children: [
+              Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                      margin: EdgeInsets.only(top: 1),
+                      width: 100,
+                      height: 131,
+                      child: Image.memory(
+                        base64Decode(person2[idx].avatar),
+                      ))),
+              Container(
+                  padding: EdgeInsets.all(5),
+                  width: 220,
+                  child: Column(
+                    children: [
+                      Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "${person2[idx].nama_depan} ${person2[idx].nama_belakang} - ${person2[idx].jabatan} \n${person2[idx].nama_cabang}",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )),
+                      Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(person2[idx].username)),
+                      Row(children: [
+                        Icon(Icons.mail),
+                        Text(person2[idx].email, textAlign: TextAlign.left)
+                      ]),
+                      Row(children: [
+                        Icon(Icons.phone),
+                        Text(person2[idx].no_telp, textAlign: TextAlign.left)
+                      ]),
+                      Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Text("Group : " + person2[idx].nama_grup,
+                              textAlign: TextAlign.left)),
+                    ],
+                  )),
+            ]),
+          ],
+        ));
+        temp.add(w);
+        idx++;
+      }
     }
     return temp;
   }
@@ -163,7 +170,9 @@ class _PersonelDataState extends State<PersonelData> {
                               labelText: 'Search Personnel',
                             ),
                             onChanged: (value) {
-                              _txtcari = value;
+                              setState(() {
+                                _txtcari = value;
+                              });                              
                               // bacaData();
                             },
                           ),
