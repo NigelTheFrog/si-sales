@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as imglib;
 import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -50,7 +53,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
     }
   }
 
-  Widget daftargrup(data) {
+  Widget daftargrup(data, context) {
     List<Pembelian> pembelian2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
@@ -64,7 +67,6 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
       ], rows: []));
     } else {
       for (var pem in json['data']) {
-        print(pem);
         Pembelian pembelian = Pembelian.fromJson(pem);
         pembelian2.add(pembelian);
       }
@@ -95,15 +97,37 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                               textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Total Penjualan",
+                          child: Text("Total Pembelian",
                               textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child:
+                              Text("Foto Nota", textAlign: TextAlign.center))),
                 ],
                     rows: pembelian2
                         .map<DataRow>((element) => DataRow(cells: [
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.id,
-                                      textAlign: TextAlign.center))),
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      textStyle: const TextStyle(
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetailPembelian(
+                                                    laporan_id: element.id,
+                                                    tanggal: element.tanggal,
+                                                    waktu: element.waktu,
+                                                    foto_nota: "",
+                                                  )));
+                                    },
+                                    child: Text(element.id,
+                                        textAlign: TextAlign.center),
+                                  ))),
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: Text(element.tanggal,
@@ -120,10 +144,35 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                                   alignment: Alignment.center,
                                   child: Text("Rp. ${element.total_pembelian}",
                                       textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                alignment: Alignment.center,
+                                child: GestureDetector(
+                                  child: Image(
+                                      image: ResizeImage(
+                                          MemoryImage(
+                                              base64Decode(prosesimg((element.foto)))),
+                                          width: 10,
+                                          height: 10)),
+                                  // Image.memory(base64Decode(element.foto)),
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                            content: Image.memory(
+                                                base64Decode(element.foto))));
+                                  },
+                                ),
+                              )),
                             ]))
                         .toList()));
           });
     }
+  }
+
+  prosesimg(img) {
+    imglib.Image? image = imglib.decodeImage(img);
+    imglib.Image image2 = img.copyResize(image!, width: 100, height: 100);
+    return Uint8List.fromList(img.encodeJpg(image2));
   }
 
   @override
@@ -132,7 +181,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
         appBar: AppBar(
           title: Text("Daftar Pembelian"),
         ),
-        drawer: MyDrawer(),
+        // drawer: MyDrawer(),
         body: Container(
           alignment: Alignment.topCenter,
           child: SingleChildScrollView(
@@ -176,12 +225,12 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                 Container(
                     alignment: Alignment.topCenter,
                     height: MediaQuery.of(context).size.height,
-                    width: 800,
                     child: FutureBuilder(
                         future: fetchData(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            return daftargrup(snapshot.data.toString());
+                            return daftargrup(
+                                snapshot.data.toString(), context);
                           } else {
                             return Center(child: CircularProgressIndicator());
                           }

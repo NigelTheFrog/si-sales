@@ -1,5 +1,12 @@
 class Pembelian {
-  final String id, tanggal, waktu, id_cabang, nama_cabang, jumlah_barang, total_pembelian;
+  final String id,
+      tanggal,
+      waktu,
+      id_cabang,
+      nama_cabang,
+      foto,
+      jumlah_barang,
+      total_pembelian;
   // final int ;
 
   Pembelian({
@@ -8,6 +15,7 @@ class Pembelian {
     required this.waktu,
     required this.jumlah_barang,
     required this.total_pembelian,
+    required this.foto,
     required this.id_cabang,
     required this.nama_cabang,
   });
@@ -19,6 +27,7 @@ class Pembelian {
       waktu: json['waktu'] as String,
       jumlah_barang: json['jumlah_barang'] as String,
       total_pembelian: json['total_pembelian'] as String,
+      foto: json['foto'] as String,
       id_cabang: json['id_cabang'] as String,
       nama_cabang: json['nama_cabang'] as String,
     );
