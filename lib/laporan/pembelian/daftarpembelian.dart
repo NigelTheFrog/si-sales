@@ -8,10 +8,17 @@ import 'package:pt_coronet_crown/drawer.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import '../../main.dart';
 
-String nama_depan = "", nama_belakang = "", username = "", id_jabatan = "";
+String nama_depan = "",
+    nama_belakang = "",
+    username = "",
+    id_jabatan = "",
+    startdate = "",
+    enddate = "";
 
 class DaftarPembelian extends StatefulWidget {
   DaftarPembelian({Key? key}) : super(key: key);
@@ -23,6 +30,8 @@ class DaftarPembelian extends StatefulWidget {
 
 class _DaftarPembelianState extends State<DaftarPembelian> {
   String _txtcari = "";
+  TextEditingController _startDateController = TextEditingController();
+  TextEditingController _endDateController = TextEditingController();
 
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -39,13 +48,20 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
     // TODO: implement initState
     super.initState();
     _loadData();
+    initializeDateFormatting();
+    _startDateController.text =
+        DateFormat.yMMMMEEEEd('id').format(DateTime.now());
+    startdate = DateTime.now().toString().substring(0, 10);
+    enddate = DateTime.now().toString().substring(0, 10);
+    _endDateController.text =
+        DateFormat.yMMMMEEEEd('id').format(DateTime.now());
   }
 
   Future<String> fetchData() async {
     final response = await http.post(
-      Uri.parse(
-          "http://localhost/magang/laporan/pembelian/daftarpembelian.php"),
-    );
+        Uri.parse(
+            "http://localhost/magang/laporan/pembelian/daftarpembelian.php"),
+        body: {'startdate': startdate, 'enddate': enddate});
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -87,6 +103,9 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                   ))),
                   DataColumn(
                       label: Expanded(
+                          child: Text("Pembeli", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
                           child: Text("Tanggal", textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
@@ -99,35 +118,51 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                       label: Expanded(
                           child: Text("Total Pembelian",
                               textAlign: TextAlign.center))),
-                  DataColumn(
-                      label: Expanded(
-                          child:
-                              Text("Foto Nota", textAlign: TextAlign.center))),
                 ],
                     rows: pembelian2
                         .map<DataRow>((element) => DataRow(cells: [
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      textStyle: const TextStyle(
-                                          fontWeight: FontWeight.normal),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailPembelian(
-                                                    laporan_id: element.id,
-                                                    tanggal: element.tanggal,
-                                                    waktu: element.waktu,
-                                                    foto_nota: "",
-                                                  )));
-                                    },
-                                    child: Text(element.id,
-                                        textAlign: TextAlign.center),
-                                  ))),
+                                  child: Tooltip(
+                                      message: "Foto Nota",
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                          textStyle: const TextStyle(
+                                              fontWeight: FontWeight.normal),
+                                        ),
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                  content: Tooltip(
+                                                      message:
+                                                          "Halaman Detail Pembelian",
+                                                      child: GestureDetector(
+                                                          onTap: () {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            DetailPembelian(
+                                                                              laporan_id: element.id,
+                                                                              tanggal: element.tanggal,
+                                                                              waktu: element.waktu,
+                                                                              foto_nota: "",
+                                                                            )));
+                                                          },
+                                                          child: Image.memory(
+                                                              base64Decode(element
+                                                                  .foto))))));
+                                        },
+                                        child: Text(element.id,
+                                            textAlign: TextAlign.center),
+                                      )))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      "${element.nama_depan} ${element.nama_belakang}",
+                                      textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: Text(element.tanggal,
@@ -138,106 +173,388 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                                       textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.jumlah_barang.toString(),
+                                  child: Text(element.jumlah_barang,
                                       textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text("Rp. ${element.total_pembelian}",
+                                  child: Text(
+                                      "Rp. ${NumberFormat('###,000').format(element.total_pembelian)}",
                                       textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                alignment: Alignment.center,
-                                child: GestureDetector(
-                                  child: Image(
-                                      image: ResizeImage(
-                                          MemoryImage(
-                                              base64Decode(prosesimg((element.foto)))),
-                                          width: 10,
-                                          height: 10)),
-                                  // Image.memory(base64Decode(element.foto)),
-                                  onTap: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                            content: Image.memory(
-                                                base64Decode(element.foto))));
-                                  },
-                                ),
-                              )),
                             ]))
                         .toList()));
           });
     }
   }
 
-  prosesimg(img) {
-    imglib.Image? image = imglib.decodeImage(img);
-    imglib.Image image2 = img.copyResize(image!, width: 100, height: 100);
-    return Uint8List.fromList(img.encodeJpg(image2));
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Daftar Pembelian"),
-        ),
-        // drawer: MyDrawer(),
-        body: Container(
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.topCenter,
-                  width: 400,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 248, 172, 49)),
-                            onPressed: () {},
-                            child: Text(
-                              "Tambah Pembelian",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                            )),
-                        Container(
-                          height: 50,
-                          width: 175,
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.search),
-                              labelText: 'Cari Nota',
-                            ),
-                            onChanged: (value) {
-                              _txtcari = value;
-                              // bacaData();
-                            },
-                          ),
-                        )
-                      ]),
-                ),
-                Container(
-                    alignment: Alignment.topCenter,
-                    height: MediaQuery.of(context).size.height,
-                    child: FutureBuilder(
-                        future: fetchData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return daftargrup(
-                                snapshot.data.toString(), context);
-                          } else {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                        }))
-              ],
-            ),
+    if (idjabatan == "1" || idjabatan == "2") {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Daftar Pembelian"),
           ),
-        ));
+          drawer: MyDrawer(),
+          body: Container(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      margin: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topCenter,
+                      width: 400,
+                      child: MediaQuery.of(context).size.width > 390
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color.fromARGB(
+                                              255, 248, 172, 49)),
+                                      onPressed: () {},
+                                      child: Text(
+                                        "Tambah Pembelian",
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 16),
+                                      )),
+                                  Container(
+                                    height: 50,
+                                    width: 175,
+                                    child: TextFormField(
+                                      decoration: const InputDecoration(
+                                        icon: Icon(Icons.search),
+                                        labelText: 'Cari Nota',
+                                      ),
+                                      onChanged: (value) {
+                                        _txtcari = value;
+                                        // bacaData();
+                                      },
+                                    ),
+                                  )
+                                ])
+                          : Column(
+                              children: <Widget>[
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Color.fromARGB(255, 248, 172, 49)),
+                                    onPressed: () {},
+                                    child: Text(
+                                      "Tambah Pembelian",
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 16),
+                                    )),
+                                Container(
+                                  height: 50,
+                                  width: 175,
+                                  child: TextFormField(
+                                    decoration: const InputDecoration(
+                                      icon: Icon(Icons.search),
+                                      labelText: 'Cari Nota',
+                                    ),
+                                    onChanged: (value) {
+                                      _txtcari = value;
+                                      // bacaData();
+                                    },
+                                  ),
+                                )
+                              ],
+                            )),
+                  Text(
+                    "Pilih tanggal untuk melakukan filtering data",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  Container(
+                      margin: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topCenter,
+                      width: 700,
+                      child: MediaQuery.of(context).size.width > 390
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "Start Date",
+                                      ),
+                                      controller: _startDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              startdate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _startDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "End Date",
+                                      ),
+                                      controller: _endDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              enddate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _endDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
+                              ],
+                            )
+                          : Container()),
+                  Container(
+                      alignment: Alignment.topCenter,
+                      height: MediaQuery.of(context).size.height,
+                      child: FutureBuilder(
+                          future: fetchData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return daftargrup(
+                                  snapshot.data.toString(), context);
+                            } else {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                          }))
+                ],
+              ),
+            ),
+          ));
+    } else {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Daftar Pembelian"),
+          ),
+          body: Container(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      margin: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topCenter,
+                      width: 400,
+                      child: MediaQuery.of(context).size.width > 390
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color.fromARGB(
+                                              255, 248, 172, 49)),
+                                      onPressed: () {},
+                                      child: Text(
+                                        "Tambah Pembelian",
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 16),
+                                      )),
+                                  Container(
+                                    height: 50,
+                                    width: 175,
+                                    child: TextFormField(
+                                      decoration: const InputDecoration(
+                                        icon: Icon(Icons.search),
+                                        labelText: 'Cari Nota',
+                                      ),
+                                      onChanged: (value) {
+                                        _txtcari = value;
+                                        // bacaData();
+                                      },
+                                    ),
+                                  )
+                                ])
+                          : Column(
+                              children: <Widget>[
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Color.fromARGB(255, 248, 172, 49)),
+                                    onPressed: () {},
+                                    child: Text(
+                                      "Tambah Pembelian",
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 16),
+                                    )),
+                                Container(
+                                  height: 50,
+                                  width: 175,
+                                  child: TextFormField(
+                                    decoration: const InputDecoration(
+                                      icon: Icon(Icons.search),
+                                      labelText: 'Cari Nota',
+                                    ),
+                                    onChanged: (value) {
+                                      _txtcari = value;
+                                      // bacaData();
+                                    },
+                                  ),
+                                )
+                              ],
+                            )),
+                  Text(
+                    "Pilih tanggal untuk melakukan filtering data",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  Container(
+                      margin: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topCenter,
+                      width: 700,
+                      child: MediaQuery.of(context).size.width > 390
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "Start Date",
+                                      ),
+                                      controller: _startDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              startdate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _startDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "End Date",
+                                      ),
+                                      controller: _endDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              enddate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _endDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
+                              ],
+                            )
+                          : Container()),
+                  Container(
+                      alignment: Alignment.topCenter,
+                      height: MediaQuery.of(context).size.height,
+                      child: FutureBuilder(
+                          future: fetchData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return daftargrup(
+                                  snapshot.data.toString(), context);
+                            } else {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                          }))
+                ],
+              ),
+            ),
+          ));
+    }
   }
 }

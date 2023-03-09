@@ -3,6 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
+import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
+import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
+import 'package:pt_coronet_crown/customicon/transaction_icons.dart';
+import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
 import 'package:pt_coronet_crown/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,7 +103,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   },
                 ),
                 ListTile(
-                  title: const Text("Waiting for Approval"),
+                  title: const Text("Menunggu Persetujuan"),
                   leading: const Icon(Icons.pending_actions),
                   onTap: () {
                     Navigator.popAndPushNamed(context, "leaderboard");
@@ -111,6 +115,31 @@ class _MyDrawerState extends State<MyDrawer> {
                   onTap: () {
                     Navigator.popAndPushNamed(context, "setting");
                   },
+                ),
+                ExpansionTile(
+                  title: const Text("Transaksi"),
+                  leading: const Icon(Transaction.attach_money),
+                  children: <Widget>[
+                    ListTile(
+                      title: const Text("Pembelian"),
+                      leading: const Icon(Clippy.clippy),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DaftarPembelian(),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      title: const Text("Penjualan"),
+                      leading: const Icon(ClipBoardCheck.clipboard_check),
+                      onTap: () {
+                        Navigator.popAndPushNamed(context, "home");
+                      },
+                    ),
+                  ],
                 ),
                 ExpansionTile(
                   title: const Text("Company"),
