@@ -73,14 +73,18 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
     List<Pembelian> pembelian2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
-      return Container(
-          child: DataTable(columns: [
-        DataColumn(label: Text("ID Laporan")),
-        DataColumn(label: Text("Tanggal")),
-        DataColumn(label: Text("Waktu")),
-        DataColumn(label: Text("Jumlah barang")),
-        DataColumn(label: Text("Total Pembelian")),
-      ], rows: []));
+      return SingleChildScrollView(
+          scrollDirection: MediaQuery.of(context).size.width >= 725
+              ? Axis.vertical
+              : Axis.horizontal,
+          child: Container(
+              child: DataTable(columns: [
+            DataColumn(label: Text("ID Laporan")),
+            DataColumn(label: Text("Tanggal")),
+            DataColumn(label: Text("Waktu")),
+            DataColumn(label: Text("Jumlah barang")),
+            DataColumn(label: Text("Total Pembelian")),
+          ], rows: [])));
     } else {
       for (var pem in json['data']) {
         Pembelian pembelian = Pembelian.fromJson(pem);
@@ -134,23 +138,26 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                                           showDialog(
                                               context: context,
                                               builder: (context) => AlertDialog(
-                                                  content: Tooltip(
-                                                      message:
-                                                          "Halaman Detail Pembelian",
-                                                      child: GestureDetector(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            DetailPembelian(
-                                                                              laporan_id: element.id,
-                                                                            )));
-                                                          },
-                                                          child: Image.memory(
-                                                              base64Decode(element
-                                                                  .foto))))));
+                                                  content: Container(
+                                                      width: 500,
+                                                      height: 500,
+                                                      child: Tooltip(
+                                                          message:
+                                                              "Halaman Detail Pembelian",
+                                                          child:
+                                                              GestureDetector(
+                                                                  onTap: () {
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) => DetailPembelian(
+                                                                                  laporan_id: element.id,
+                                                                                )));
+                                                                  },
+                                                                  child: Image.memory(
+                                                                      base64Decode(
+                                                                          element
+                                                                              .foto)))))));
                                         },
                                         child: Text(element.id,
                                             textAlign: TextAlign.center),
@@ -269,7 +276,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                       padding: EdgeInsets.all(10),
                       alignment: Alignment.topCenter,
                       width: 700,
-                      child: MediaQuery.of(context).size.width > 390
+                      child: MediaQuery.of(context).size.width >= 650
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -353,92 +360,82 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                             )
                           : Column(
                               children: <Widget>[
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      width: 300,
-                                      child: Row(children: [
-                                        Expanded(
-                                            child: TextFormField(
-                                          decoration: InputDecoration(
-                                            labelText: "Start Date",
-                                          ),
-                                          controller: _startDateController,
-                                        )),
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              showDatePicker(
-                                                      context: context,
-                                                      initialDate:
-                                                          DateTime.now(),
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2200))
-                                                  .then((value) {
-                                                setState(() {
-                                                  startdate = value
-                                                      .toString()
-                                                      .substring(0, 10);
-                                                  String formattedDate =
-                                                      DateFormat.yMMMMEEEEd(
-                                                              'id')
-                                                          .format(value!);
-                                                  _startDateController.text =
-                                                      formattedDate;
-                                                });
-                                              });
-                                            },
-                                            child: Icon(
-                                              Icons.calendar_today_sharp,
-                                              color: Colors.white,
-                                              size: 24.0,
-                                            ))
-                                      ]),
-                                    ),
-                                    Container(
-                                      height: 50,
-                                      width: 300,
-                                      child: Row(children: [
-                                        Expanded(
-                                            child: TextFormField(
-                                          decoration: InputDecoration(
-                                            labelText: "End Date",
-                                          ),
-                                          controller: _endDateController,
-                                        )),
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              showDatePicker(
-                                                      context: context,
-                                                      initialDate:
-                                                          DateTime.now(),
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2200))
-                                                  .then((value) {
-                                                setState(() {
-                                                  enddate = value
-                                                      .toString()
-                                                      .substring(0, 10);
-                                                  String formattedDate =
-                                                      DateFormat.yMMMMEEEEd(
-                                                              'id')
-                                                          .format(value!);
-                                                  _endDateController.text =
-                                                      formattedDate;
-                                                });
-                                              });
-                                            },
-                                            child: Icon(
-                                              Icons.calendar_today_sharp,
-                                              color: Colors.white,
-                                              size: 24.0,
-                                            ))
-                                      ]),
-                                    ),
-                                  ],
-                                )
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "Start Date",
+                                      ),
+                                      controller: _startDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              startdate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _startDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "End Date",
+                                      ),
+                                      controller: _endDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              enddate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _endDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
                               ],
                             )),
                   Container(
@@ -541,7 +538,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                       padding: EdgeInsets.all(10),
                       alignment: Alignment.topCenter,
                       width: 700,
-                      child: MediaQuery.of(context).size.width > 390
+                      child: MediaQuery.of(context).size.width >= 650
                           ? Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -625,92 +622,82 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                             )
                           : Column(
                               children: <Widget>[
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      width: 300,
-                                      child: Row(children: [
-                                        Expanded(
-                                            child: TextFormField(
-                                          decoration: InputDecoration(
-                                            labelText: "Start Date",
-                                          ),
-                                          controller: _startDateController,
-                                        )),
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              showDatePicker(
-                                                      context: context,
-                                                      initialDate:
-                                                          DateTime.now(),
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2200))
-                                                  .then((value) {
-                                                setState(() {
-                                                  startdate = value
-                                                      .toString()
-                                                      .substring(0, 10);
-                                                  String formattedDate =
-                                                      DateFormat.yMMMMEEEEd(
-                                                              'id')
-                                                          .format(value!);
-                                                  _startDateController.text =
-                                                      formattedDate;
-                                                });
-                                              });
-                                            },
-                                            child: Icon(
-                                              Icons.calendar_today_sharp,
-                                              color: Colors.white,
-                                              size: 24.0,
-                                            ))
-                                      ]),
-                                    ),
-                                    Container(
-                                      height: 50,
-                                      width: 300,
-                                      child: Row(children: [
-                                        Expanded(
-                                            child: TextFormField(
-                                          decoration: InputDecoration(
-                                            labelText: "End Date",
-                                          ),
-                                          controller: _endDateController,
-                                        )),
-                                        ElevatedButton(
-                                            onPressed: () {
-                                              showDatePicker(
-                                                      context: context,
-                                                      initialDate:
-                                                          DateTime.now(),
-                                                      firstDate: DateTime(2000),
-                                                      lastDate: DateTime(2200))
-                                                  .then((value) {
-                                                setState(() {
-                                                  enddate = value
-                                                      .toString()
-                                                      .substring(0, 10);
-                                                  String formattedDate =
-                                                      DateFormat.yMMMMEEEEd(
-                                                              'id')
-                                                          .format(value!);
-                                                  _endDateController.text =
-                                                      formattedDate;
-                                                });
-                                              });
-                                            },
-                                            child: Icon(
-                                              Icons.calendar_today_sharp,
-                                              color: Colors.white,
-                                              size: 24.0,
-                                            ))
-                                      ]),
-                                    ),
-                                  ],
-                                )
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "Start Date",
+                                      ),
+                                      controller: _startDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              startdate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _startDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
+                                Container(
+                                  height: 50,
+                                  width: 300,
+                                  child: Row(children: [
+                                    Expanded(
+                                        child: TextFormField(
+                                      decoration: InputDecoration(
+                                        labelText: "End Date",
+                                      ),
+                                      controller: _endDateController,
+                                    )),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          showDatePicker(
+                                                  context: context,
+                                                  initialDate: DateTime.now(),
+                                                  firstDate: DateTime(2000),
+                                                  lastDate: DateTime(2200))
+                                              .then((value) {
+                                            setState(() {
+                                              enddate = value
+                                                  .toString()
+                                                  .substring(0, 10);
+                                              String formattedDate =
+                                                  DateFormat.yMMMMEEEEd('id')
+                                                      .format(value!);
+                                              _endDateController.text =
+                                                  formattedDate;
+                                            });
+                                          });
+                                        },
+                                        child: Icon(
+                                          Icons.calendar_today_sharp,
+                                          color: Colors.white,
+                                          size: 24.0,
+                                        ))
+                                  ]),
+                                ),
                               ],
                             )),
                   Container(
