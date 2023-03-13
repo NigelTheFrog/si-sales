@@ -1,10 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
+import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
+import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
 import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,6 +68,16 @@ class MyApp extends StatelessWidget {
       ),
       home: const MyHomePage(title: 'Home'),
       debugShowCheckedModeBanner: false,
+      routes: {
+        "daftarpembelian": (context) => DaftarPembelian(),
+        "daftarpenjualan": (context) => DaftarPenjualan(),
+        "daftarpersonel": (context) => PersonelData(),
+        "daftargrup": (context) => PersonelGroup(),
+        "tambahstaff": (context) => CreateAccount(),
+        "tambahgrup": (context) => CreateGroup(),
+        "detailpembelian": (context) => PersonelGroup(),
+        "detailpenjualan": (context) => PersonelGroup(),
+      },
     );
   }
 }
@@ -79,7 +93,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  final List<Widget> _screens = [Home() ];
+  final List<Widget> _screens = [Home()];
   // final List<String> _title = ['Home', 'My Creation', 'List Sensor', 'Setting'];
 
   Widget myBottomNavBar() {
@@ -148,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           backgroundColor: Colors.blue,
           label: Text("Logout", style: TextStyle(color: Colors.white)),
-          icon:  const Icon(Icons.logout),
+          icon: const Icon(Icons.logout),
         ),
       );
     }

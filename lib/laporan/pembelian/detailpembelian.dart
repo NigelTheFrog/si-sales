@@ -176,51 +176,63 @@ class _DetailPembelianState extends State<DetailPembelian> {
                                           .toList());
                                 }),
                             Align(
-                                alignment: Alignment.topLeft,
+                                alignment: Alignment.topRight,
                                 child: Text(
                                   "\n\nTotal jumlah barang: ${_pembelian!.jumlah_barang}",
                                   textAlign: TextAlign.left,
                                 )),
-                            Align(
-                                alignment: Alignment.topLeft,
+                            Container(
+                                padding: EdgeInsets.only(top:5, bottom: 10),
+                                alignment: Alignment.topRight,
                                 child: Text(
                                     "\nSubtotal Pembelian: Rp. ${NumberFormat('###,000').format(_pembelian!.total_pembelian)}",
                                     textAlign: TextAlign.left)),
                             Container(
-                                padding: EdgeInsets.only(top: 10),
+                              alignment: Alignment.topRight,
+                              padding: EdgeInsets.only(top: 10),
+                              child: Container(
+                                width: 158,
                                 child: Row(
                                   children: [
-                                    Text(
-                                        "Diskon: Rp.  ${NumberFormat('###,000').format(10000)}"),
                                     Tooltip(
                                       message: "Ubah Diskon",
                                       child: IconButton(
                                         onPressed: () {},
                                         icon: Icon(Icons.edit),
                                       ),
-                                    )
+                                    ),
+                                    Text(
+                                        "Diskon: Rp.  ${NumberFormat('###,000').format(10000)}"),
                                   ],
-                                )),
-                            Row(
-                              children: [
-                                Text("Pajak: 10%"),
-                                Tooltip(
-                                  message: "Ubah pajak",
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.edit),
-                                  ),
-                                )
-                              ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              alignment: Alignment.topRight,
+                              padding: EdgeInsets.only(top: 10),
+                              child: Container(
+                                width: 106,
+                                child: Row(
+                                  children: [
+                                    Tooltip(
+                                        message: "Ubah pajak",
+                                        child: IconButton(
+                                          onPressed: () {},
+                                          icon: Icon(Icons.edit),
+                                        )),
+                                    Text("Pajak: 10%"),
+                                  ],
+                                ),
+                              ),
                             ),
                             Align(
-                                alignment: Alignment.topLeft,
+                                alignment: Alignment.topRight,
                                 child: Text(
                                     "\nTotal Pembelian: Rp. ${NumberFormat('###,000').format((_pembelian!.total_pembelian - 10000) + ((_pembelian!.total_pembelian - 10000) / 10))}",
                                     textAlign: TextAlign.left)),
                             Container(
                               padding: EdgeInsets.only(top: 10),
-                              alignment: Alignment.topCenter,
+                              alignment: Alignment.topLeft,
                               width: 300,
                               child: Row(
                                 children: [

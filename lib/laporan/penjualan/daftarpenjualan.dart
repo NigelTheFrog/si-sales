@@ -1,14 +1,24 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
+import 'package:image/image.dart' as imglib;
+import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import '../../main.dart';
 
-String nama_depan = "", nama_belakang = "", username = "", id_jabatan = "";
+String nama_depan = "",
+    nama_belakang = "",
+    username = "",
+    id_jabatan = "",
+    startdate = "",
+    enddate = "";
 
 class DaftarPenjualan extends StatefulWidget {
   DaftarPenjualan({Key? key}) : super(key: key);
@@ -20,6 +30,8 @@ class DaftarPenjualan extends StatefulWidget {
 
 class _DaftarPenjualanState extends State<DaftarPenjualan> {
   String _txtcari = "";
+  TextEditingController _startDateController = TextEditingController();
+  TextEditingController _endDateController = TextEditingController();
 
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -36,13 +48,20 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     // TODO: implement initState
     super.initState();
     _loadData();
+    initializeDateFormatting();
+    _startDateController.text =
+        DateFormat.yMMMMEEEEd('id').format(DateTime.now());
+    startdate = DateTime.now().toString().substring(0, 10);
+    enddate = DateTime.now().toString().substring(0, 10);
+    _endDateController.text =
+        DateFormat.yMMMMEEEEd('id').format(DateTime.now());
   }
 
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/admin/personel/personelgroup/daftarpersonelgroup.php"),
-        body: {'id_jabatan': id_jabatan});
+            "http://localhost/magang/laporan/pembelian/daftarpembelian.php"),
+        body: {'startdate': startdate, 'enddate': enddate});
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -50,23 +69,43 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     }
   }
 
-  Widget daftargrup(data) {
-    List<Penjualan> penjualan2 = [];
+  Widget daftargrup(data, context) {
+    List<Pembelian> pembelian2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
-      return Container(
-          child: DataTable(columns: [
-        DataColumn(label: Text("ID Laporan")),
-        DataColumn(label: Text("Tanggal")),
-        DataColumn(label: Text("Waktu")),
-        DataColumn(label: Text("Jumlah barang")),
-        DataColumn(label: Text("Total Penjualan")),
-        DataColumn(label: Text("Penjual")),
-      ], rows: []));
+      return SingleChildScrollView(
+          scrollDirection: MediaQuery.of(context).size.width >= 725
+              ? Axis.vertical
+              : Axis.horizontal,
+          child: Container(
+              child: DataTable(columns: [
+            DataColumn(
+                label: Expanded(
+                    child: Text(
+              "ID Laporan",
+              textAlign: TextAlign.center,
+            ))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Penjual", textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Tanggal", textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Waktu", textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Jumlah barang", textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child:
+                        Text("Total Penjualan", textAlign: TextAlign.center))),
+          ], rows: [])));
     } else {
-      for (var pen in json['data']) {
-        Penjualan penjualan = Penjualan.fromJson(pen);
-        penjualan2.add(penjualan);
+      for (var pem in json['data']) {
+        Pembelian pembelian = Pembelian.fromJson(pem);
+        pembelian2.add(pembelian);
       }
       return ListView.builder(
           scrollDirection: MediaQuery.of(context).size.width >= 725
@@ -85,6 +124,9 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                   ))),
                   DataColumn(
                       label: Expanded(
+                          child: Text("Penjual", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
                           child: Text("Tanggal", textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
@@ -97,18 +139,50 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                       label: Expanded(
                           child: Text("Total Penjualan",
                               textAlign: TextAlign.center))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text("Laba", textAlign: TextAlign.center))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text("Penjual", textAlign: TextAlign.center))),
                 ],
-                    rows: penjualan2
+                    rows: pembelian2
                         .map<DataRow>((element) => DataRow(cells: [
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.id,
+                                  child: Tooltip(
+                                      message: "Foto Nota",
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                          textStyle: const TextStyle(
+                                              fontWeight: FontWeight.normal),
+                                        ),
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                  content: Container(
+                                                      width: 500,
+                                                      height: 500,
+                                                      child: Tooltip(
+                                                          message:
+                                                              "Halaman Detail Pembelian",
+                                                          child:
+                                                              GestureDetector(
+                                                                  onTap: () {
+                                                                    Navigator.push(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                            builder: (context) => DetailPembelian(
+                                                                                  laporan_id: element.id,
+                                                                                )));
+                                                                  },
+                                                                  child: Image.memory(
+                                                                      base64Decode(
+                                                                          element
+                                                                              .foto)))))));
+                                        },
+                                        child: Text(element.id,
+                                            textAlign: TextAlign.center),
+                                      )))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      "${element.nama_depan} ${element.nama_belakang}",
                                       textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
@@ -120,21 +194,12 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                                       textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Text(element.jumlah_barang.toString(),
+                                  child: Text(element.jumlah_barang,
                                       textAlign: TextAlign.center))),
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: Text(
-                                      element.total_penjualan.toString(),
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.laba.toString(),
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      "${element.nama_depan} ${element.nama_belakang}",
+                                      "Rp. ${NumberFormat('###,000').format(element.total_pembelian)}",
                                       textAlign: TextAlign.center))),
                             ]))
                         .toList()));
@@ -142,69 +207,274 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     }
   }
 
+  Widget buildContainer(BuildContext context) {
+    return Container(
+      alignment: Alignment.topCenter,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+                margin: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                alignment: Alignment.topCenter,
+                width: 400,
+                child: MediaQuery.of(context).size.width > 390
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Color.fromARGB(255, 248, 172, 49)),
+                                onPressed: () {},
+                                child: Text(
+                                  "Tambah Penjualan",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16),
+                                )),
+                            Container(
+                              height: 50,
+                              width: 175,
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                  icon: Icon(Icons.search),
+                                  labelText: 'Cari Laporan',
+                                ),
+                                onChanged: (value) {
+                                  _txtcari = value;
+                                  // bacaData();
+                                },
+                              ),
+                            )
+                          ])
+                    : Column(
+                        children: <Widget>[
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Color.fromARGB(255, 248, 172, 49)),
+                              onPressed: () {},
+                              child: Text(
+                                "Tambah Penjualan",
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 16),
+                              )),
+                          Container(
+                            height: 50,
+                            width: 175,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.search),
+                                labelText: 'Cari Laporan',
+                              ),
+                              onChanged: (value) {
+                                _txtcari = value;
+                                // bacaData();
+                              },
+                            ),
+                          )
+                        ],
+                      )),
+            Text(
+              "Pilih tanggal untuk melakukan filtering data",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            Container(
+                margin: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                alignment: Alignment.topCenter,
+                width: 700,
+                child: MediaQuery.of(context).size.width >= 650
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            height: 50,
+                            width: 300,
+                            child: Row(children: [
+                              Expanded(
+                                  child: TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: "Start Date",
+                                ),
+                                controller: _startDateController,
+                              )),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2000),
+                                            lastDate: DateTime(2200))
+                                        .then((value) {
+                                      setState(() {
+                                        startdate =
+                                            value.toString().substring(0, 10);
+                                        String formattedDate =
+                                            DateFormat.yMMMMEEEEd('id')
+                                                .format(value!);
+                                        _startDateController.text =
+                                            formattedDate;
+                                      });
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.calendar_today_sharp,
+                                    color: Colors.white,
+                                    size: 24.0,
+                                  ))
+                            ]),
+                          ),
+                          Container(
+                            height: 50,
+                            width: 300,
+                            child: Row(children: [
+                              Expanded(
+                                  child: TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: "End Date",
+                                ),
+                                controller: _endDateController,
+                              )),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2000),
+                                            lastDate: DateTime(2200))
+                                        .then((value) {
+                                      setState(() {
+                                        enddate =
+                                            value.toString().substring(0, 10);
+                                        String formattedDate =
+                                            DateFormat.yMMMMEEEEd('id')
+                                                .format(value!);
+                                        _endDateController.text = formattedDate;
+                                      });
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.calendar_today_sharp,
+                                    color: Colors.white,
+                                    size: 24.0,
+                                  ))
+                            ]),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: <Widget>[
+                          Container(
+                            height: 50,
+                            width: 300,
+                            child: Row(children: [
+                              Expanded(
+                                  child: TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: "Start Date",
+                                ),
+                                controller: _startDateController,
+                              )),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2000),
+                                            lastDate: DateTime(2200))
+                                        .then((value) {
+                                      setState(() {
+                                        startdate =
+                                            value.toString().substring(0, 10);
+                                        String formattedDate =
+                                            DateFormat.yMMMMEEEEd('id')
+                                                .format(value!);
+                                        _startDateController.text =
+                                            formattedDate;
+                                      });
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.calendar_today_sharp,
+                                    color: Colors.white,
+                                    size: 24.0,
+                                  ))
+                            ]),
+                          ),
+                          Container(
+                            height: 50,
+                            width: 300,
+                            child: Row(children: [
+                              Expanded(
+                                  child: TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: "End Date",
+                                ),
+                                controller: _endDateController,
+                              )),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(2000),
+                                            lastDate: DateTime(2200))
+                                        .then((value) {
+                                      setState(() {
+                                        enddate =
+                                            value.toString().substring(0, 10);
+                                        String formattedDate =
+                                            DateFormat.yMMMMEEEEd('id')
+                                                .format(value!);
+                                        _endDateController.text = formattedDate;
+                                      });
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.calendar_today_sharp,
+                                    color: Colors.white,
+                                    size: 24.0,
+                                  ))
+                            ]),
+                          ),
+                        ],
+                      )),
+            Container(
+                alignment: Alignment.topCenter,
+                height: MediaQuery.of(context).size.height,
+                child: FutureBuilder(
+                    future: fetchData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return daftargrup(snapshot.data.toString(), context);
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    }))
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Daftar Penjualan"),
-        ),
-        drawer: MyDrawer(),
-        body: Container(
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.topCenter,
-                  width: 400,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 248, 172, 49)),
-                            onPressed: () {},
-                            child: Text(
-                              "Tambah Pembelian",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                            )),
-                        Container(
-                          height: 50,
-                          width: 175,
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.search),
-                              labelText: 'Cari Nota',
-                            ),
-                            onChanged: (value) {
-                              _txtcari = value;
-                              // bacaData();
-                            },
-                          ),
-                        )
-                      ]),
-                ),
-                Container(
-                    alignment: Alignment.topCenter,
-                    height: MediaQuery.of(context).size.height,
-                    width: 800,
-                    child: FutureBuilder(
-                        future: fetchData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return daftargrup(snapshot.data.toString());
-                          } else {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                        }))
-              ],
-            ),
+    if (idjabatan == "1" || idjabatan == "2") {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Daftar Penjualan"),
           ),
-        ));
+          drawer: MyDrawer(),
+          body: buildContainer(context));
+    } else {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Daftar Penjualan"),
+          ),
+          body: buildContainer(context));
+    }
   }
 }

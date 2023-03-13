@@ -1,12 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
-import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
 import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
 import 'package:pt_coronet_crown/customicon/transaction_icons.dart';
-import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
 import 'package:pt_coronet_crown/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -77,20 +74,14 @@ class _MyDrawerState extends State<MyDrawer> {
                       title: const Text("Personel Data"),
                       leading: const Icon(Icons.account_box),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PersonelData()));
+                        Navigator.popAndPushNamed(context, "daftarpersonel");
                       },
                     ),
                     ListTile(
                       title: const Text("Personel Group"),
                       leading: const Icon(Icons.group),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PersonelGroup()));
+                        Navigator.popAndPushNamed(context, "daftargrup");
                       },
                     ),
                   ],
@@ -124,19 +115,14 @@ class _MyDrawerState extends State<MyDrawer> {
                       title: const Text("Pembelian"),
                       leading: const Icon(Clippy.clippy),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DaftarPembelian(),
-                          ),
-                        );
+                        Navigator.popAndPushNamed(context, "daftarpembelian");
                       },
                     ),
                     ListTile(
                       title: const Text("Penjualan"),
                       leading: const Icon(ClipBoardCheck.clipboard_check),
                       onTap: () {
-                        Navigator.popAndPushNamed(context, "home");
+                        Navigator.popAndPushNamed(context, "daftarpenjualan");
                       },
                     ),
                   ],

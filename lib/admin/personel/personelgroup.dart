@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
 import 'package:pt_coronet_crown/class/personel/personelgrup.dart';
 import 'package:pt_coronet_crown/drawer.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../main.dart';
 
@@ -157,10 +155,7 @@ class _PersonelGroupState extends State<PersonelGroup> {
                                 backgroundColor:
                                     Color.fromARGB(255, 248, 172, 49)),
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => CreateGroup()));
+                              Navigator.popAndPushNamed(context, "tambahgrup");
                             },
                             child: Text(
                               "Add New Group",
