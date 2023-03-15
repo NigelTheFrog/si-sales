@@ -69,7 +69,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
     }
   }
 
-  Widget daftargrup(data, context) {
+  Widget daftarpembelian(data, context) {
     List<Pembelian> pembelian2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
@@ -229,7 +229,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                                         Color.fromARGB(255, 248, 172, 49)),
                                 onPressed: () {},
                                 child: Text(
-                                  "Tambah Penjualan",
+                                  "Tambah Pembelian",
                                   style: TextStyle(
                                       color: Colors.black, fontSize: 16),
                                 )),
@@ -453,7 +453,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                     future: fetchData(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return daftargrup(snapshot.data.toString(), context);
+                        return daftarpembelian(snapshot.data.toString(), context);
                       } else {
                         return Center(child: CircularProgressIndicator());
                       }

@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as imglib;
-import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
+import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
 import 'package:pt_coronet_crown/drawer.dart';
-import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
+import 'package:pt_coronet_crown/laporan/penjualan/detailpenjualan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
@@ -60,8 +58,8 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/laporan/pembelian/daftarpembelian.php"),
-        body: {'startdate': startdate, 'enddate': enddate});
+            "http://localhost/magang/laporan/penjualan/daftarpenjualan.php"),
+        body: {'startdate': startdate, 'enddate': enddate, 'cari': _txtcari});
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -69,8 +67,8 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     }
   }
 
-  Widget daftargrup(data, context) {
-    List<Pembelian> pembelian2 = [];
+  Widget daftarpenjualan(data, context) {
+    List<Penjualan> penjualan2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
       return SingleChildScrollView(
@@ -103,9 +101,9 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                         Text("Total Penjualan", textAlign: TextAlign.center))),
           ], rows: [])));
     } else {
-      for (var pem in json['data']) {
-        Pembelian pembelian = Pembelian.fromJson(pem);
-        pembelian2.add(pembelian);
+      for (var pen in json['data']) {
+        Penjualan penjualan = Penjualan.fromJson(pen);
+        penjualan2.add(penjualan);
       }
       return ListView.builder(
           scrollDirection: MediaQuery.of(context).size.width >= 725
@@ -140,45 +138,63 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                           child: Text("Total Penjualan",
                               textAlign: TextAlign.center))),
                 ],
-                    rows: pembelian2
+                    rows: penjualan2
                         .map<DataRow>((element) => DataRow(cells: [
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: Tooltip(
-                                      message: "Foto Nota",
-                                      child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        onPressed: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                  content: Container(
-                                                      width: 500,
-                                                      height: 500,
-                                                      child: Tooltip(
-                                                          message:
-                                                              "Halaman Detail Pembelian",
-                                                          child:
-                                                              GestureDetector(
+                                  child: element.foto == null
+                                      ? Tooltip(
+                                          message: "Halaman Detail",
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                              textStyle: const TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DetailPenjualan(
+                                                            laporan_id:
+                                                                element.id,
+                                                          )));
+                                            },
+                                            child: Text(element.id,
+                                                textAlign: TextAlign.center),
+                                          ))
+                                      : Tooltip(
+                                          message: "Foto Nota",
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                              textStyle: const TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                            onPressed: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) => AlertDialog(
+                                                      content: Container(
+                                                          width: 500,
+                                                          height: 500,
+                                                          child: Tooltip(
+                                                              message: "Halaman Detail Penjualan",
+                                                              child: GestureDetector(
                                                                   onTap: () {
                                                                     Navigator.push(
                                                                         context,
                                                                         MaterialPageRoute(
-                                                                            builder: (context) => DetailPembelian(
+                                                                            builder: (context) => DetailPenjualan(
                                                                                   laporan_id: element.id,
                                                                                 )));
                                                                   },
-                                                                  child: Image.memory(
-                                                                      base64Decode(
-                                                                          element
-                                                                              .foto)))))));
-                                        },
-                                        child: Text(element.id,
-                                            textAlign: TextAlign.center),
-                                      )))),
+                                                                  child: Image.memory(base64Decode(element.foto as String)))))));
+                                            },
+                                            child: Text(element.id,
+                                                textAlign: TextAlign.center),
+                                          )))),
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: Text(
@@ -199,7 +215,7 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: Text(
-                                      "Rp. ${NumberFormat('###,000').format(element.total_pembelian)}",
+                                      "Rp. ${NumberFormat('###,000').format((element.total_penjualan - element.diskon) + (((element.total_penjualan - element.diskon) * (element.ppn / 100.00))))}",
                                       textAlign: TextAlign.center))),
                             ]))
                         .toList()));
@@ -242,7 +258,9 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                                   labelText: 'Cari Laporan',
                                 ),
                                 onChanged: (value) {
-                                  _txtcari = value;
+                                  setState(() {
+                                    _txtcari = value;
+                                  });
                                   // bacaData();
                                 },
                               ),
@@ -269,8 +287,9 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                                 labelText: 'Cari Laporan',
                               ),
                               onChanged: (value) {
-                                _txtcari = value;
-                                // bacaData();
+                                setState(() {
+                                  _txtcari = value;
+                                });
                               },
                             ),
                           )
@@ -449,7 +468,8 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                     future: fetchData(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return daftargrup(snapshot.data.toString(), context);
+                        return daftarpenjualan(
+                            snapshot.data.toString(), context);
                       } else {
                         return Center(child: CircularProgressIndicator());
                       }
