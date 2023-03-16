@@ -8,6 +8,7 @@ import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
+import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
 import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,6 +78,7 @@ class MyApp extends StatelessWidget {
         "tambahgrup": (context) => CreateGroup(),
         "detailpembelian": (context) => PersonelGroup(),
         "detailpenjualan": (context) => PersonelGroup(),
+        "tambahlaporanpenjualan": (context) => BuatPenjualan(),
       },
     );
   }

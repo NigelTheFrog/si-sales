@@ -243,7 +243,9 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor:
                                         Color.fromARGB(255, 248, 172, 49)),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.popAndPushNamed(context, "tambahlaporanpenjualan");
+                                },
                                 child: Text(
                                   "Tambah Penjualan",
                                   style: TextStyle(

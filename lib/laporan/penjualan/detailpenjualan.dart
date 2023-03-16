@@ -62,7 +62,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
                     Container(
                       width: 500,
                       height: 600,
-                      alignment: Alignment.topCenter,
+                      alignment: _penjualan!.foto == null ? Alignment.center : Alignment.topCenter,
                       child: _penjualan!.foto == null
                           ? Text("Penjualan ini tidak memakai nota")
                           : Image.memory(
@@ -77,6 +77,10 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
                           Text("ID Laporan: ${_penjualan!.id}",
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text(
+                              "Penjual: ${_penjualan!.nama_depan}  ${_penjualan!.nama_belakang}", textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
                           Container(
                             padding: EdgeInsets.only(top: 10),
                             alignment: Alignment.topCenter,
@@ -246,7 +250,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
                                 Tooltip(
-                                  message: "",
+                                  message: "Ubah Outle",
                                   child: IconButton(
                                     onPressed: () {},
                                     icon: Icon(Icons.edit),
@@ -254,6 +258,10 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
                                 )
                               ],
                             ),
+                          ),
+                          Text(
+                            _penjualan!.alamat,
+                            style: TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center,
                           )
                         ]))
                   ])
