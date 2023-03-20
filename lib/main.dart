@@ -11,6 +11,7 @@ import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
 import 'package:pt_coronet_crown/mainpage/home.dart';
+import 'package:pt_coronet_crown/test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String username = "", idjabatan = "", avatar = "";
@@ -79,6 +80,7 @@ class MyApp extends StatelessWidget {
         "detailpembelian": (context) => PersonelGroup(),
         "detailpenjualan": (context) => PersonelGroup(),
         "tambahlaporanpenjualan": (context) => BuatPenjualan(),
+        "test" :  (context) => genBill()
       },
     );
   }

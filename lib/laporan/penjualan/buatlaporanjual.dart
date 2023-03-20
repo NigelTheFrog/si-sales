@@ -17,30 +17,21 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:pt_coronet_crown/class/produk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class BuatPenjualan extends StatefulWidget {
-  BuatPenjualan({Key? key}) : super(key: key);
+class dynamicWidget extends StatefulWidget {
+  dynamicWidget({Key? key}) : super(key: key);
   @override
-  _BuatPenjualanState createState() {
-    return _BuatPenjualanState();
+  _dynamicWidgetState createState() {
+    return _dynamicWidgetState();
   }
 }
 
-class _BuatPenjualanState extends State<BuatPenjualan> {
+class _dynamicWidgetState extends State<dynamicWidget> {
+  TextEditingController quantityController = new TextEditingController();
+  TextEditingController hargaController = new TextEditingController();
   late Timer timer;
-  int count = 1;
-  int id = Random().nextInt(4294967296), id_produk = 0;
-  String _id_outlet = "", _username = "", _ppn = "", _diskon = "";
-  String controllerProduct = "", controllerOutlet = "";
-  var _foto = null, _foto_proses = null, listOfProduct = [];
-  List<Widget> _productList = [];
 
-  final picker = ImagePicker();
-  final _formKey = GlobalKey<FormState>();
-
-  _loadData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _username = prefs.getString("username") ?? '';
-  }
+  int id_produk = 0;
+  String controllerProduct = "";
 
   Future<List> daftarproduct() async {
     Map json;
@@ -53,6 +44,128 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     } else {
       throw Exception('Failed to read API');
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
+      setState(() {
+        generateDaftarProduct();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    quantityController.dispose();
+    timer.cancel();
+    hargaController.dispose();
+  }
+
+  Widget comboProduct = Text("");
+
+  void generateDaftarProduct() {
+    List<Produk> produks;
+    var data = daftarproduct();
+    data.then((value) {
+      produks = List<Produk>.from(value.map((i) {
+        return Produk.fromJson(i);
+      }));
+      setState(() {
+        comboProduct = DropdownButtonHideUnderline(
+            child: DropdownButton(
+                hint: controllerProduct == ""
+                    ? Text("Daftar Product")
+                    : Text(
+                        controllerProduct,
+                        style: TextStyle(color: Colors.black),
+                      ),
+                isDense: false,
+                items: produks.map((produk) {
+                  return DropdownMenuItem(
+                    child: Text(produk.jenis),
+                    value: [produk.id, produk.jenis],
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    id_produk = value![0] as int;
+                    controllerProduct = value[1].toString();
+                  });
+                }));
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 440,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          SizedBox(
+            height: 50,
+            width: 150,
+            child: comboProduct,
+          ),
+          SizedBox(
+              height: 50,
+              width: 100,
+              child: TextFormField(
+                controller: quantityController,
+                decoration: const InputDecoration(
+                  labelText: 'Quantity',
+                ),
+                keyboardType: TextInputType.number,
+              )),
+          SizedBox(
+              height: 50,
+              width: 150,
+              child: TextFormField(
+                controller: hargaController,
+                decoration: const InputDecoration(
+                  labelText: 'Harga (per barang)',
+                ),
+                keyboardType: TextInputType.number,
+              )),
+        ],
+      ),
+    );
+  }
+}
+
+class BuatPenjualan extends StatefulWidget {
+  BuatPenjualan({Key? key}) : super(key: key);
+  @override
+  _BuatPenjualanState createState() {
+    return _BuatPenjualanState();
+  }
+}
+
+class _BuatPenjualanState extends State<BuatPenjualan> {
+  late Timer timer;
+  double heightAddItem = 0;
+  int id = Random().nextInt(4294967296);
+  String _id_outlet = "", _username = "", _ppn = "", _diskon = "";
+  String controllerOutlet = "";
+  var _foto = null, _foto_proses = null;
+
+  List<dynamicWidget> dynamicList = [];
+  List<String> harga = [];
+  List<String> quantity = [];
+
+  final picker = ImagePicker();
+  final _formKey = GlobalKey<FormState>();
+  final fileName = TextEditingController();
+
+  _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _username = prefs.getString("username") ?? '';
   }
 
   // Future<List> daftaroutlet() async {
@@ -129,7 +242,6 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
       setState(() {
         _loadData();
-        generateDaftarProduct();
         // generatDaftarJabatan();
       });
     });
@@ -140,39 +252,6 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     // TODO: implement dispose
     timer.cancel();
     super.dispose();
-  }
-
-  void generateDaftarProduct() {
-    List<Produk> produks;
-    var data = daftarproduct();
-    data.then((value) {
-      produks = List<Produk>.from(value.map((i) {
-        return Produk.fromJson(i);
-      }));
-      setState(() {
-        comboProduct = DropdownButtonHideUnderline(
-            child: DropdownButton(
-                hint: controllerProduct == ""
-                    ? Text("Daftar Product")
-                    : Text(
-                        controllerProduct,
-                        style: TextStyle(color: Colors.black),
-                      ),
-                isDense: false,
-                items: produks.map((produk) {
-                  return DropdownMenuItem(
-                    child: Text(produk.jenis),
-                    value: [produk.id, produk.jenis],
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    id_produk = value![0] as int;
-                    controllerProduct = value[1].toString();
-                  });
-                }));
-      });
-    });
   }
 
   // void generatDaftarJabatan() {
@@ -215,7 +294,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
       final String filePath = '${value?.path}/$_timestamp.jpg';
       _foto_proses = File(filePath);
       img.Image? temp = img.readJpg(_foto!.readAsBytesSync());
-      img.Image temp2 = img.copyResize(temp!, width: 500, height: 500);
+      img.Image temp2 = img.copyResize(temp!, width: 500, height: 480);
       setState(() {
         _foto_proses = Uint8List.fromList(img.encodeJpg(temp2));
       });
@@ -225,11 +304,12 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
   Future chooseImg() async {
     FilePickerResult fileResult =
         await FilePicker.platform.pickFiles() as FilePickerResult;
+    fileName.text = fileResult.names.first!;
     if (fileResult != null) {
       setState(() {
         _foto = fileResult.files.first.bytes;
         img.Image? temp = img.decodeImage(_foto!);
-        img.Image temp2 = img.copyResize(temp!, width: 500, height: 500);
+        img.Image temp2 = img.copyResize(temp!, width: 500, height: 523);
         _foto_proses = Uint8List.fromList(img.encodeJpg(temp2));
       });
     }
@@ -245,55 +325,16 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     //});
   }
 
-  Widget addItem() {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      SizedBox(
-        height: 50,
-        width: 150,
-        child: comboProduct,
-      ),
-      SizedBox(
-          height: 50,
-          width: 100,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Quantity',
-            ),
-            onChanged: (value) {
-              _ppn = value;
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                _ppn = "0";
-              }
-              return null;
-            },
-          )),
-      SizedBox(
-          height: 50,
-          width: 150,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Harga (per barang)',
-            ),
-            onChanged: (value) {
-              _ppn = value;
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                _ppn = "0";
-              }
-              return null;
-            },
-          )),
-      Tooltip(
-        message: "Delete product",
-        child: IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.delete),
-        ),
-      )
-    ]);
+  addDynamic() {
+    setState(() {
+      if (quantity.isNotEmpty) {
+        quantity = [];
+        harga = [];
+        dynamicList = [];
+      }
+      dynamicList.add(dynamicWidget());
+      heightAddItem += 50;
+    });
   }
 
   @override
@@ -344,15 +385,34 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                         },
                       )),
                   Container(
-                    height: 100,
-                    width: 600,
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
-                    child: ListView.builder(
-                        itemCount: _productList.length,
-                        itemBuilder: (context, index) {
-                          return _productList[index];
-                        }),
-                  ),
+                      alignment: Alignment.center,
+                      height: heightAddItem,
+                      child: ListView.builder(
+                        itemCount: dynamicList.length,
+                        itemBuilder: (_, index) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              dynamicList[index],
+                              Tooltip(
+                                message: "Delete product",
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      dynamicList.removeAt(index);
+                                      heightAddItem -= 50;
+                                    });
+
+                                    // harga.removeAt(index);
+                                    // quantity.removeAt(index);
+                                  },
+                                  icon: Icon(Icons.delete),
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      )),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Container(
@@ -361,7 +421,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            _productList.add(addItem());
+                            addDynamic();
                           });
                         },
                         child: Text(
@@ -372,35 +432,55 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                       ),
                     ),
                   ),
-                  Text("UNGGAH FOTO NOTA (JIKA ADA)",
+                  Text("UNGGAH FOTO NOTA (JIKA ADA) \n",
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                  Padding(
-                      padding: EdgeInsets.all(10),
-                      child: GestureDetector(
-                          onTap: () {
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: 320,
+                        height: 50,
+                        child: TextFormField(
+                          controller: fileName,
+                          style: TextStyle(color: Colors.grey),
+                          enabled: false,
+                          decoration: InputDecoration(
+                            labelText: "Foto nota",
+                            labelStyle: TextStyle(color: Colors.grey),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 2, color: Colors.blue), //<-- SEE HERE
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 50,
+                        width: 120,
+                        child: ElevatedButton(
+                          onPressed: () {
                             if (kIsWeb) {
                               chooseImg();
                             } else {
                               captureImg();
                             }
-                          }, // Image tapped
-                          child: Container(
+                          },
+                          child: Text('Upload file'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 10),
+                    child: _foto_proses == null
+                        ? const Text("")
+                        : SizedBox(
                             height: 480,
                             width: 500,
-                            color: Colors.blue,
-                            child: _foto_proses == null
-                                ? Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Belum ada gambar diambil',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  )
-                                : Image.memory(_foto_proses!),
-                            // : Image.file(_avatar_proses!),
-                          ))),
+                            child: Image.memory(_foto_proses!),
+                          ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Container(
@@ -408,12 +488,14 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                       width: 300,
                       child: ElevatedButton(
                         onPressed: () {
-                          if (_formKey.currentState != null &&
-                              !_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('Harap Isian diperbaiki')));
-                          } else
-                            submit(context);
+                          print("harga = $harga \n quantity = $quantity");
+                          // if (_formKey.currentState != null &&
+                          //     !_formKey.currentState!.validate()) {
+                          //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          //       content: Text('Harap Isian diperbaiki')));
+                          // } else {
+                          //
+                          // }
                         },
                         child: Text('Submit'),
                       ),
