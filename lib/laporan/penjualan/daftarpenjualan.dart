@@ -142,7 +142,7 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                         .map<DataRow>((element) => DataRow(cells: [
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: element.foto == null
+                                  child: element.foto == null ||element.foto == ""
                                       ? Tooltip(
                                           message: "Halaman Detail",
                                           child: TextButton(

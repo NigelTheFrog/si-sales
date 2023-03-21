@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
         "detailpembelian": (context) => PersonelGroup(),
         "detailpenjualan": (context) => PersonelGroup(),
         "tambahlaporanpenjualan": (context) => BuatPenjualan(),
-        "test" :  (context) => genBill()
+        "test": (context) => Test(),
       },
     );
   }

@@ -39,6 +39,7 @@ dependencies:
   image: ^3.2.2
   path_provider: ^2.0.11
   file_picker: ^5.2.5
+  dropdown_search: ^3.0.0
 
 
 

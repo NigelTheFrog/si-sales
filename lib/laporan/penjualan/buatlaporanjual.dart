@@ -9,15 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
-import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
-import 'package:pt_coronet_crown/class/cabang.dart';
-import 'package:pt_coronet_crown/class/jabatan.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:pt_coronet_crown/class/produk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class dynamicWidget extends StatefulWidget {
+  TextEditingController quantityController = TextEditingController();
+  TextEditingController hargaController = TextEditingController();
+  int idProdukController = 0;
+  String controllerProduct = "";
   dynamicWidget({Key? key}) : super(key: key);
   @override
   _dynamicWidgetState createState() {
@@ -26,12 +28,7 @@ class dynamicWidget extends StatefulWidget {
 }
 
 class _dynamicWidgetState extends State<dynamicWidget> {
-  TextEditingController quantityController = new TextEditingController();
-  TextEditingController hargaController = new TextEditingController();
   late Timer timer;
-
-  int id_produk = 0;
-  String controllerProduct = "";
 
   Future<List> daftarproduct() async {
     Map json;
@@ -61,9 +58,7 @@ class _dynamicWidgetState extends State<dynamicWidget> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    quantityController.dispose();
     timer.cancel();
-    hargaController.dispose();
   }
 
   Widget comboProduct = Text("");
@@ -78,10 +73,10 @@ class _dynamicWidgetState extends State<dynamicWidget> {
       setState(() {
         comboProduct = DropdownButtonHideUnderline(
             child: DropdownButton(
-                hint: controllerProduct == ""
+                hint: widget.controllerProduct == ""
                     ? Text("Daftar Product")
                     : Text(
-                        controllerProduct,
+                        widget.controllerProduct,
                         style: TextStyle(color: Colors.black),
                       ),
                 isDense: false,
@@ -93,8 +88,8 @@ class _dynamicWidgetState extends State<dynamicWidget> {
                 }).toList(),
                 onChanged: (value) {
                   setState(() {
-                    id_produk = value![0] as int;
-                    controllerProduct = value[1].toString();
+                    widget.idProdukController = value![0] as int;
+                    widget.controllerProduct = value[1].toString();
                   });
                 }));
       });
@@ -103,8 +98,8 @@ class _dynamicWidgetState extends State<dynamicWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 440,
+    return Container(
+      width: 420,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -115,9 +110,9 @@ class _dynamicWidgetState extends State<dynamicWidget> {
           ),
           SizedBox(
               height: 50,
-              width: 100,
+              width: 110,
               child: TextFormField(
-                controller: quantityController,
+                controller: widget.quantityController,
                 decoration: const InputDecoration(
                   labelText: 'Quantity',
                 ),
@@ -125,9 +120,9 @@ class _dynamicWidgetState extends State<dynamicWidget> {
               )),
           SizedBox(
               height: 50,
-              width: 150,
+              width: 140,
               child: TextFormField(
-                controller: hargaController,
+                controller: widget.hargaController,
                 decoration: const InputDecoration(
                   labelText: 'Harga (per barang)',
                 ),
@@ -151,13 +146,18 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
   late Timer timer;
   double heightAddItem = 0;
   int id = Random().nextInt(4294967296);
-  String _id_outlet = "", _username = "", _ppn = "", _diskon = "";
-  String controllerOutlet = "";
+  String _id_outlet = "",
+      _username = "",
+      _ppn = "",
+      _diskon = "",
+      controllerOutlet = "";
   var _foto = null, _foto_proses = null;
+  List _outlet = [];
 
   List<dynamicWidget> dynamicList = [];
   List<String> harga = [];
   List<String> quantity = [];
+  List<int> id_produk = [];
 
   final picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
@@ -167,20 +167,6 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _username = prefs.getString("username") ?? '';
   }
-
-  // Future<List> daftaroutlet() async {
-  //   Map json;
-  //   final response = await http.post(
-  //     Uri.parse("http://localhost/magang/admin/cabang/daftarcabang.php"),
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     json = jsonDecode(response.body);
-  //     return json['data'];
-  //   } else {
-  //     throw Exception('Failed to read API');
-  //   }
-  // }
 
   void warningDialog(context, warning_message) {
     showDialog<String>(
@@ -199,20 +185,23 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
 
   void submit(BuildContext context) async {
     var base64Image;
-    if (_foto_proses == null) {
-      base64Image = null;
-    } else {
+    if (_foto_proses != null) {
       base64Image = base64Encode(_foto_proses);
+    } else {
+      base64Image = "";
     }
     final response = await http.post(
         Uri.parse("http://localhost/magang/laporan/penjualan/buatlaporan.php"),
         body: {
-          'id': id,
+          'id': id.toString(),
           'id_outlet': _id_outlet,
           'username': _username,
           'foto': base64Image,
           'diskon': _diskon,
-          'ppn': _ppn
+          'ppn': _ppn,
+          'harga': jsonEncode(harga),
+          'quantity': jsonEncode(quantity),
+          'id_produk': jsonEncode(id_produk)
         });
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
@@ -221,6 +210,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         dispose();
+        Navigator.popAndPushNamed(context, "daftarpenjualan");
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -232,8 +222,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     }
   }
 
-  Widget comboProduct = Text("");
-  Widget comboJabatan = Text("");
+  Widget comboOutlet = Text("");
 
   @override
   void initState() {
@@ -253,39 +242,6 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     timer.cancel();
     super.dispose();
   }
-
-  // void generatDaftarJabatan() {
-  //   List<Jabatan> jabatans;
-  //   var data = daftarJabatan();
-  //   data.then((value) {
-  //     jabatans = List<Jabatan>.from(value.map((i) {
-  //       return Jabatan.fromJson(i);
-  //     }));
-  //     setState(() {
-  //       comboJabatan = DropdownButtonHideUnderline(
-  //           child: DropdownButton(
-  //               hint: controllerJabatan == ""
-  //                   ? Text("Daftar Jabatan")
-  //                   : Text(
-  //                       controllerJabatan,
-  //                       style: TextStyle(color: Colors.black),
-  //                     ),
-  //               isDense: false,
-  //               items: jabatans.map((jabatan) {
-  //                 return DropdownMenuItem(
-  //                   child: Text(jabatan.jabatan),
-  //                   value: [jabatan.id, jabatan.jabatan],
-  //                 );
-  //               }).toList(),
-  //               onChanged: (value) {
-  //                 setState(() {
-  //                   _jabatan = value![0].toString();
-  //                   controllerJabatan = value[1].toString();
-  //                 });
-  //               }));
-  //     });
-  //   });
-  // }
 
   void prosesFoto() {
     Future<Directory?> extDir = getTemporaryDirectory();
@@ -318,11 +274,8 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
   Future captureImg() async {
     var picked_img =
         await picker.pickImage(source: ImageSource.camera, imageQuality: 20);
-    // setState(() {
     _foto = File(picked_img!.path);
     prosesFoto();
-
-    //});
   }
 
   addDynamic() {
@@ -330,6 +283,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
       if (quantity.isNotEmpty) {
         quantity = [];
         harga = [];
+        id_produk = [];
         dynamicList = [];
       }
       dynamicList.add(dynamicWidget());
@@ -349,49 +303,52 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
           child: Form(
             key: _formKey,
             child: Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(20),
                 width: 500,
                 child: Column(children: <Widget>[
-                  Padding(
-                      padding: EdgeInsets.all(10),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Diskon',
-                        ),
-                        onChanged: (value) {
-                          _diskon = value;
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            _diskon = "0";
-                          }
-                          return null;
-                        },
-                      )),
-                  Padding(
-                      padding: EdgeInsets.all(10),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'PPN',
-                        ),
-                        onChanged: (value) {
-                          _ppn = value;
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            _ppn = "0";
-                          }
-                          return null;
-                        },
-                      )),
+                  Text("ISIKAN DATA PENJUALAN \n",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   Container(
-                      alignment: Alignment.center,
+                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    alignment: Alignment.center,
+                    child: DropdownSearch<dynamic>(
+                      dropdownSearchDecoration: InputDecoration(
+                        labelText: "Daftar Outlet",
+                      ),
+                      mode: Mode.MENU,
+                      showSearchBox: true,
+                      onFind: (text) async {
+                        Map json;
+                        var response = await http.post(
+                            Uri.parse(
+                                "http://localhost/magang/outlet/daftaroutlet.php"),
+                            body: {'cari': text});
+
+                        if (response.statusCode == 200) {
+                          json = jsonDecode(response.body);
+                          setState(() {
+                            _outlet = json['data'];
+                          });
+                        }
+                        return _outlet as List<dynamic>;
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          controllerOutlet = value['nama_toko'];
+                          _id_outlet = value['id'];
+                        });
+                      },
+                      itemAsString: (item) => item['nama_toko'],
+                    ),
+                  ),
+                  Container(
                       height: heightAddItem,
                       child: ListView.builder(
                         itemCount: dynamicList.length,
                         itemBuilder: (_, index) {
                           return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               dynamicList[index],
                               Tooltip(
@@ -432,6 +389,46 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                       ),
                     ),
                   ),
+                  Padding(
+                      padding: EdgeInsets.only(top: 10, bottom: 10),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                                padding: EdgeInsets.only(right: 10),
+                                width: 230,
+                                child: TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: 'Diskon (diskon total)',
+                                  ),
+                                  onChanged: (value) {
+                                    _diskon = value;
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      _diskon = "0";
+                                    }
+                                    return null;
+                                  },
+                                )),
+                            Container(
+                                width: 230,
+                                padding: EdgeInsets.only(left: 10),
+                                child: TextFormField(
+                                  decoration: const InputDecoration(
+                                    labelText: 'PPN (dalam %)',
+                                  ),
+                                  onChanged: (value) {
+                                    _ppn = value;
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      _ppn = "0";
+                                    }
+                                    return null;
+                                  },
+                                )),
+                          ])),
                   Text("UNGGAH FOTO NOTA (JIKA ADA) \n",
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
@@ -455,18 +452,27 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         height: 50,
-                        width: 120,
+                        width: _foto_proses == null ? 120 : 70,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (kIsWeb) {
-                              chooseImg();
+                            if (_foto_proses == null) {
+                              if (kIsWeb) {
+                                chooseImg();
+                              } else {
+                                captureImg();
+                              }
                             } else {
-                              captureImg();
+                              setState(() {
+                                _foto_proses = null;
+                                fileName.text = "";
+                              });
                             }
                           },
-                          child: Text('Upload file'),
+                          child: _foto_proses == null
+                              ? Text('Upload file')
+                              : const Icon(Icons.delete),
                         ),
                       ),
                     ],
@@ -488,14 +494,19 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                       width: 300,
                       child: ElevatedButton(
                         onPressed: () {
-                          print("harga = $harga \n quantity = $quantity");
-                          // if (_formKey.currentState != null &&
-                          //     !_formKey.currentState!.validate()) {
-                          //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          //       content: Text('Harap Isian diperbaiki')));
-                          // } else {
-                          //
-                          // }
+                          dynamicList.forEach((widget) =>
+                              quantity.add(widget.quantityController.text));
+                          dynamicList.forEach((widget) =>
+                              harga.add(widget.hargaController.text));
+                          dynamicList.forEach((widget) =>
+                              id_produk.add(widget.idProdukController));
+                          if (_formKey.currentState != null &&
+                              !_formKey.currentState!.validate()) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text('Harap Isian diperbaiki')));
+                          } else {
+                            submit(context);
+                          }
                         },
                         child: Text('Submit'),
                       ),

@@ -62,8 +62,8 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
                     Container(
                       width: 500,
                       height: 600,
-                      alignment: _penjualan!.foto == null ? Alignment.center : Alignment.topCenter,
-                      child: _penjualan!.foto == null
+                      alignment: _penjualan!.foto == null || _penjualan!.foto == "" ? Alignment.center : Alignment.topCenter,
+                      child: _penjualan!.foto == null || _penjualan!.foto == ""
                           ? Text("Penjualan ini tidak memakai nota")
                           : Image.memory(
                               base64Decode(_penjualan!.foto as String)),
@@ -250,7 +250,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold)),
                                 Tooltip(
-                                  message: "Ubah Outle",
+                                  message: "Ubah Outlet",
                                   child: IconButton(
                                     onPressed: () {},
                                     icon: Icon(Icons.edit),
