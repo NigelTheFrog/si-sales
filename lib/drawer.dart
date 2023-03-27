@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pt_coronet_crown/customicon/calendar_icons.dart';
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
 import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
+import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
+import 'package:pt_coronet_crown/customicon/proposal_icons.dart';
 import 'package:pt_coronet_crown/customicon/transaction_icons.dart';
 import 'package:pt_coronet_crown/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -123,6 +126,26 @@ class _MyDrawerState extends State<MyDrawer> {
                       leading: const Icon(ClipBoardCheck.clipboard_check),
                       onTap: () {
                         Navigator.popAndPushNamed(context, "daftarpenjualan");
+                      },
+                    ),
+                  ],
+                ),
+                ExpansionTile(
+                  title: Text("Event"),
+                  leading: Icon(EventChart.chart_line),
+                  children: [
+                    ListTile(
+                      title: const Text("Proposal Event"),
+                      leading: const Icon(Proposal.doc_text_inv),
+                      onTap: () {
+                        Navigator.popAndPushNamed(context, "daftarproposal");
+                      },
+                    ),
+                    ListTile(
+                      title: const Text("Riwayat Event"),
+                      leading: const Icon(Calendar.event),
+                      onTap: () {
+                        Navigator.popAndPushNamed(context, "daftarevent");
                       },
                     ),
                   ],

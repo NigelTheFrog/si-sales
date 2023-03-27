@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/class/personel/personelgrup.dart';
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../main.dart';
 
@@ -13,6 +14,8 @@ class PersonelGroup extends StatefulWidget {
     return _PersonelGroupState();
   }
 }
+
+String id_jabatan = "";
 
 class _PersonelGroupState extends State<PersonelGroup> {
   String _txtcari = "";
@@ -25,6 +28,20 @@ class _PersonelGroupState extends State<PersonelGroup> {
     } else {
       throw Exception('Failed to read API');
     }
+  }
+
+  _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_jabatan = prefs.getString("idJabatan") ?? '';
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadData();
   }
 
   Widget daftargrup(data) {
@@ -130,70 +147,85 @@ class _PersonelGroupState extends State<PersonelGroup> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if (id_jabatan == "1") {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Personnel Group"),
+          ),
+          drawer: MyDrawer(),
+          body: Container(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    alignment: Alignment.topCenter,
+                    width: 400,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Color.fromARGB(255, 248, 172, 49)),
+                              onPressed: () {
+                                Navigator.popAndPushNamed(
+                                    context, "tambahgrup");
+                              },
+                              child: Text(
+                                "Add New Group",
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 16),
+                              )),
+                          Container(
+                            height: 50,
+                            width: 175,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.search),
+                                labelText: 'Cari Group',
+                              ),
+                              onChanged: (value) {
+                                _txtcari = value;
+                                // bacaData();
+                              },
+                            ),
+                          )
+                        ]),
+                  ),
+                  Container(
+                      alignment: Alignment.topCenter,
+                      height: MediaQuery.of(context).size.height,
+                      width: 800,
+                      child: FutureBuilder(
+                          future: fetchData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return daftargrup(snapshot.data.toString());
+                            } else {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                          }))
+                ],
+              ),
+            ),
+          ));
+    } else {
+      return Scaffold(
         appBar: AppBar(
           title: Text("Personnel Group"),
         ),
-        drawer: MyDrawer(),
-        body: Container(
-          
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.topCenter,
-                  width: 400,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 248, 172, 49)),
-                            onPressed: () {
-                              Navigator.popAndPushNamed(context, "tambahgrup");
-                            },
-                            child: Text(
-                              "Add New Group",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                            )),
-                        Container(
-                          height: 50,
-                          width: 175,
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.search),
-                              labelText: 'Cari Group',
-                            ),
-                            onChanged: (value) {
-                              _txtcari = value;
-                              // bacaData();
-                            },
-                          ),
-                        )
-                      ]),
-                ),
-                Container(
-                    alignment: Alignment.topCenter,
-                    height: MediaQuery.of(context).size.height,
-                    width: 800,
-                    child: FutureBuilder(
-                        future: fetchData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return daftargrup(snapshot.data.toString());
-                          } else {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                        }))
-              ],
-            ),
+        body: Center(
+          child: Text(
+            "Anda tidak memiliki akses ke halaman ini \nSilahkan kontak admin",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
           ),
-        ));
+        ),
+      );
+    }
   }
 }

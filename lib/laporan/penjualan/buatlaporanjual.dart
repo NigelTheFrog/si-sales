@@ -15,19 +15,19 @@ import 'package:pt_coronet_crown/class/produk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
-class dynamicWidget extends StatefulWidget {
+class dynamicWidgetJual extends StatefulWidget {
   TextEditingController quantityController = TextEditingController();
   TextEditingController hargaController = TextEditingController();
   int idProdukController = 0;
   String controllerProduct = "";
-  dynamicWidget({Key? key}) : super(key: key);
+  dynamicWidgetJual({Key? key}) : super(key: key);
   @override
-  _dynamicWidgetState createState() {
-    return _dynamicWidgetState();
+  _dynamicWidgetJualState createState() {
+    return _dynamicWidgetJualState();
   }
 }
 
-class _dynamicWidgetState extends State<dynamicWidget> {
+class _dynamicWidgetJualState extends State<dynamicWidgetJual> {
   late Timer timer;
 
   Future<List> daftarproduct() async {
@@ -154,7 +154,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
   var _foto = null, _foto_proses = null;
   List _outlet = [];
 
-  List<dynamicWidget> dynamicList = [];
+  List<dynamicWidgetJual> dynamicList = [];
   List<String> harga = [];
   List<String> quantity = [];
   List<int> id_produk = [];
@@ -286,7 +286,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
         id_produk = [];
         dynamicList = [];
       }
-      dynamicList.add(dynamicWidget());
+      dynamicList.add(dynamicWidgetJual());
       heightAddItem += 50;
     });
   }

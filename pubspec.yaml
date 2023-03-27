@@ -40,6 +40,8 @@ dependencies:
   path_provider: ^2.0.11
   file_picker: ^5.2.5
   dropdown_search: ^3.0.0
+  syncfusion_flutter_pdf: ^20.3.49
+
 
 
 
@@ -101,6 +103,12 @@ flutter:
     - family: Transaction
       fonts:
       - asset: assets/fonts/Transaction.ttf
+    - family: Calendar
+      fonts:
+      - asset: assets/fonts/Calendar.ttf
+    - family: Proposal
+      fonts:
+      - asset: assets/fonts/Proposal.ttf
 
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
