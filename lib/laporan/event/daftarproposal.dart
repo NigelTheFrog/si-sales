@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/class/transaksi/event.dart';
 import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/laporan/event/detailevent.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/detailpenjualan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -57,7 +58,7 @@ class _DaftarProposalState extends State<DaftarProposal> {
 
   Future<String> fetchData() async {
     final response = await http.post(
-        Uri.parse("http://localhost/magang/laporan/event/daftarevent.php"),
+        Uri.parse("http://localhost/magang/laporan/event/daftarproposal.php"),
         body: {'startdate': startdate, 'enddate': enddate, 'cari': _txtcari});
     if (response.statusCode == 200) {
       return response.body;
@@ -71,135 +72,137 @@ class _DaftarProposalState extends State<DaftarProposal> {
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
       return SingleChildScrollView(
-          scrollDirection: MediaQuery.of(context).size.width >= 1343
+          scrollDirection: MediaQuery.of(context).size.width >= 1125
               ? Axis.vertical
               : Axis.horizontal,
           child: Container(
-            alignment: Alignment.center,
+              alignment: Alignment.center,
               child: DataTable(columns: [
-            DataColumn(
-                label: Expanded(
-                    child: Text(
-              "ID Event",
-              textAlign: TextAlign.center,
-            ))),
-            DataColumn(
-                label: Expanded(
-                    child: Text(
-              "Nama Event",
-              textAlign: TextAlign.center,
-            ))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Lokasi", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Tanggal", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Tujuan", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Proposal", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child:
-                        Text("Status Proposal", textAlign: TextAlign.center))),
-          ], rows: [])));
+                DataColumn(
+                    label: Expanded(
+                        child: Text(
+                  "ID Event",
+                  textAlign: TextAlign.center,
+                ))),
+                DataColumn(
+                    label: Expanded(
+                        child: Text(
+                  "Nama Event",
+                  textAlign: TextAlign.center,
+                ))),
+                DataColumn(
+                    label: Expanded(
+                        child: Text("Lokasi", textAlign: TextAlign.center))),
+                DataColumn(
+                    label: Expanded(
+                        child: Text("Tanggal", textAlign: TextAlign.center))),
+                DataColumn(
+                    label: Expanded(
+                        child: Text("Penanggung \nJawab",
+                            textAlign: TextAlign.center))),
+                DataColumn(
+                    label: Expanded(
+                        child: Text("Proposal", textAlign: TextAlign.center))),
+                DataColumn(
+                    label: Expanded(
+                        child: Text("Status \nProposal",
+                            textAlign: TextAlign.center))),
+              ], rows: [])));
     } else {
       for (var pen in json['data']) {
         Event event = Event.fromJson(pen);
         event2.add(event);
       }
       return ListView.builder(
-          scrollDirection: MediaQuery.of(context).size.width >= 1343
+          scrollDirection: MediaQuery.of(context).size.width >= 1125
               ? Axis.vertical
               : Axis.horizontal,
           itemCount: 1,
           itemBuilder: (BuildContext ctxt, int index) {
-            return Container(
-                alignment: Alignment.center,
-                child: DataTable(
-                    dataRowHeight: 100,
-                    columns: [
-                      DataColumn(
-                          label: Expanded(
-                              child: Text(
-                        "ID Event",
-                        textAlign: TextAlign.center,
-                      ))),
-                      DataColumn(
-                          label: Expanded(
-                              child: Text(
-                        "Nama Event",
-                        textAlign: TextAlign.center,
-                      ))),
-                      DataColumn(
-                          label: Expanded(
-                              child:
-                                  Text("Lokasi", textAlign: TextAlign.center))),
-                      DataColumn(
-                          label: Expanded(
-                              child: Text("Tanggal",
+            return DataTable(
+                dataRowHeight: 100,
+                columns: [
+                  DataColumn(
+                      label: Expanded(
+                          child: Text(
+                    "ID Event",
+                    textAlign: TextAlign.center,
+                  ))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text(
+                    "Nama Event",
+                    textAlign: TextAlign.center,
+                  ))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Lokasi", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Tanggal", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Penanggung \nJawab",
+                              textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child:
+                              Text("Proposal", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Status \nProposal",
+                              textAlign: TextAlign.center))),
+                ],
+                rows: event2
+                    .map<DataRow>((element) => DataRow(cells: [
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Tooltip(
+                                  message: "Halaman Detail",
+                                  child: TextButton(
+                                    style: TextButton.styleFrom(
+                                      textStyle: const TextStyle(
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    onPressed: () {
+                                      // Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) =>
+                                      //             DetailEvent(
+                                      //               event_id: element.id,
+                                      //             )));
+                                    },
+                                    child: Text(element.id,
+                                        textAlign: TextAlign.center),
+                                  )))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Text(element.nama,
                                   textAlign: TextAlign.center))),
-                      DataColumn(
-                          label: Expanded(
-                              child:
-                                  Text("Tujuan", textAlign: TextAlign.center))),
-                      DataColumn(
-                          label: Expanded(
-                              child: Text("Proposal",
-                                  textAlign: TextAlign.center))),
-                      DataColumn(
-                          label: Expanded(
-                              child: Text("Status Proposal",
-                                  textAlign: TextAlign.center))),
-                    ],
-                    rows: event2
-                        .map<DataRow>((element) => DataRow(cells: [
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Tooltip(
-                                      message: "Halaman Detail",
-                                      child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DetailPenjualan(
-                                                        laporan_id: element.id,
-                                                      )));
-                                        },
-                                        child: Text(element.id,
-                                            textAlign: TextAlign.center),
-                                      )))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.nama,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: SizedBox(
-                                      width: 200,
-                                      child: Text(element.lokasi,
-                                          textAlign: TextAlign.center)))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                  width: 170,
+                                  child: Text(element.lokasi,
+                                      textAlign: TextAlign.center)))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                  width: 110,
                                   child: Text(element.tanggal,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: SizedBox(
-                                      width: 160,
-                                      child: Text(element.tujuan,
-                                          textAlign: TextAlign.center)))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
+                                      textAlign: TextAlign.center)))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                  width: 150,
+                                  child: Text(
+                                      "${element.nama_depan} \n${element.nama_belakang}",
+                                      textAlign: TextAlign.center)))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                  width: 75,
                                   child: Tooltip(
                                       message: "Unduh File proposal",
                                       child: TextButton(
@@ -219,35 +222,35 @@ class _DaftarProposalState extends State<DaftarProposal> {
                                         },
                                         child: Text("File Proposal",
                                             textAlign: TextAlign.center),
-                                      )))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Tooltip(
-                                      message: element.status_proposal == 1
-                                          ? "Proposal belum di-acc"
-                                          : "Proposal sudah di-acc",
-                                      child: element.status_proposal == 1
-                                          ? Icon(Icons.close, color: Colors.red)
-                                          : Icon(
-                                              Icons.check,
-                                              color: Colors.green,
-                                            )))),
-                              // DataCell(Align(
-                              //     alignment: Alignment.center,
-                              //     child: Text(
-                              //         "Rp. ${NumberFormat('###,000').format(element.jumlah_penjualan.toString())}",
-                              //         textAlign: TextAlign.center))),
-                              // DataCell(Align(
-                              //     alignment: Alignment.center,
-                              //     child: Text(element.jumlah_barang,
-                              //         textAlign: TextAlign.center))),
-                              // DataCell(Align(
-                              //     alignment: Alignment.center,
-                              //     child: Text(
-                              //         "Rp. ${NumberFormat('###,000').format((element.total_penjualan - element.diskon) + (((element.total_penjualan - element.diskon) * (element.ppn / 100.00))))}",
-                              //         textAlign: TextAlign.center))),
-                            ]))
-                        .toList()));
+                                      ))))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Tooltip(
+                                  message: element.status_proposal == 0
+                                      ? "Proposal belum di-acc"
+                                      : "Proposal sudah di-acc",
+                                  child: element.status_proposal == 0
+                                      ? Icon(Icons.close, color: Colors.red)
+                                      : Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                        )))),
+                          // DataCell(Align(
+                          //     alignment: Alignment.center,
+                          //     child: Text(
+                          //         "Rp. ${NumberFormat('###,000').format(element.jumlah_penjualan.toString())}",
+                          //         textAlign: TextAlign.center))),
+                          // DataCell(Align(
+                          //     alignment: Alignment.center,
+                          //     child: Text(element.jumlah_barang,
+                          //         textAlign: TextAlign.center))),
+                          // DataCell(Align(
+                          //     alignment: Alignment.center,
+                          //     child: Text(
+                          //         "Rp. ${NumberFormat('###,000').format((element.total_penjualan - element.diskon) + (((element.total_penjualan - element.diskon) * (element.ppn / 100.00))))}",
+                          //         textAlign: TextAlign.center))),
+                        ]))
+                    .toList());
           });
     }
   }
@@ -500,7 +503,8 @@ class _DaftarProposalState extends State<DaftarProposal> {
                     future: fetchData(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return daftarProposal(snapshot.data.toString(), context);
+                        return daftarProposal(
+                            snapshot.data.toString(), context);
                       } else {
                         return Center(child: CircularProgressIndicator());
                       }

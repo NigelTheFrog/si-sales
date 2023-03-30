@@ -15,6 +15,8 @@ import 'package:pt_coronet_crown/class/produk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
+String idCabang = "";
+
 class dynamicWidgetJual extends StatefulWidget {
   TextEditingController quantityController = TextEditingController();
   TextEditingController hargaController = TextEditingController();
@@ -33,8 +35,9 @@ class _dynamicWidgetJualState extends State<dynamicWidgetJual> {
   Future<List> daftarproduct() async {
     Map json;
     final response = await http.post(
-      Uri.parse("http://localhost/magang/admin/product/daftarproduct.php"),
-    );
+        Uri.parse(
+            "http://localhost/magang/admin/product/daftarproductcabang.php"),
+        body: {"idCabang": idCabang});
     if (response.statusCode == 200) {
       json = jsonDecode(response.body);
       return json['data'];
@@ -166,6 +169,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _username = prefs.getString("username") ?? '';
+    idCabang = prefs.getString("idCabang") ?? '';
   }
 
   void warningDialog(context, warning_message) {
@@ -199,6 +203,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
           'foto': base64Image,
           'diskon': _diskon,
           'ppn': _ppn,
+          'id_cabang': idCabang,
           'harga': jsonEncode(harga),
           'quantity': jsonEncode(quantity),
           'id_produk': jsonEncode(id_produk)
@@ -216,6 +221,9 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
         setState(() {
           warningDialog(context, "Ukuran gambar terlalu besar");
         });
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('')));
       }
     } else {
       throw Exception('Failed to read API');

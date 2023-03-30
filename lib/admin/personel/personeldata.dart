@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pt_coronet_crown/admin/personel/detailpersonel.dart';
 import 'package:pt_coronet_crown/class/personel/personel.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -30,7 +31,26 @@ class _PersonelDataState extends State<PersonelData> {
     }
   }
 
-  List<Widget> listPersonel(data) {
+  void deletePersonel(String username) async {
+    final response = await http.post(
+        Uri.parse(
+            "http://localhost/magang/admin/personel/personeldata/deletepersonel.php"),
+        body: {"username": username});
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      if (json['result'] == 'success') {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sukses menghapus data $username')));
+        dispose();
+        Navigator.popAndPushNamed(context, "daftarpersonel");
+      }
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  List<Widget> listPersonel(BuildContext context, data) {
     List<Widget> temp = [];
     List<Person> person2 = [];
     Map json = jsonDecode(data);
@@ -42,9 +62,7 @@ class _PersonelDataState extends State<PersonelData> {
         Person person = Person.fromJson(pers);
         person2.add(person);
       }
-      var idx = 0;
-      while (idx < person2.length) {
-        // print(person2[idx].username);
+      for (int i = 0; i < person2.length; i++) {
         w = Card(
             child: Stack(
           children: [
@@ -63,14 +81,54 @@ class _PersonelDataState extends State<PersonelData> {
                     message: 'Edit data personnel',
                     child: IconButton(
                       icon: Icon(Icons.edit),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DetailPersonel(
+                                      username: person2[i].username,
+                                      avatar: person2[i].avatar,
+                                      namaDepan: person2[i].nama_depan,
+                                      namaBelakang: person2[i].nama_belakang,
+                                      nomorTelepon: person2[i].no_telp,
+                                      namaJabatan: person2[i].jabatan,
+                                      namaCabang: person2[i].nama_cabang,
+                                      email: person2[i].email,
+                                    )));
+                      },
                     ),
                   ),
                   Tooltip(
                     message: 'Delete Personnel',
                     child: IconButton(
                       icon: Icon(Icons.delete),
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Warning!"),
+                                content: Text(
+                                    "Dengan menekan tombol iya, \nAnda akan menghapus data user: ${person2[i].username}"),
+                                actions: [
+                                  TextButton(
+                                    child: Text("Cancel"),
+                                    onPressed: () {},
+                                  ),
+                                  TextButton(
+                                    child: Text("Iya"),
+                                    onPressed: () {
+                                      //deletePersonel(person2[i].username);
+                                    },
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                          //deletePersonel(person2[idx].username);
+                        });
+                      },
                     ),
                   )
                 ],
@@ -84,7 +142,7 @@ class _PersonelDataState extends State<PersonelData> {
                       width: 100,
                       height: 131,
                       child: Image.memory(
-                        base64Decode(person2[idx].avatar),
+                        base64Decode(person2[i].avatar),
                       ))),
               Container(
                   padding: EdgeInsets.all(5),
@@ -94,23 +152,23 @@ class _PersonelDataState extends State<PersonelData> {
                       Align(
                           alignment: Alignment.topLeft,
                           child: Text(
-                            "${person2[idx].nama_depan} ${person2[idx].nama_belakang} - ${person2[idx].jabatan} \n${person2[idx].nama_cabang}",
+                            "${person2[i].nama_depan} ${person2[i].nama_belakang} - ${person2[i].jabatan} \n${person2[i].nama_cabang}",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           )),
                       Align(
                           alignment: Alignment.topLeft,
-                          child: Text(person2[idx].username)),
+                          child: Text(person2[i].username)),
                       Row(children: [
                         Icon(Icons.mail),
-                        Text(person2[idx].email, textAlign: TextAlign.left)
+                        Text(person2[i].email, textAlign: TextAlign.left)
                       ]),
                       Row(children: [
                         Icon(Icons.phone),
-                        Text(person2[idx].no_telp, textAlign: TextAlign.left)
+                        Text(person2[i].no_telp, textAlign: TextAlign.left)
                       ]),
                       Align(
                           alignment: Alignment.bottomLeft,
-                          child: Text("Group : " + person2[idx].nama_grup,
+                          child: Text("Group : " + person2[i].nama_grup,
                               textAlign: TextAlign.left)),
                     ],
                   )),
@@ -118,7 +176,6 @@ class _PersonelDataState extends State<PersonelData> {
           ],
         ));
         temp.add(w);
-        idx++;
       }
     }
     return temp;
@@ -150,8 +207,7 @@ class _PersonelDataState extends State<PersonelData> {
                                 backgroundColor:
                                     Color.fromARGB(255, 248, 172, 49)),
                             onPressed: () {
-                              Navigator.popAndPushNamed(
-                                  context, "tambahstaff");
+                              Navigator.popAndPushNamed(context, "tambahstaff");
                             },
                             child: Text(
                               "Add New Personnel",
@@ -195,8 +251,8 @@ class _PersonelDataState extends State<PersonelData> {
                                     (MediaQuery.of(context).size.height /
                                         2.63)),
                                 mainAxisSpacing: 8.0,
-                                children:
-                                    listPersonel(snapshot.data.toString()));
+                                children: listPersonel(
+                                    context, snapshot.data.toString()));
                           } else {
                             return Center(child: CircularProgressIndicator());
                           }

@@ -61,9 +61,15 @@ class _LoginState extends State<Login> {
         prefs.setString("cabang", json["cabang"]);
         main();
       } else {
-        setState(() {
-          error_login = "Incorrect user or password";
-        });
+        if (json['message'] == "1") {
+          setState(() {
+            error_login = "Akun anda telah diblok, silahkan kontak admin";
+          });
+        } else {
+          setState(() {
+            error_login = "Password anda salah";
+          });
+        }
       }
     } else {
       throw Exception('Failed to read API');
@@ -120,7 +126,6 @@ class _LoginState extends State<Login> {
                           if (error_login != "")
                             Text(error_login,
                                 style: TextStyle(color: Colors.red)),
-                          
                           Padding(
                               padding: const EdgeInsets.all(10),
                               child: Container(
