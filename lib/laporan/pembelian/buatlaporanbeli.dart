@@ -146,13 +146,14 @@ class _BuatPembelianState extends State<BuatPembelian> {
   late Timer timer;
   double heightAddItem = 0;
   int id = Random().nextInt(4294967296);
-  String _id_outlet = "",
+  String _id_supplier = "",
       _username = "",
       _ppn = "",
       _diskon = "",
-      controllerOutlet = "";
+      controllerSupplier = "",
+      id_cabang = "";
   var _foto = null, _foto_proses = null;
-  List _outlet = [];
+  List _supplier = [];
 
   List<dynamicWidgetBeli> dynamicList = [];
   List<String> harga = [];
@@ -166,6 +167,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _username = prefs.getString("username") ?? '';
+    id_cabang = prefs.getString("idCabang") ?? '';
   }
 
   void warningDialog(context, warning_message) {
@@ -191,14 +193,15 @@ class _BuatPembelianState extends State<BuatPembelian> {
       base64Image = "";
     }
     final response = await http.post(
-        Uri.parse("http://localhost/magang/laporan/penjualan/buatlaporan.php"),
+        Uri.parse("http://localhost/magang/laporan/pembelian/buatlaporan.php"),
         body: {
           'id': id.toString(),
-          'id_outlet': _id_outlet,
+          'id_supplier': _id_supplier,
           'username': _username,
           'foto': base64Image,
           'diskon': _diskon,
           'ppn': _ppn,
+          'id_cabang': id_cabang,
           'harga': jsonEncode(harga),
           'quantity': jsonEncode(quantity),
           'id_produk': jsonEncode(id_produk)
@@ -210,7 +213,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         dispose();
-        Navigator.popAndPushNamed(context, "daftarpenjualan");
+        Navigator.popAndPushNamed(context, "daftarpembelian");
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -222,15 +225,13 @@ class _BuatPembelianState extends State<BuatPembelian> {
     }
   }
 
-  Widget comboOutlet = Text("");
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadData();
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
       setState(() {
-        _loadData();
         // generatDaftarJabatan();
       });
     });
@@ -322,24 +323,24 @@ class _BuatPembelianState extends State<BuatPembelian> {
                         Map json;
                         var response = await http.post(
                             Uri.parse(
-                                "http://localhost/magang/outlet/daftaroutlet.php"),
+                                "http://localhost/magang/supplier/daftarsupplier.php"),
                             body: {'cari': text});
 
                         if (response.statusCode == 200) {
                           json = jsonDecode(response.body);
                           setState(() {
-                            _outlet = json['data'];
+                            _supplier = json['data'];
                           });
                         }
-                        return _outlet as List<dynamic>;
+                        return _supplier as List<dynamic>;
                       },
                       onChanged: (value) {
                         setState(() {
-                          controllerOutlet = value['nama_toko'];
-                          _id_outlet = value['id'];
+                          controllerSupplier = value['nama_supplier'];
+                          _id_supplier = value['id'];
                         });
                       },
-                      itemAsString: (item) => item['nama_toko'],
+                      itemAsString: (item) => item['nama_supplier'],
                     ),
                   ),
                   Container(

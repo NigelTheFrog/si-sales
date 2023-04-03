@@ -48,6 +48,9 @@ class _LoginState extends State<Login> {
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
+        if(json["avatar"] == null || json["avatar"] == "") {
+
+        }
         final prefs = await SharedPreferences.getInstance();
         prefs.setString("username", json['username']);
         prefs.setString("nama_depan", json["nama_depan"]);

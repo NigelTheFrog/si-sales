@@ -112,8 +112,7 @@ class _CreateAccountState extends State<CreateAccount> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         dispose();
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PersonelData()));
+        Navigator.of(context).pop();
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {

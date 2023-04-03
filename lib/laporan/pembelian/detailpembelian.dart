@@ -45,6 +45,194 @@ class _DetailPembelianState extends State<DetailPembelian> {
     bacaData();
   }
 
+  Widget showPicture() {
+    return Container(
+      width: 500,
+      height: 600,
+      alignment: Alignment.topCenter,
+      child: Image.memory(base64Decode(_pembelian!.foto)),
+    );
+  }
+
+  Widget showColumnData(BuildContext context) {
+    return Container(
+        alignment: Alignment.topCenter,
+        height: MediaQuery.of(context).size.height,
+        width: 500,
+        padding: EdgeInsets.only(left: 20),
+        child: Column(children: [
+          Text("ID Laporan: ${_pembelian!.id}",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            alignment: Alignment.topCenter,
+            width: 231,
+            child: Row(
+              children: [
+                Text(
+                  "Tanggal: ${_pembelian!.tanggal}",
+                  textAlign: TextAlign.center,
+                ),
+                Tooltip(
+                  message: "",
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.edit),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            alignment: Alignment.topCenter,
+            width: 174,
+            child: Row(
+              children: [
+                Text("RINCIAN BARANG ",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                    )),
+                Tooltip(
+                  message: "Ubah rincian barang",
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.edit),
+                  ),
+                )
+              ],
+            ),
+          ),
+          ListView.builder(
+              shrinkWrap: true,
+              itemCount: 1,
+              itemBuilder: (BuildContext ctxt, int index) {
+                return DataTable(
+                    columns: [
+                      DataColumn(
+                          label: Expanded(
+                              child: Text(
+                        "Jenis \nProduk",
+                        textAlign: TextAlign.center,
+                      ))),
+                      DataColumn(
+                          label: Expanded(
+                              child: Text("Kuantitas",
+                                  textAlign: TextAlign.center))),
+                      DataColumn(
+                          label: Expanded(
+                              child: Text("Harga \nSatuan",
+                                  textAlign: TextAlign.center))),
+                      DataColumn(
+                          label: Expanded(
+                              child: Text("Harga \nTotal",
+                                  textAlign: TextAlign.center))),
+                    ],
+                    rows: _pembelian!.produk!
+                        .map<DataRow>((element) => DataRow(cells: [
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(element['jenis'],
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(element['quantity'].toString(),
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      "Rp. ${NumberFormat('###,000').format(element['harga'])}",
+                                      style: TextStyle(fontSize: 13),
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      "Rp. ${NumberFormat('###,000').format(element['total_harga'])}",
+                                      style: TextStyle(fontSize: 13),
+                                      textAlign: TextAlign.center))),
+                            ]))
+                        .toList());
+              }),
+          Align(
+              alignment: Alignment.topRight,
+              child: Text(
+                "\n\nTotal jumlah barang: ${_pembelian!.jumlah_barang}",
+                textAlign: TextAlign.left,
+              )),
+          Container(
+              padding: EdgeInsets.only(top: 5, bottom: 10),
+              alignment: Alignment.topRight,
+              child: Text(
+                  "\nSubtotal Pembelian: Rp. ${NumberFormat('###,000').format(_pembelian!.total_pembelian)}",
+                  textAlign: TextAlign.left)),
+          Container(
+            alignment: Alignment.topRight,
+            padding: EdgeInsets.only(top: 10),
+            child: Container(
+              width: 158,
+              child: Row(
+                children: [
+                  Tooltip(
+                    message: "Ubah Diskon",
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.edit),
+                    ),
+                  ),
+                  Text(
+                      "Diskon: Rp.  ${NumberFormat('###,000').format(_pembelian!.diskon)}"),
+                ],
+              ),
+            ),
+          ),
+          Container(
+            alignment: Alignment.topRight,
+            padding: EdgeInsets.only(top: 10),
+            child: Container(
+              width: 106,
+              child: Row(
+                children: [
+                  Tooltip(
+                      message: "Ubah pajak",
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: Icon(Icons.edit),
+                      )),
+                  Text("Pajak: ${_pembelian!.ppn}%"),
+                ],
+              ),
+            ),
+          ),
+          Align(
+              alignment: Alignment.topRight,
+              child: Text(
+                  "\nTotal Pembelian: Rp. ${NumberFormat('###,000').format((_pembelian!.total_pembelian - _pembelian!.diskon) + (((_pembelian!.total_pembelian - _pembelian!.diskon) * (_pembelian!.ppn / 100.00))))}",
+                  textAlign: TextAlign.left)),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            alignment: Alignment.topCenter,
+            width: 300,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("SUPPLIER: ${_pembelian!.nama_supplier}",
+                    textAlign: TextAlign.center,
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Tooltip(
+                  message: "",
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.edit),
+                  ),
+                )
+              ],
+            ),
+          )
+        ]));
+  }
+
   Widget tampilData(BuildContext context) {
     return SingleChildScrollView(
         scrollDirection: kIsWeb
@@ -58,374 +246,8 @@ class _DetailPembelianState extends State<DetailPembelian> {
             alignment: Alignment.topLeft,
             padding: EdgeInsets.all(20),
             child: kIsWeb
-                ? Row(children: [
-                    Container(
-                      width: 500,
-                      height: 600,
-                      alignment: Alignment.topCenter,
-                      child: Image.memory(base64Decode(_pembelian!.foto)),
-                    ),
-                    Container(
-                        alignment: Alignment.topCenter,
-                        height: MediaQuery.of(context).size.height,
-                        width: 500,
-                        padding: EdgeInsets.only(left: 20),
-                        child: Column(children: [
-                          Text("ID Laporan: ${_pembelian!.id}",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          Container(
-                            padding: EdgeInsets.only(top: 10),
-                            alignment: Alignment.topCenter,
-                            width: 231,
-                            child: Row(
-                              children: [
-                                Text(
-                                  "Tanggal: ${_pembelian!.tanggal}",
-                                  textAlign: TextAlign.center,
-                                ),
-                                Tooltip(
-                                  message: "",
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.edit),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(top: 10),
-                            alignment: Alignment.topCenter,
-                            width: 174,
-                            child: Row(
-                              children: [
-                                Text("RINCIAN BARANG ",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    )),
-                                Tooltip(
-                                  message: "Ubah rincian barang",
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.edit),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: 1,
-                              itemBuilder: (BuildContext ctxt, int index) {
-                                return DataTable(
-                                    columns: [
-                                      DataColumn(
-                                          label: Expanded(
-                                              child: Text(
-                                        "Jenis \nProduk",
-                                        textAlign: TextAlign.center,
-                                      ))),
-                                      DataColumn(
-                                          label: Expanded(
-                                              child: Text("Kuantitas",
-                                                  textAlign:
-                                                      TextAlign.center))),
-                                      DataColumn(
-                                          label: Expanded(
-                                              child: Text("Harga \nSatuan",
-                                                  textAlign:
-                                                      TextAlign.center))),
-                                      DataColumn(
-                                          label: Expanded(
-                                              child: Text("Harga \nTotal",
-                                                  textAlign:
-                                                      TextAlign.center))),
-                                    ],
-                                    rows: _pembelian!.produk!
-                                        .map<DataRow>((element) =>
-                                            DataRow(cells: [
-                                              DataCell(Align(
-                                                  alignment: Alignment.center,
-                                                  child: Text(element['jenis'],
-                                                      textAlign:
-                                                          TextAlign.center))),
-                                              DataCell(Align(
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                      element['quantity']
-                                                          .toString(),
-                                                      textAlign:
-                                                          TextAlign.center))),
-                                              DataCell(Align(
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                      "Rp. ${NumberFormat('###,000').format(element['harga'])}",
-                                                      style: TextStyle(
-                                                          fontSize: 13),
-                                                      textAlign:
-                                                          TextAlign.center))),
-                                              DataCell(Align(
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                      "Rp. ${NumberFormat('###,000').format(element['total_harga'])}",
-                                                      style: TextStyle(
-                                                          fontSize: 13),
-                                                      textAlign:
-                                                          TextAlign.center))),
-                                            ]))
-                                        .toList());
-                              }),
-                          Align(
-                              alignment: Alignment.topRight,
-                              child: Text(
-                                "\n\nTotal jumlah barang: ${_pembelian!.jumlah_barang}",
-                                textAlign: TextAlign.left,
-                              )),
-                          Container(
-                              padding: EdgeInsets.only(top: 5, bottom: 10),
-                              alignment: Alignment.topRight,
-                              child: Text(
-                                  "\nSubtotal Pembelian: Rp. ${NumberFormat('###,000').format(_pembelian!.total_pembelian)}",
-                                  textAlign: TextAlign.left)),
-                          Container(
-                            alignment: Alignment.topRight,
-                            padding: EdgeInsets.only(top: 10),
-                            child: Container(
-                              width: 158,
-                              child: Row(
-                                children: [
-                                  Tooltip(
-                                    message: "Ubah Diskon",
-                                    child: IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(Icons.edit),
-                                    ),
-                                  ),
-                                  Text(
-                                      "Diskon: Rp.  ${NumberFormat('###,000').format(10000)}"),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Container(
-                            alignment: Alignment.topRight,
-                            padding: EdgeInsets.only(top: 10),
-                            child: Container(
-                              width: 106,
-                              child: Row(
-                                children: [
-                                  Tooltip(
-                                      message: "Ubah pajak",
-                                      child: IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.edit),
-                                      )),
-                                  Text("Pajak: 10%"),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Align(
-                              alignment: Alignment.topRight,
-                              child: Text(
-                                  "\nTotal Pembelian: Rp. ${NumberFormat('###,000').format((_pembelian!.total_pembelian - 10000) + ((_pembelian!.total_pembelian - 10000) / 10))}",
-                                  textAlign: TextAlign.left)),
-                          Container(
-                            padding: EdgeInsets.only(top: 10),
-                            alignment: Alignment.topLeft,
-                            width: 300,
-                            child: Row(
-                              children: [
-                                Text("SUPPLIER: PT. CORONET CROWN ",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
-                                Tooltip(
-                                  message: "",
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.edit),
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
-                        ]))
-                  ])
-                : Column(children: [
-                    Container(
-                      alignment: Alignment.topCenter,
-                      child: Image.memory(base64Decode(_pembelian!.foto)),
-                    ),
-                    Text("ID Laporan: ${_pembelian!.id}",
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    Container(
-                      padding: EdgeInsets.only(top: 10),
-                      alignment: Alignment.topCenter,
-                      width: 231,
-                      child: Row(
-                        children: [
-                          Text(
-                            "Tanggal: ${_pembelian!.tanggal}",
-                            textAlign: TextAlign.center,
-                          ),
-                          Tooltip(
-                            message: "",
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.edit),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(top: 10),
-                      alignment: Alignment.topCenter,
-                      width: 174,
-                      child: Row(
-                        children: [
-                          Text("RINCIAN BARANG ",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                              )),
-                          Tooltip(
-                            message: "Ubah rincian barang",
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.edit),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      alignment: Alignment.topCenter,
-                      height: MediaQuery.of(context).size.height,
-                      width: 500,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: 1,
-                          itemBuilder: (BuildContext ctxt, int index) {
-                            return DataTable(
-                                columns: [
-                                  DataColumn(
-                                      label: Expanded(
-                                          child: Text(
-                                    "Jenis \nProduk",
-                                    textAlign: TextAlign.center,
-                                  ))),
-                                  DataColumn(
-                                      label: Expanded(
-                                          child: Text("Kuantitas",
-                                              textAlign: TextAlign.center))),
-                                  DataColumn(
-                                      label: Expanded(
-                                          child: Text("Harga \nSatuan",
-                                              textAlign: TextAlign.center))),
-                                  DataColumn(
-                                      label: Expanded(
-                                          child: Text("Harga \nTotal",
-                                              textAlign: TextAlign.center))),
-                                ],
-                                rows: _pembelian!.produk!
-                                    .map<DataRow>((element) => DataRow(cells: [
-                                          DataCell(Align(
-                                              alignment: Alignment.center,
-                                              child: Text(element['jenis'],
-                                                  textAlign:
-                                                      TextAlign.center))),
-                                          DataCell(Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                  element['quantity']
-                                                      .toString(),
-                                                  textAlign:
-                                                      TextAlign.center))),
-                                          DataCell(Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                  "Rp. ${NumberFormat('###,000').format(element['harga'])}",
-                                                  textAlign:
-                                                      TextAlign.center))),
-                                          DataCell(Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                  "Rp. ${NumberFormat('###,000').format(element['total'])}",
-                                                  textAlign:
-                                                      TextAlign.center))),
-                                        ]))
-                                    .toList());
-                          }),
-                    ),
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "\n\nTotal jumlah barang: ${_pembelian!.jumlah_barang}",
-                          textAlign: TextAlign.left,
-                        )),
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                            "\nTotal Harga: Rp. ${NumberFormat('###,000').format(_pembelian!.total_pembelian)}",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.left)),
-                    Container(
-                        padding: EdgeInsets.only(top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                                "Diskon: Rp.  ${NumberFormat('###,000').format(10000)}"),
-                            Tooltip(
-                              message: "Ubah Diskon",
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.edit),
-                              ),
-                            )
-                          ],
-                        )),
-                    Row(
-                      children: [
-                        Text("Pajak: 10%"),
-                        Tooltip(
-                          message: "Ubah pajak",
-                          child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.edit),
-                          ),
-                        )
-                      ],
-                    ),
-                    Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                            "\nTotal Pembelian: Rp. ${NumberFormat('###,000').format((_pembelian!.total_pembelian - 10000) + ((_pembelian!.total_pembelian - 10000) / 10))}",
-                            textAlign: TextAlign.left)),
-                    Container(
-                      padding: EdgeInsets.only(top: 10),
-                      alignment: Alignment.topCenter,
-                      width: 300,
-                      child: Row(
-                        children: [
-                          Text("SUPPLIER: PT. CORONET CROWN ",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          Tooltip(
-                            message: "",
-                            child: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.edit),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ])));
+                ? Row(children: [showPicture(), showColumnData(context)])
+                : Column(children: [showPicture(), showColumnData(context)])));
   }
 
   @override

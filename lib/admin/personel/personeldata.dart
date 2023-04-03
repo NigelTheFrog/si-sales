@@ -42,8 +42,6 @@ class _PersonelDataState extends State<PersonelData> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Sukses menghapus data $username')));
-        dispose();
-        Navigator.popAndPushNamed(context, "daftarpersonel");
       }
     } else {
       throw Exception('Failed to read API');

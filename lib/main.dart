@@ -9,6 +9,7 @@ import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:pt_coronet_crown/laporan/event/daftarevent.dart';
 import 'package:pt_coronet_crown/laporan/event/daftarproposal.dart';
+import 'package:pt_coronet_crown/laporan/pembelian/buatlaporanbeli.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
@@ -75,16 +76,17 @@ class MyApp extends StatelessWidget {
         "daftarpembelian": (context) => DaftarPembelian(),
         "daftarpenjualan": (context) => DaftarPenjualan(),
         "tambahlaporanpenjualan": (context) => BuatPenjualan(),
+        "tambahlaporanpembelian": (context) => BuatPembelian(),
         "daftarproposal": (context) => DaftarProposal(),
         "daftarevent": (context) => DaftarEvent(),
-        
+
         //harus dilakukan pengecekan id jabatan
         "daftarpersonel": (context) => PersonelData(),
         "daftargrup": (context) => PersonelGroup(),
         "tambahstaff": (context) => CreateAccount(),
         "tambahgrup": (context) => CreateGroup(),
         // "detailpembelian": (context) => PersonelGroup(),
-        // "detailpenjualan": (context) => PersonelGroup(),        
+        // "detailpenjualan": (context) => PersonelGroup(),
       },
     );
   }

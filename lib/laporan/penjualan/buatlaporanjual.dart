@@ -163,7 +163,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
   List<int> id_produk = [];
 
   final picker = ImagePicker();
-  final _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final fileName = TextEditingController();
 
   _loadData() async {
@@ -180,7 +180,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
               content: Text(warning_message),
               actions: <Widget>[
                 TextButton(
-                  onPressed: () => Navigator.pop(context, 'OK'),
+                  onPressed: () => Navigator.of(context).pop(),
                   child: const Text('OK'),
                 ),
               ],
@@ -222,23 +222,25 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
           warningDialog(context, "Ukuran gambar terlalu besar");
         });
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('')));
+        setState(() {
+          warningDialog(context,
+              "${json['Error']}\nSilahkan contact leader anda untuk menambahkan jumlah stock pada sistem");
+        });
+        Navigator.popAndPushNamed(context, "daftarpenjualan");
       }
     } else {
       throw Exception('Failed to read API');
     }
   }
 
-  Widget comboOutlet = Text("");
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadData();
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
       setState(() {
-        _loadData();
         // generatDaftarJabatan();
       });
     });
@@ -350,7 +352,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                       itemAsString: (item) => item['nama_toko'],
                     ),
                   ),
-                  Container(
+                  SizedBox(
                       height: heightAddItem,
                       child: ListView.builder(
                         itemCount: dynamicList.length,
