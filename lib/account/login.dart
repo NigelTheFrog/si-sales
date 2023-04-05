@@ -43,14 +43,12 @@ class _LoginState extends State<Login> {
 
   void doLogin() async {
     final response = await http.post(
-        Uri.parse("http://localhost/magang/account/login.php"),
+        Uri.parse("http://192.168.137.1/magang/account/login.php"),
         body: {'username': _username, 'password': _password});
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
-        if(json["avatar"] == null || json["avatar"] == "") {
-
-        }
+        if (json["avatar"] == null || json["avatar"] == "") {}
         final prefs = await SharedPreferences.getInstance();
         prefs.setString("username", json['username']);
         prefs.setString("nama_depan", json["nama_depan"]);
@@ -62,6 +60,7 @@ class _LoginState extends State<Login> {
         prefs.setString("jabatan", json["jabatan"]);
         prefs.setString("idCabang", json["id_cabang"]);
         prefs.setString("cabang", json["cabang"]);
+        prefs.setString("idGrup", json["id_grup"]);
         main();
       } else {
         if (json['message'] == "1") {
@@ -99,8 +98,8 @@ class _LoginState extends State<Login> {
                               child: Container(
                                   height: 100,
                                   width: 300,
-                                  child: Image.asset(
-                                      "../assets/coronet_crown.png"))),
+                                  child:
+                                      Image.asset("assets/coronet_crown.png"))),
                           Padding(
                             padding: EdgeInsets.all(10),
                             child: TextField(

@@ -5,6 +5,7 @@ import 'package:pt_coronet_crown/admin/personel/detailpersonel.dart';
 import 'package:pt_coronet_crown/class/personel/personel.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../main.dart';
 
@@ -16,13 +17,15 @@ class PersonelData extends StatefulWidget {
   }
 }
 
+String id_jabatan = "";
+
 class _PersonelDataState extends State<PersonelData> {
   String _txtcari = "";
 
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/admin/personel/personeldata/daftarpersoneldata.php"),
+            "http://192.168.137.1/magang/admin/personel/personeldata/daftarpersoneldata.php"),
         body: {"cari": _txtcari});
     if (response.statusCode == 200) {
       return response.body;
@@ -34,7 +37,7 @@ class _PersonelDataState extends State<PersonelData> {
   void deletePersonel(String username) async {
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/admin/personel/personeldata/deletepersonel.php"),
+            "http://192.168.137.1/magang/admin/personel/personeldata/deletepersonel.php"),
         body: {"username": username});
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
@@ -46,6 +49,13 @@ class _PersonelDataState extends State<PersonelData> {
     } else {
       throw Exception('Failed to read API');
     }
+  }
+
+  _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_jabatan = prefs.getString("idJabatan") ?? '';
+    });
   }
 
   List<Widget> listPersonel(BuildContext context, data) {
@@ -181,83 +191,104 @@ class _PersonelDataState extends State<PersonelData> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Personnel Data"),
-        ),
-        drawer: MyDrawer(),
-        body: Container(
-          alignment: Alignment.topCenter,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.topCenter,
-                  width: 400,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromARGB(255, 248, 172, 49)),
-                            onPressed: () {
-                              Navigator.popAndPushNamed(context, "tambahstaff");
-                            },
-                            child: Text(
-                              "Add New Personnel",
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 16),
-                            )),
-                        Container(
-                          height: 50,
-                          width: 175,
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.search),
-                              labelText: 'Search Personnel',
-                            ),
-                            onChanged: (value) {
-                              setState(() {
-                                _txtcari = value;
-                              });
-                              // bacaData();
-                            },
-                          ),
-                        )
-                      ]),
-                ),
-                Container(
-                    alignment: Alignment.topCenter,
-                    height: MediaQuery.of(context).size.height,
-                    width: 800,
-                    child: FutureBuilder(
-                        future: fetchData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return GridView.count(
-                                crossAxisCount: kIsWeb
-                                    ? MediaQuery.of(context).size.width >= 870
-                                        ? 2
-                                        : 1
-                                    : 1,
-                                crossAxisSpacing: 4.0,
-                                childAspectRatio: (800 /
-                                    (MediaQuery.of(context).size.height /
-                                        2.63)),
-                                mainAxisSpacing: 8.0,
-                                children: listPersonel(
-                                    context, snapshot.data.toString()));
-                          } else {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                        }))
-              ],
-            ),
+    if (id_jabatan == "1") {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Personnel Data"),
           ),
-        ));
+          drawer: MyDrawer(),
+          body: Container(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    alignment: Alignment.topCenter,
+                    width: 400,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Color.fromARGB(255, 248, 172, 49)),
+                              onPressed: () {
+                                Navigator.popAndPushNamed(
+                                    context, "tambahstaff");
+                              },
+                              child: Text(
+                                "Add New Personnel",
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 16),
+                              )),
+                          Container(
+                            height: 50,
+                            width: 175,
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.search),
+                                labelText: 'Search Personnel',
+                              ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _txtcari = value;
+                                });
+                                // bacaData();
+                              },
+                            ),
+                          )
+                        ]),
+                  ),
+                  Container(
+                      alignment: Alignment.topCenter,
+                      height: MediaQuery.of(context).size.height,
+                      width: 800,
+                      child: FutureBuilder(
+                          future: fetchData(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return GridView.count(
+                                  crossAxisCount: kIsWeb
+                                      ? MediaQuery.of(context).size.width >= 870
+                                          ? 2
+                                          : 1
+                                      : 1,
+                                  crossAxisSpacing: 4.0,
+                                  childAspectRatio: (800 /
+                                      (MediaQuery.of(context).size.height /
+                                          2.63)),
+                                  mainAxisSpacing: 8.0,
+                                  children: listPersonel(
+                                      context, snapshot.data.toString()));
+                            } else {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                          }))
+                ],
+              ),
+            ),
+          ));
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Personnel Group"),
+          leading: BackButton(
+            onPressed: () {
+              Navigator.popAndPushNamed(context, "homepage");
+            },
+          ),
+        ),
+        body: Center(
+          child: Text(
+            "Anda tidak memiliki akses ke halaman ini \nSilahkan kontak admin",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
   }
 }

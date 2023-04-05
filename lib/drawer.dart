@@ -5,6 +5,7 @@ import 'package:pt_coronet_crown/customicon/calendar_icons.dart';
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
 import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
 import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
+import 'package:pt_coronet_crown/customicon/produk_icons.dart';
 import 'package:pt_coronet_crown/customicon/proposal_icons.dart';
 import 'package:pt_coronet_crown/customicon/transaction_icons.dart';
 import 'package:pt_coronet_crown/main.dart';
@@ -166,6 +167,13 @@ class _MyDrawerState extends State<MyDrawer> {
                     leading: const Icon(Icons.admin_panel_settings),
                     onTap: () {
                       Navigator.popAndPushNamed(context, "home");
+                    },
+                  ),
+                  ListTile(
+                    title: const Text("Daftar Produk"),
+                    leading: const Icon(Produk.box_open),
+                    onTap: () {
+                      Navigator.popAndPushNamed(context, "daftarproduk");
                     },
                   ),
                 ],

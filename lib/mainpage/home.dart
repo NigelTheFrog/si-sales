@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
@@ -39,106 +40,151 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-          child: SingleChildScrollView(
-              child: Column(children: <Widget>[
-        Text(
-          "\nSelamat datang $nama_depan $nama_belakang \n",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        Container(
-            height: MediaQuery.of(context).size.height,
-            width: 700,
-            child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 4.0,
-              childAspectRatio: 2 / 1.5,
-              children: [
-                GestureDetector(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => DetailSensor(
-                      //       sensor_id: sensor2[index].sensor_id,
-                      //     ),
-                      //   ),
-                      // );
-                    },
-                    child: Card(
-                        child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.check_rounded,
-                                  size: 60,
-                                ),
-                                Text(
-                                  "Absen hadir",
-                                  style: TextStyle(fontSize: 16),
-                                )
-                              ],
-                            )))),
-                GestureDetector(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => DetailSensor(
-                      //       sensor_id: sensor2[index].sensor_id,
-                      //     ),
-                      //   ),
-                      // );
-                    },
-                    child: Card(
-                        child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.exit_to_app,
-                                  size: 60,
-                                ),
-                                Text(
-                                  "Absen pulang",
-                                  style: TextStyle(fontSize: 16),
-                                )
-                              ],
-                            )))),
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DaftarPembelian(),
-                        ),
-                      );
-                    },
-                    child: Card(
-                        child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: id_jabatan == "3"
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        size: 60,
-                                      ),
-                                      Text(
-                                        "Kunjungan Masuk",
-                                        style: TextStyle(fontSize: 16),
-                                      )
-                                    ],
-                                  )
-                                : Column(
+    if (id_jabatan != "1" || id_jabatan != "2") {
+      if (kIsWeb) {
+        return Scaffold(
+            body: Center(
+          child: Text(
+            "Silahkan akses melalui aplikasi pada ponsel anda",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ));
+      } else {
+        return Scaffold(
+          body: Center(
+              child: SingleChildScrollView(
+                  child: Column(children: <Widget>[
+            Text(
+              "\nSelamat datang \n$nama_depan $nama_belakang \n", textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Container(
+                height: MediaQuery.of(context).size.height,
+                width: 700,
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 4.0,
+                  childAspectRatio: 2 / 1.5,
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => DetailSensor(
+                          //       sensor_id: sensor2[index].sensor_id,
+                          //     ),
+                          //   ),
+                          // );
+                        },
+                        child: Card(
+                            child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check_rounded,
+                                      size: 60,
+                                    ),
+                                    Text(
+                                      "Absen hadir",
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                )))),
+                    GestureDetector(
+                        onTap: () {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => DetailSensor(
+                          //       sensor_id: sensor2[index].sensor_id,
+                          //     ),
+                          //   ),
+                          // );
+                        },
+                        child: Card(
+                            child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.exit_to_app,
+                                      size: 60,
+                                    ),
+                                    Text(
+                                      "Absen pulang",
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                )))),
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DaftarPembelian(),
+                            ),
+                          );
+                        },
+                        child: Card(
+                            child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.location_on,
+                                      size: 60,
+                                    ),
+                                    Text(
+                                      "Kunjungan Masuk",
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                )))),                    
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DaftarPenjualan()),
+                          );
+                        },
+                        child: Card(
+                            child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.location_off,
+                                      size: 60,
+                                    ),
+                                    Text(
+                                      "Kunjungan keluar",
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                )))),
+                                if (id_jabatan != "3")
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.popAndPushNamed(
+                                context, "daftarpembelian");
+                          },
+                          child: Card(
+                              child: Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
@@ -151,36 +197,17 @@ class _HomeState extends State<Home> {
                                       )
                                     ],
                                   )))),
-                GestureDetector(
-                    onTap: () {
-                      if (id_jabatan == "3") {
-                      } else {}
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DaftarPenjualan()
-                        ),
-                      );
-                    },
-                    child: Card(
-                        child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: id_jabatan == "3"
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.location_off,
-                                        size: 60,
-                                      ),
-                                      Text(
-                                        "Kunjungan keluar",
-                                        style: TextStyle(fontSize: 16),
-                                      )
-                                    ],
-                                  )
-                                : Column(
+                    if (id_jabatan != "3")
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.popAndPushNamed(
+                                context, "daftarpenjualan");
+                          },
+                          child: Card(
+                              child: Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
@@ -193,37 +220,44 @@ class _HomeState extends State<Home> {
                                       )
                                     ],
                                   )))),
-                GestureDetector(
-                    onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => DetailSensor(
-                      //       sensor_id: sensor2[index].sensor_id,
-                      //     ),
-                      //   ),
-                      // );
-                    },
-                    child: Card(
-                        child: Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  EventChart.chart_line,
-                                  size: 60,
-                                ),
-                                Text(
-                                  "\nLaporan Event",
-                                  style: TextStyle(fontSize: 16),
-                                )
-                              ],
-                            )))),
-              ],
-            ))
-      ]))),
-    );
+                    GestureDetector(
+                        onTap: () {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => DetailSensor(
+                          //       sensor_id: sensor2[index].sensor_id,
+                          //     ),
+                          //   ),
+                          // );
+                        },
+                        child: Card(
+                            child: Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      EventChart.chart_line,
+                                      size: 60,
+                                    ),
+                                    Text(
+                                      "\nLaporan Event",
+                                      style: TextStyle(fontSize: 16),
+                                    )
+                                  ],
+                                )))),
+                  ],
+                ))
+          ]))),
+        );
+      }
+    } else {
+      return Scaffold(
+          body: Center(
+        child: Text("Selamat datang"),
+      ));
+    }
   }
 }

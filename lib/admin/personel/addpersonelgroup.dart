@@ -33,7 +33,7 @@ class _CreateGroupState extends State<CreateGroup> {
   Future<List> daftarCabang() async {
     Map json;
     final response = await http.post(
-      Uri.parse("http://localhost/magang/admin/cabang/daftarcabang.php"),
+      Uri.parse("http://192.168.137.1/magang/admin/cabang/daftarcabang.php"),
     );
     if (response.statusCode == 200) {
       json = jsonDecode(response.body);
@@ -47,7 +47,7 @@ class _CreateGroupState extends State<CreateGroup> {
     Map json;
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/admin/personel/personelgroup/daftarPegawai.php"),
+            "http://192.168.137.1/magang/admin/personel/personelgroup/daftarPegawai.php"),
         body: {'id_cabang': cabang});
     if (response.statusCode == 200) {
       json = jsonDecode(response.body);
@@ -68,7 +68,7 @@ class _CreateGroupState extends State<CreateGroup> {
   void submit(BuildContext context) async {
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/admin/personel/personelgroup/tambahgrup.php"),
+            "http://192.168.137.1/magang/admin/personel/personelgroup/tambahgrup.php"),
         body: {
           'id': _idgroup,
           'nama_group': _namagroup,

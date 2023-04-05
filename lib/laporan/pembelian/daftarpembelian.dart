@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -59,7 +59,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/laporan/pembelian/daftarpembelian.php"),
+            "http://192.168.137.1/magang/laporan/pembelian/daftarpembelian.php"),
         body: {'startdate': startdate, 'enddate': enddate, 'cari': _txtcari});
     if (response.statusCode == 200) {
       return response.body;
@@ -112,9 +112,9 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
               : Axis.horizontal,
           itemCount: 1,
           itemBuilder: (BuildContext ctxt, int index) {
-            return Container(
-                child: DataTable(
-                    columns: [
+            return DataTable(
+                dataRowHeight: 75,
+                columns: [
                   DataColumn(
                       label: Expanded(
                           child: Text(
@@ -132,17 +132,19 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                           child: Text("Waktu", textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Jumlah barang",
+                          child: Text("Jumlah \nbarang",
                               textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Total Pembelian",
+                          child: Text("Total \nPembelian",
                               textAlign: TextAlign.center))),
                 ],
-                    rows: pembelian2
-                        .map<DataRow>((element) => DataRow(cells: [
-                              DataCell(Align(
-                                  alignment: Alignment.center,
+                rows: pembelian2
+                    .map<DataRow>((element) => DataRow(cells: [
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                  width: 200,
                                   child: Tooltip(
                                       message: "Foto Nota",
                                       child: TextButton(
@@ -154,56 +156,64 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                                           showDialog(
                                               context: context,
                                               builder: (context) => AlertDialog(
-                                                  content: Container(
-                                                      width: 500,
-                                                      height: 500,
-                                                      child: Tooltip(
-                                                          message:
-                                                              "Halaman Detail Pembelian",
-                                                          child:
-                                                              GestureDetector(
-                                                                  onTap: () {
-                                                                    Navigator.push(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                            builder: (context) => DetailPembelian(
-                                                                                  laporan_id: element.id,
-                                                                                )));
-                                                                  },
-                                                                  child: Image.memory(
-                                                                      base64Decode(
-                                                                          element
-                                                                              .foto)))))));
+                                                  content: kIsWeb
+                                                      ? SizedBox(
+                                                          width: 500,
+                                                          height: 500,
+                                                          child: showFotoNota(
+                                                              context,
+                                                              element.id,
+                                                              element.foto))
+                                                      : FittedBox(
+                                                          child: showFotoNota(
+                                                              context,
+                                                              element.id,
+                                                              element.foto))));
                                         },
                                         child: Text(element.id,
                                             textAlign: TextAlign.center),
-                                      )))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      "${element.nama_depan} ${element.nama_belakang}",
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.tanggal,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.waktu,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.jumlah_barang,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      "Rp. ${NumberFormat('###,000').format((element.total_pembelian - element.diskon) + (((element.total_pembelian - element.diskon) * (element.ppn / 100.00))))}",
-                                      textAlign: TextAlign.center))),
-                            ]))
-                        .toList()));
+                                      ))))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                  "${element.nama_depan} ${element.nama_belakang}",
+                                  textAlign: TextAlign.center))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Text(element.tanggal,
+                                  textAlign: TextAlign.center))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Text(element.waktu,
+                                  textAlign: TextAlign.center))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Text(element.jumlah_barang,
+                                  textAlign: TextAlign.center))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                  "Rp. ${NumberFormat('###,000').format((element.total_pembelian - element.diskon) + (((element.total_pembelian - element.diskon) * (element.ppn / 100.00))))}",
+                                  textAlign: TextAlign.center))),
+                        ]))
+                    .toList());
           });
     }
+  }
+
+  Widget showFotoNota(BuildContext context, id, foto) {
+    return Tooltip(
+        message: "Halaman Detail Pembelian",
+        child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailPembelian(
+                            laporan_id: id,
+                          )));
+            },
+            child: Image.memory(base64Decode(foto))));
   }
 
   Widget buttonTambahPembelian(BuildContext context) {
@@ -240,7 +250,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
 
   Widget tanggalSelesai(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: 60,
       width: 300,
       child: Row(children: [
         Expanded(
@@ -277,7 +287,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
 
   Widget tanggalMulai(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: 60,
       width: 300,
       child: Row(children: [
         Expanded(
@@ -332,6 +342,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
                             kolomCari()
                           ])
                     : Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           buttonTambahPembelian(context),
                           kolomCari()
@@ -389,10 +400,33 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
           ),
           drawer: MyDrawer(),
           body: buildContainer(context));
+    } else if (idjabatan == "3") {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Daftar Pembelian"),
+          leading: BackButton(
+            onPressed: () {
+              Navigator.popAndPushNamed(context, "homepage");
+            },
+          ),
+        ),
+        body: Center(
+          child: Text(
+            "Anda tidak memiliki akses ke halaman ini \nSilahkan kontak admin",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     } else {
       return Scaffold(
           appBar: AppBar(
             title: Text("Daftar Pembelian"),
+            leading: BackButton(
+              onPressed: () {
+                Navigator.popAndPushNamed(context, "homepage");
+              },
+            ),
           ),
           body: buildContainer(context));
     }

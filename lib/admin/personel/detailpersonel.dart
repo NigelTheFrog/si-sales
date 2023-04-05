@@ -67,7 +67,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
   Future<List> daftarCabang() async {
     Map json;
     final response = await http.post(
-      Uri.parse("http://localhost/magang/admin/cabang/daftarcabang.php"),
+      Uri.parse("http://192.168.137.1/magang/admin/cabang/daftarcabang.php"),
     );
 
     if (response.statusCode == 200) {
@@ -81,7 +81,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
   Future<List> daftarJabatan() async {
     Map json;
     final response = await http.post(
-      Uri.parse("http://localhost/magang/admin/jabatan/daftarjabatan.php"),
+      Uri.parse("http://192.168.137.1/magang/admin/jabatan/daftarjabatan.php"),
     );
 
     if (response.statusCode == 200) {
@@ -111,7 +111,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
     if (_avatar_proses == null) return;
     String base64Image = base64Encode(_avatar_proses);
     final response = await http.post(
-        Uri.parse("http://localhost/magang/account/createaccount.php"),
+        Uri.parse("http://192.168.137.1/magang/account/createaccount.php"),
         body: {
           'username': widget.username,
           'namaDepan': namaDepanController.text,

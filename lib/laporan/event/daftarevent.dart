@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:html';
+// import "package:universal_html/html.dart";
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/class/transaksi/event.dart';
@@ -200,26 +200,30 @@ class _DaftarEventState extends State<DaftarEvent> {
                               alignment: Alignment.center,
                               child: SizedBox(
                                   width: 75,
-                                  child: element.laporan == null ? Text("File laporan \nbelum diunggah", textAlign: TextAlign.center) : Tooltip(
-                                      message: "Unduh File Laporan",
-                                      child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          textStyle: const TextStyle(
-                                              fontWeight: FontWeight.normal),
-                                        ),
-                                        onPressed: () {
-                                          if (kIsWeb) {
-                                            AnchorElement(
-                                                href:
-                                                    "data:application/octet-stream;charset=utf-16le;base64,${element.laporan}")
-                                              ..setAttribute("download",
-                                                  "proposal-${element.id}.pdf")
-                                              ..click();
-                                          }
-                                        },
-                                        child: Text("File Laporan",
-                                            textAlign: TextAlign.center),
-                                      ))))),
+                                  child: element.laporan == null
+                                      ? Text("File laporan \nbelum diunggah",
+                                          textAlign: TextAlign.center)
+                                      : Tooltip(
+                                          message: "Unduh File Laporan",
+                                          child: TextButton(
+                                            style: TextButton.styleFrom(
+                                              textStyle: const TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                            ),
+                                            onPressed: () {
+                                              // if (kIsWeb) {
+                                              //   AnchorElement(
+                                              //       href:
+                                              //           "data:application/octet-stream;charset=utf-16le;base64,${element.laporan}")
+                                              //     ..setAttribute("download",
+                                              //         "proposal-${element.id}.pdf")
+                                              //     ..click();
+                                              // }
+                                            },
+                                            child: Text("File Laporan",
+                                                textAlign: TextAlign.center),
+                                          ))))),
                           DataCell(Align(
                               alignment: Alignment.center,
                               child: Tooltip(

@@ -22,7 +22,7 @@ class _PersonelGroupState extends State<PersonelGroup> {
 
   Future<String> fetchData() async {
     final response = await http.post(Uri.parse(
-        "http://localhost/magang/admin/personel/personelgroup/daftarpersonelgroup.php"));
+        "http://192.168.137.1/magang/admin/personel/personelgroup/daftarpersonelgroup.php"));
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -217,6 +217,11 @@ class _PersonelGroupState extends State<PersonelGroup> {
       return Scaffold(
         appBar: AppBar(
           title: Text("Personnel Group"),
+          leading: BackButton(
+            onPressed: () {
+              Navigator.popAndPushNamed(context, "homepage");
+            },
+          ),
         ),
         body: Center(
           child: Text(

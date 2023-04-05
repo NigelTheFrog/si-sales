@@ -33,7 +33,7 @@ class _dynamicWidgetBeliState extends State<dynamicWidgetBeli> {
   Future<List> daftarproduct() async {
     Map json;
     final response = await http.post(
-      Uri.parse("http://localhost/magang/admin/product/daftarproduct.php"),
+      Uri.parse("http://192.168.137.1/magang/admin/product/daftarproduct.php"),
     );
     if (response.statusCode == 200) {
       json = jsonDecode(response.body);
@@ -150,7 +150,6 @@ class _BuatPembelianState extends State<BuatPembelian> {
       _username = "",
       _ppn = "",
       _diskon = "",
-      controllerSupplier = "",
       id_cabang = "";
   var _foto = null, _foto_proses = null;
   List _supplier = [];
@@ -193,7 +192,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
       base64Image = "";
     }
     final response = await http.post(
-        Uri.parse("http://localhost/magang/laporan/pembelian/buatlaporan.php"),
+        Uri.parse("http://192.168.137.1/magang/laporan/pembelian/buatlaporan.php"),
         body: {
           'id': id.toString(),
           'id_supplier': _id_supplier,
@@ -296,6 +295,11 @@ class _BuatPembelianState extends State<BuatPembelian> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              Navigator.popAndPushNamed(context, "daftarpembelian");
+            },
+          ),
           title: Text("Buat Laporan Pembelian"),
         ),
         body: SingleChildScrollView(
@@ -323,7 +327,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
                         Map json;
                         var response = await http.post(
                             Uri.parse(
-                                "http://localhost/magang/supplier/daftarsupplier.php"),
+                                "http://192.168.137.1/magang/supplier/daftarsupplier.php"),
                             body: {'cari': text});
 
                         if (response.statusCode == 200) {
@@ -336,7 +340,6 @@ class _BuatPembelianState extends State<BuatPembelian> {
                       },
                       onChanged: (value) {
                         setState(() {
-                          controllerSupplier = value['nama_supplier'];
                           _id_supplier = value['id'];
                         });
                       },

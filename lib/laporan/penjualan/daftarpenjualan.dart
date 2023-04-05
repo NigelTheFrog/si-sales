@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -23,7 +22,8 @@ String nama_depan = "",
     id_jabatan = "",
     startdate = "",
     enddate = "",
-    id_cabang = "";
+    id_cabang = "",
+    id_grup = "";
 
 class DaftarPenjualan extends StatefulWidget {
   DaftarPenjualan({Key? key}) : super(key: key);
@@ -49,6 +49,7 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
       nama_depan = prefs.getString("nama_depan") ?? '';
       nama_belakang = prefs.getString("nama_belakang") ?? '';
       id_cabang = prefs.getString("idCabang") ?? '';
+      id_grup = prefs.getString("idGrup") ?? '';
     });
   }
 
@@ -69,14 +70,15 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://localhost/magang/laporan/penjualan/daftarpenjualan.php"),
+            "http://192.168.137.1/magang/laporan/penjualan/daftarpenjualan.php"),
         body: {
           'startdate': startdate,
           'enddate': enddate,
           'cari': _txtcari,
           'idjabatan': id_jabatan,
           'idcabang': id_cabang,
-          'username': username
+          'username': username,
+          'id_grup': id_grup
         });
     if (response.statusCode == 200) {
       return response.body;
@@ -225,29 +227,23 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                                               showDialog(
                                                   context: context,
                                                   builder: (context) => AlertDialog(
-                                                      content: Container(
-                                                          width: 500,
-                                                          height: 500,
-                                                          child: Tooltip(
-                                                              message: "Halaman Detail Penjualan",
-                                                              child: GestureDetector(
-                                                                  onTap: () {
-                                                                    // _write(element
-                                                                    //         .foto
-                                                                    //     as String);
-                                                                    // _write(
-                                                                    //     base64Decode(element.foto
-                                                                    //         as String),
-                                                                    //     element
-                                                                    //         .id);
-                                                                    Navigator.push(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                            builder: (context) => DetailPenjualan(
-                                                                                  laporan_id: element.id,
-                                                                                )));
-                                                                  },
-                                                                  child: Image.memory(base64Decode(element.foto as String)))))));
+                                                      content: kIsWeb
+                                                          ? SizedBox(
+                                                              width: 500,
+                                                              height: 500,
+                                                              child:
+                                                                  showFotoNota(
+                                                                      context,
+                                                                      element
+                                                                          .id,
+                                                                      element
+                                                                          .foto))
+                                                          : FittedBox(
+                                                              child: showFotoNota(
+                                                                  context,
+                                                                  element.id,
+                                                                  element
+                                                                      .foto))));
                                             },
                                             child: Text(element.id,
                                                 textAlign: TextAlign.center),
@@ -278,6 +274,21 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                         .toList()));
           });
     }
+  }
+
+  Widget showFotoNota(BuildContext context, id, foto) {
+    return Tooltip(
+        message: "Halaman Detail Penjualan",
+        child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailPenjualan(
+                            laporan_id: id,
+                          )));
+            },
+            child: Image.memory(base64Decode(foto))));
   }
 
   Widget buttonTambahPenjualan(BuildContext context) {
@@ -314,7 +325,7 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
 
   Widget tanggalSelesai(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: 60,
       width: 300,
       child: Row(children: [
         Expanded(
@@ -351,7 +362,7 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
 
   Widget tanggalMulai(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: 60,
       width: 300,
       child: Row(children: [
         Expanded(
@@ -400,14 +411,23 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                 width: 400,
                 child: MediaQuery.of(context).size.width > 390
                     ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment:
+                            id_jabatan == "1" || id_jabatan == "2"
+                                ? MainAxisAlignment.spaceBetween
+                                : MainAxisAlignment.center,
                         children: <Widget>[
-                            buttonTambahPenjualan(context),
+                            if (id_jabatan == "1" || id_jabatan == "2")
+                              buttonTambahPenjualan(context),
                             kolomCari()
                           ])
                     : Column(
+                        mainAxisAlignment:
+                            id_jabatan == "1" || id_jabatan == "2"
+                                ? MainAxisAlignment.spaceBetween
+                                : MainAxisAlignment.center,
                         children: <Widget>[
-                          buttonTambahPenjualan(context),
+                          if (id_jabatan == "1" || id_jabatan == "2")
+                            buttonTambahPenjualan(context),
                           kolomCari()
                         ],
                       )),
@@ -466,7 +486,11 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     } else {
       return Scaffold(
           appBar: AppBar(
-            leading: BackButton(),
+            leading: BackButton(
+              onPressed: () {
+                Navigator.popAndPushNamed(context, "homepage");
+              },
+            ),
             title: Text("Daftar Penjualan"),
           ),
           body: buildContainer(context));
