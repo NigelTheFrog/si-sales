@@ -215,7 +215,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         dispose();
-        Navigator.popAndPushNamed(context, "daftarpenjualan");
+        Navigator.popAndPushNamed(context, "/daftarpenjualan");
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -226,7 +226,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
           warningDialog(context,
               "${json['Error']}\nSilahkan contact leader anda untuk menambahkan jumlah stock pada sistem");
         });
-        Navigator.popAndPushNamed(context, "daftarpenjualan");
+        Navigator.popAndPushNamed(context, "/daftarpenjualan");
       }
     } else {
       throw Exception('Failed to read API');

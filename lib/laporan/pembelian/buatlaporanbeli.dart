@@ -192,7 +192,8 @@ class _BuatPembelianState extends State<BuatPembelian> {
       base64Image = "";
     }
     final response = await http.post(
-        Uri.parse("http://192.168.137.1/magang/laporan/pembelian/buatlaporan.php"),
+        Uri.parse(
+            "http://192.168.137.1/magang/laporan/pembelian/buatlaporan.php"),
         body: {
           'id': id.toString(),
           'id_supplier': _id_supplier,
@@ -212,7 +213,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         dispose();
-        Navigator.popAndPushNamed(context, "daftarpembelian");
+        Navigator.popAndPushNamed(context, "/daftarpembelian");
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -297,7 +298,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
         appBar: AppBar(
           leading: BackButton(
             onPressed: () {
-              Navigator.popAndPushNamed(context, "daftarpembelian");
+              Navigator.popAndPushNamed(context, "/daftarpembelian");
             },
           ),
           title: Text("Buat Laporan Pembelian"),

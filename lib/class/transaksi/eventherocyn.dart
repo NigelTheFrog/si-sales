@@ -12,14 +12,14 @@
 //   final int? jumlah_penjualan, total_penjualan, status_proposal;
 //   final List? produk;
 //   final List? kebutuhan;
-class Event {
+class EventHerocyn {
   final String id, nama, lokasi, tanggal, username, nama_depan, nama_belakang;
   final List? produk;
   final String? tujuan, laporan, proposal;
   final int? status_proposal, status_laporan;
   final List? kebutuhan;
 
-  Event({
+  EventHerocyn({
     required this.id,
     required this.tanggal,
     required this.nama,
@@ -40,8 +40,8 @@ class Event {
     this.produk,
   });
 
-  factory Event.fromJson(Map<String, dynamic> json) {
-    return Event(
+  factory EventHerocyn.fromJson(Map<String, dynamic> json) {
+    return EventHerocyn(
         id: json['id'] as String,
         tanggal: json['tanggal'] as String,
         nama: json['nama'] as String,

@@ -56,10 +56,11 @@ class _HomeState extends State<Home> {
               child: SingleChildScrollView(
                   child: Column(children: <Widget>[
             Text(
-              "\nSelamat datang \n$nama_depan $nama_belakang \n", textAlign: TextAlign.center,
+              "\nSelamat datang \n$nama_depan $nama_belakang \n",
+              textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Container(
+            SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: 700,
                 child: GridView.count(
@@ -79,7 +80,7 @@ class _HomeState extends State<Home> {
                           // );
                         },
                         child: Card(
-                            child: Container(
+                            child: SizedBox(
                                 width: double.infinity,
                                 height: double.infinity,
                                 child: Column(
@@ -125,15 +126,11 @@ class _HomeState extends State<Home> {
                                 )))),
                     GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DaftarPembelian(),
-                            ),
-                          );
+                          Navigator.popAndPushNamed(
+                              context, "/tambahlaporanpenjualan");
                         },
                         child: Card(
-                            child: Container(
+                            child: SizedBox(
                                 width: double.infinity,
                                 height: double.infinity,
                                 child: Column(
@@ -148,7 +145,7 @@ class _HomeState extends State<Home> {
                                       style: TextStyle(fontSize: 16),
                                     )
                                   ],
-                                )))),                    
+                                )))),
                     GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -174,7 +171,9 @@ class _HomeState extends State<Home> {
                                     )
                                   ],
                                 )))),
-                                if (id_jabatan != "3")
+                    if (id_jabatan != "3" &&
+                        id_jabatan != "4" &&
+                        id_jabatan != "5")
                       GestureDetector(
                           onTap: () {
                             Navigator.popAndPushNamed(

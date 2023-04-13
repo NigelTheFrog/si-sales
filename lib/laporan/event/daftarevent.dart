@@ -1,8 +1,8 @@
 import 'dart:convert';
-// import "package:universal_html/html.dart";
+import "package:universal_html/html.dart" as universal_html;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/class/transaksi/event.dart';
+import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:pt_coronet_crown/laporan/event/detailevent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,7 +66,7 @@ class _DaftarEventState extends State<DaftarEvent> {
   }
 
   Widget daftarEvent(data, context) {
-    List<Event> event2 = [];
+    List<EventHerocyn> event2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
       return SingleChildScrollView(
@@ -108,7 +108,7 @@ class _DaftarEventState extends State<DaftarEvent> {
               ], rows: [])));
     } else {
       for (var pen in json['data']) {
-        Event event = Event.fromJson(pen);
+        EventHerocyn event = EventHerocyn.fromJson(pen);
         event2.add(event);
       }
       return ListView.builder(
@@ -212,14 +212,14 @@ class _DaftarEventState extends State<DaftarEvent> {
                                                       FontWeight.normal),
                                             ),
                                             onPressed: () {
-                                              // if (kIsWeb) {
-                                              //   AnchorElement(
-                                              //       href:
-                                              //           "data:application/octet-stream;charset=utf-16le;base64,${element.laporan}")
-                                              //     ..setAttribute("download",
-                                              //         "proposal-${element.id}.pdf")
-                                              //     ..click();
-                                              // }
+                                              if (kIsWeb) {
+                                                universal_html.AnchorElement(
+                                                    href:
+                                                        "data:application/octet-stream;charset=utf-16le;base64,${element.laporan}")
+                                                  ..setAttribute("download",
+                                                      "proposal-${element.id}.pdf")
+                                                  ..click();
+                                              }
                                             },
                                             child: Text("File Laporan",
                                                 textAlign: TextAlign.center),

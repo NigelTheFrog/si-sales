@@ -221,7 +221,7 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
         style: ElevatedButton.styleFrom(
             backgroundColor: Color.fromARGB(255, 248, 172, 49)),
         onPressed: () {
-          Navigator.popAndPushNamed(context, "tambahlaporanpembelian");
+          Navigator.popAndPushNamed(context, "/tambahlaporanpembelian");
         },
         child: Text(
           "Tambah Pembelian",

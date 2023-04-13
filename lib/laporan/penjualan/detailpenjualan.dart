@@ -372,7 +372,8 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Outlet: ${_penjualan!.nama_toko} \n ${_penjualan!.alamat}",
+                Text(
+                    "Outlet: ${_penjualan!.nama_toko} \n ${_penjualan!.alamat}",
                     textAlign: TextAlign.center,
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -391,7 +392,6 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
               ],
             ),
           ),
-          
         ]));
   }
 
@@ -443,6 +443,11 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
     return Scaffold(
         appBar: AppBar(
           title: Text("Detail Penjualan"),
+          leading: BackButton(
+            onPressed: () {
+              Navigator.popAndPushNamed(context, "/daftarpenjualan");
+            },
+          ),
         ),
         body: _penjualan == null
             ? Container(

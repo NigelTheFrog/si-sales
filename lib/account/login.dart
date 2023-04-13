@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,10 +14,11 @@ class MyLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primaryColor: Colors.blue,
+          ),
       home: Login(),
     );
   }
@@ -33,6 +36,13 @@ class _LoginState extends State<Login> {
   String _password = "";
   String error_login = "";
   String picture = "null";
+
+//   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+//if (Platform.isAndroid) {
+//   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+// } else if (Platform.isIOS) {
+//   // iOS-specific code
+// }
 
   @override
   void initState() {

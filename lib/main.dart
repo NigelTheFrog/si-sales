@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
@@ -12,12 +13,16 @@ import 'package:pt_coronet_crown/laporan/event/daftarevent.dart';
 import 'package:pt_coronet_crown/laporan/event/daftarproposal.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/buatlaporanbeli.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
+import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
+import 'package:pt_coronet_crown/mainpage/history.dart';
 import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
 
-String username = "", idjabatan = "", avatar = "";
+String username = "", idjabatan = "";
+var avatar = "";
 
 Future<String> checkUser() async {
   final prefs = await SharedPreferences.getInstance();
@@ -74,11 +79,12 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'Home'),
       debugShowCheckedModeBanner: false,
       routes: {
-        "daftarpembelian": (context) => DaftarPembelian(),
-        "daftarpenjualan": (context) => DaftarPenjualan(),
-        "tambahlaporanpenjualan": (context) => BuatPenjualan(),
-        "tambahlaporanpembelian": (context) => BuatPembelian(),
-        "homepage": (context) => MyApp(),
+        "/daftarpembelian": (context) => DaftarPembelian(),
+        "/daftarpenjualan": (context) => DaftarPenjualan(),
+        "/tambahlaporanpenjualan": (context) => BuatPenjualan(),
+        "/tambahlaporanpembelian": (context) => BuatPembelian(),
+        "/homepage": (context) => MyApp(),
+
         // "daftarproposal": (context) => DaftarProposal(),
         // "daftarevent": (context) => DaftarEvent(),
 
@@ -106,8 +112,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
-  final List<Widget> _screens = [Home()];
-  // final List<String> _title = ['Home', 'My Creation', 'List Sensor', 'Setting'];
+  final List<Widget> _screens = [Home(), History()];
+  // final List<String> _title = ['Home', 'History'];
 
   Widget myBottomNavBar() {
     return BottomNavigationBar(
@@ -159,21 +165,27 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Image.asset('assets/crn.png', height: 50, fit: BoxFit.cover),
-          actions: <Widget>[
+            title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Image.asset('assets/crn.png', height: 50, fit: BoxFit.cover),
             CircleAvatar(
               backgroundImage: Image.memory(base64Decode(avatar)).image,
               radius: 23,
-            ),
+            )
           ],
-        ),
+        )
+            // actions: <Widget>[
+
+            // ],
+            ),
         body: _screens[_currentIndex],
         bottomNavigationBar: myBottomNavBar(),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
             doLogout();
           },
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.orange,
           label: Text("Logout", style: TextStyle(color: Colors.white)),
           icon: const Icon(Icons.logout),
         ),

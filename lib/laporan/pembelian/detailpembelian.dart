@@ -438,7 +438,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
           title: Text("Detail Pembelian"),
           leading: BackButton(
             onPressed: () {
-              Navigator.popAndPushNamed(context, "daftarpembelian");
+              Navigator.popAndPushNamed(context, "/daftarpembelian");
             },
           ),
         ),

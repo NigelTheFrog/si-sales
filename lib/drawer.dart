@@ -119,7 +119,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     title: const Text("Pembelian"),
                     leading: const Icon(Clippy.clippy),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "daftarpembelian");
+                      Navigator.popAndPushNamed(context, "/daftarpembelian");
                     },
                   ),
                   ListTile(
