@@ -5,6 +5,8 @@ import 'package:pt_coronet_crown/customicon/calendar_icons.dart';
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
 import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
 import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
+import 'package:pt_coronet_crown/customicon/jabatan_icons.dart';
+import 'package:pt_coronet_crown/customicon/outlet_icons.dart';
 import 'package:pt_coronet_crown/customicon/produk_icons.dart';
 import 'package:pt_coronet_crown/customicon/proposal_icons.dart';
 import 'package:pt_coronet_crown/customicon/transaction_icons.dart';
@@ -78,14 +80,14 @@ class _MyDrawerState extends State<MyDrawer> {
                     title: const Text("Personel Data"),
                     leading: const Icon(Icons.account_box),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "daftarpersonel");
+                      Navigator.popAndPushNamed(context, "/daftarpersonel");
                     },
                   ),
                   ListTile(
                     title: const Text("Personel Group"),
                     leading: const Icon(Icons.group),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "daftargrup");
+                      Navigator.popAndPushNamed(context, "/daftargrup");
                     },
                   ),
                 ],
@@ -126,7 +128,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     title: const Text("Penjualan"),
                     leading: const Icon(ClipBoardCheck.clipboard_check),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "daftarpenjualan");
+                      Navigator.popAndPushNamed(context, "/daftarpenjualan");
                     },
                   ),
                 ],
@@ -139,17 +141,24 @@ class _MyDrawerState extends State<MyDrawer> {
                     title: const Text("Proposal Event"),
                     leading: const Icon(Proposal.doc_text_inv),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "daftarproposal");
+                      Navigator.popAndPushNamed(context, "/daftarproposal");
                     },
                   ),
                   ListTile(
                     title: const Text("Riwayat Event"),
                     leading: const Icon(Calendar.event),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "daftarevent");
+                      Navigator.popAndPushNamed(context, "/daftarevent");
                     },
                   ),
                 ],
+              ),
+              ListTile(
+                title: const Text("Outlet"),
+                leading: const Icon(Outlet.industrial_building),
+                onTap: () {
+                  Navigator.popAndPushNamed(context, "/daftaroutlet");
+                },
               ),
               ExpansionTile(
                 title: const Text("Company"),
@@ -173,7 +182,14 @@ class _MyDrawerState extends State<MyDrawer> {
                     title: const Text("Daftar Produk"),
                     leading: const Icon(Produk.box_open),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "daftarproduk");
+                      Navigator.popAndPushNamed(context, "/daftarproduk");
+                    },
+                  ),
+                  ListTile(
+                    title: const Text("Daftar Jabatan"),
+                    leading: const Icon(Jabatan.group),
+                    onTap: () {
+                      Navigator.popAndPushNamed(context, "/daftarjabatan");
                     },
                   ),
                 ],

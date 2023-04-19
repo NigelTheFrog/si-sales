@@ -42,7 +42,7 @@ dependencies:
   dropdown_search: ^3.0.0
   syncfusion_flutter_pdf: ^20.3.49
   universal_html: ^2.2.1
-  device_info_plus: ^8.0.1
+  device_info_plus: ^5.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -61,6 +61,7 @@ flutter_icons:
 dev_dependencies:
   flutter_launcher_icons: ^0.9.3
   flutter_native_splash: ^2.2.16
+  unique_identifier: ^0.3.0
   flutter_test:
     sdk: flutter
 
@@ -120,6 +121,12 @@ flutter:
     - family: Produk
       fonts:
       - asset: assets/fonts/Produk.ttf
+    - family: Jabatan
+      fonts:
+      - asset: assets/fonts/Jabatan.ttf
+    - family: Outlet
+      fonts:
+      - asset: assets/fonts/Outlet.ttf
 
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf

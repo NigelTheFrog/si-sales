@@ -58,6 +58,13 @@ class _PersonelDataState extends State<PersonelData> {
     });
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadData();
+  }
+
   List<Widget> listPersonel(BuildContext context, data) {
     List<Widget> temp = [];
     List<Person> person2 = [];
@@ -102,6 +109,11 @@ class _PersonelDataState extends State<PersonelData> {
                                       namaJabatan: person2[i].jabatan,
                                       namaCabang: person2[i].nama_cabang,
                                       email: person2[i].email,
+                                      idcabang: person2[i].id_cabang,
+                                      idjabatan:
+                                          person2[i].id_jabatan.toString(),
+                                      idgrup: person2[i].id_grup,
+                                      namaGrup: person2[i].nama_grup,
                                     )));
                       },
                     ),
@@ -274,7 +286,7 @@ class _PersonelDataState extends State<PersonelData> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text("Personnel Group"),
+          title: Text("Personnel Data"),
           leading: BackButton(
             onPressed: () {
               Navigator.popAndPushNamed(context, "homepage");

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/account/createacount.dart';

@@ -200,6 +200,42 @@ class _HistoryState extends State<History> {
     }
   }
 
+  Widget buildHistoryPembelian() {
+    return Container(
+        padding: EdgeInsets.all(10),
+        height: MediaQuery.of(context).size.height - 150,
+        width: MediaQuery.of(context).size.width,
+        child: FutureBuilder(
+            future: fetchDataHistoryPembelian(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return daftarHistoryPembelian(snapshot.data.toString());
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            }));
+  }
+
+  Widget buildHistoryPenjualan() {
+    return Container(
+        padding: EdgeInsets.all(10),
+        height: MediaQuery.of(context).size.height - 150,
+        width: MediaQuery.of(context).size.width,
+        child: FutureBuilder(
+            future: fetchDataHistoryPenjualan(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return daftarHistoryPenjualan(snapshot.data.toString());
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            }));
+  }
+
+  Widget buildHistoryEvent() {
+    return Container();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -238,42 +274,19 @@ class _HistoryState extends State<History> {
                       size: 20,
                     ),
                     child: Text(
-                      "Riwayat Penjualan",
+                      "Riwayat Event",
                       style: TextStyle(fontSize: 10),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ])),
-                body: TabBarView(children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.all(10),
-                      height: MediaQuery.of(context).size.height - 150,
-                      width: MediaQuery.of(context).size.width,
-                      child: FutureBuilder(
-                          future: fetchDataHistoryPenjualan(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return daftarHistoryPenjualan(
-                                  snapshot.data.toString());
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          })),
-                  Container(
-                      padding: EdgeInsets.all(10),
-                      height: MediaQuery.of(context).size.height - 150,
-                      width: MediaQuery.of(context).size.width,
-                      child: FutureBuilder(
-                          future: fetchDataHistoryPembelian(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return daftarHistoryPembelian(
-                                  snapshot.data.toString());
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          })),
-                  Container()
-                ]))));
+                body: TabBarView(
+                    children: id_jabatan == "3"
+                        ? <Widget>[buildHistoryPenjualan(), buildHistoryEvent()]
+                        : <Widget>[
+                            buildHistoryPenjualan(),
+                            buildHistoryPembelian(),
+                            buildHistoryEvent()
+                          ]))));
   }
 }

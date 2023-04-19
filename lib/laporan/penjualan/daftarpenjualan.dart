@@ -45,7 +45,7 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       username = prefs.getString("username") ?? '';
-      id_jabatan = prefs.getString("idjabatan") ?? '';
+      id_jabatan = prefs.getString("idJabatan") ?? '';
       nama_depan = prefs.getString("nama_depan") ?? '';
       nama_belakang = prefs.getString("nama_belakang") ?? '';
       id_cabang = prefs.getString("idCabang") ?? '';

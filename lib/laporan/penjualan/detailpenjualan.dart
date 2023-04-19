@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailPenjualan extends StatefulWidget {
   String laporan_id;
@@ -24,8 +25,14 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
       diskon = "0",
       ppn = "0",
       _id_outlet = "",
-      controllerOutlet = "";
+      controllerOutlet = "",
+      id_jabatan = "";
   List _outlet = [];
+
+  _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    id_jabatan = prefs.getString("idJabatan") ?? '';
+  }
 
   Future<String> fetchData() async {
     final response = await http.post(
@@ -82,6 +89,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
     // TODO: implement initState
     super.initState();
     bacaData();
+    _loadData();
   }
 
   updateDialog(BuildContext context, type) {
@@ -445,7 +453,11 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
           title: Text("Detail Penjualan"),
           leading: BackButton(
             onPressed: () {
-              Navigator.popAndPushNamed(context, "/daftarpenjualan");
+              if (id_jabatan == "1" || id_jabatan == "2") {
+                Navigator.popAndPushNamed(context, "/daftarpenjualan");
+              } else {
+                Navigator.pop(context);
+              }
             },
           ),
         ),

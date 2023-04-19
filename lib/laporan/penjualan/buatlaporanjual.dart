@@ -77,10 +77,20 @@ class _dynamicWidgetJualState extends State<dynamicWidgetJual> {
         comboProduct = DropdownButtonHideUnderline(
             child: DropdownButton(
                 hint: widget.controllerProduct == ""
-                    ? Text("Daftar Product")
+                    ? Text(
+                        "Daftar Product",
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width >= 720
+                                ? 14
+                                : 12),
+                      )
                     : Text(
                         widget.controllerProduct,
-                        style: TextStyle(color: Colors.black),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: MediaQuery.of(context).size.width >= 720
+                                ? 14
+                                : 12),
                       ),
                 isDense: false,
                 items: produks.map((produk) {
@@ -101,20 +111,23 @@ class _dynamicWidgetJualState extends State<dynamicWidgetJual> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 420,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width >= 720 ? 420 : 323,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           SizedBox(
             height: 50,
-            width: 150,
+            width: MediaQuery.of(context).size.width >= 720 ? 150 : 136,
             child: comboProduct,
           ),
           SizedBox(
               height: 50,
-              width: 110,
+              width: MediaQuery.of(context).size.width >= 720 ? 110 : 50,
               child: TextFormField(
+                style: TextStyle(
+                    fontSize:
+                        MediaQuery.of(context).size.width >= 720 ? 14 : 12),
                 controller: widget.quantityController,
                 decoration: const InputDecoration(
                   labelText: 'Quantity',
@@ -123,8 +136,11 @@ class _dynamicWidgetJualState extends State<dynamicWidgetJual> {
               )),
           SizedBox(
               height: 50,
-              width: 140,
+              width: MediaQuery.of(context).size.width >= 720 ? 140 : 115,
               child: TextFormField(
+                style: TextStyle(
+                    fontSize:
+                        MediaQuery.of(context).size.width >= 720 ? 14 : 12),
                 controller: widget.hargaController,
                 decoration: const InputDecoration(
                   labelText: 'Harga (per barang)',
@@ -153,7 +169,8 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
       _username = "",
       _ppn = "",
       _diskon = "",
-      controllerOutlet = "";
+      controllerOutlet = "",
+      id_jabatan = "";
   var _foto = null, _foto_proses = null;
   List _outlet = [];
 
@@ -170,6 +187,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _username = prefs.getString("username") ?? '';
     idCabang = prefs.getString("idCabang") ?? '';
+    id_jabatan = prefs.getString("idJabatan") ?? '';
   }
 
   void warningDialog(context, warning_message) {
@@ -195,7 +213,8 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
       base64Image = "";
     }
     final response = await http.post(
-        Uri.parse("http://192.168.137.1/magang/laporan/penjualan/buatlaporan.php"),
+        Uri.parse(
+            "http://192.168.137.1/magang/laporan/penjualan/buatlaporan.php"),
         body: {
           'id': id.toString(),
           'id_outlet': _id_outlet,
@@ -233,7 +252,6 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     }
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -263,6 +281,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
       img.Image temp2 = img.copyResize(temp!, width: 500, height: 480);
       setState(() {
         _foto_proses = Uint8List.fromList(img.encodeJpg(temp2));
+        fileName.text = filePath;
       });
     });
   }
@@ -306,6 +325,15 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     return Scaffold(
         appBar: AppBar(
           title: Text("Buat Laporan Penjualan"),
+          leading: BackButton(
+            onPressed: () {
+              if (id_jabatan == "1" || id_jabatan == "2") {
+                Navigator.popAndPushNamed(context, "/daftarpenjualan");
+              } else {
+                Navigator.popAndPushNamed(context, "/homepage");
+              }
+            },
+          ),
         ),
         body: SingleChildScrollView(
             child: Container(
@@ -324,6 +352,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                     alignment: Alignment.center,
                     child: DropdownSearch<dynamic>(
                       dropdownSearchDecoration: InputDecoration(
+                        hintText: "Daftar Outlet",
                         labelText: "Daftar Outlet",
                       ),
                       mode: Mode.MENU,
@@ -373,7 +402,13 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                                     // harga.removeAt(index);
                                     // quantity.removeAt(index);
                                   },
-                                  icon: Icon(Icons.delete),
+                                  icon: Icon(
+                                    Icons.delete,
+                                    size:
+                                        MediaQuery.of(context).size.width >= 720
+                                            ? 40
+                                            : 25,
+                                  ),
                                 ),
                               )
                             ],
@@ -406,8 +441,17 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                           children: [
                             Container(
                                 padding: EdgeInsets.only(right: 10),
-                                width: 230,
+                                width: MediaQuery.of(context).size.width >= 720
+                                    ? 230
+                                    : 180,
                                 child: TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width >= 720
+                                            ? 14
+                                            : 12,
+                                  ),
                                   decoration: const InputDecoration(
                                     labelText: 'Diskon (diskon total)',
                                   ),
@@ -422,9 +466,18 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                                   },
                                 )),
                             Container(
-                                width: 230,
+                                width: MediaQuery.of(context).size.width >= 720
+                                    ? 230
+                                    : 180,
                                 padding: EdgeInsets.only(left: 10),
                                 child: TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width >= 720
+                                            ? 14
+                                            : 12,
+                                  ),
                                   decoration: const InputDecoration(
                                     labelText: 'PPN (dalam %)',
                                   ),
@@ -446,11 +499,17 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       SizedBox(
-                        width: 320,
-                        height: 50,
+                        width: MediaQuery.of(context).size.width >= 720
+                            ? 350
+                            : 290,
+                        height: 60,
                         child: TextFormField(
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width >= 720
+                                  ? 14
+                                  : 12,
+                              color: Colors.grey),
                           controller: fileName,
-                          style: TextStyle(color: Colors.grey),
                           enabled: false,
                           decoration: InputDecoration(
                             labelText: "Foto nota",
@@ -464,7 +523,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                       ),
                       SizedBox(
                         height: 50,
-                        width: _foto_proses == null ? 120 : 70,
+                        width: 60,
                         child: ElevatedButton(
                           onPressed: () {
                             if (_foto_proses == null) {
@@ -481,7 +540,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                             }
                           },
                           child: _foto_proses == null
-                              ? Text('Upload file')
+                              ? Icon(Icons.upload)
                               : const Icon(Icons.delete),
                         ),
                       ),

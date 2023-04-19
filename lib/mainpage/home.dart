@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:unique_identifier/unique_identifier.dart';
 
 String nama_depan = "", nama_belakang = "", username = "", id_jabatan = "";
 
@@ -31,11 +34,23 @@ class _HomeState extends State<Home> {
     });
   }
 
+  getDeviceInfor() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      String? identifier = await UniqueIdentifier.serial;
+      print("Device Id: $identifier");
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      print(iosInfo.identifierForVendor);
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _loadData();
+    getDeviceInfor();
   }
 
   @override
@@ -200,7 +215,7 @@ class _HomeState extends State<Home> {
                       GestureDetector(
                           onTap: () {
                             Navigator.popAndPushNamed(
-                                context, "daftarpenjualan");
+                                context, "/daftarpenjualan");
                           },
                           child: Card(
                               child: Container(

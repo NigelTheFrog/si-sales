@@ -74,10 +74,20 @@ class _dynamicWidgetBeliState extends State<dynamicWidgetBeli> {
         comboProduct = DropdownButtonHideUnderline(
             child: DropdownButton(
                 hint: widget.controllerProduct == ""
-                    ? Text("Daftar Product")
+                    ? Text(
+                        "Daftar Product",
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width >= 720
+                                ? 14
+                                : 12),
+                      )
                     : Text(
                         widget.controllerProduct,
-                        style: TextStyle(color: Colors.black),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: MediaQuery.of(context).size.width >= 720
+                                ? 14
+                                : 12),
                       ),
                 isDense: false,
                 items: produks.map((produk) {
@@ -99,19 +109,22 @@ class _dynamicWidgetBeliState extends State<dynamicWidgetBeli> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 420,
+      width: MediaQuery.of(context).size.width >= 720 ? 420 : 323,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           SizedBox(
             height: 50,
-            width: 150,
+            width: MediaQuery.of(context).size.width >= 720 ? 150 : 136,
             child: comboProduct,
           ),
           SizedBox(
               height: 50,
-              width: 110,
+              width: MediaQuery.of(context).size.width >= 720 ? 110 : 50,
               child: TextFormField(
+                style: TextStyle(
+                    fontSize:
+                        MediaQuery.of(context).size.width >= 720 ? 14 : 12),
                 controller: widget.quantityController,
                 decoration: const InputDecoration(
                   labelText: 'Quantity',
@@ -120,8 +133,11 @@ class _dynamicWidgetBeliState extends State<dynamicWidgetBeli> {
               )),
           SizedBox(
               height: 50,
-              width: 140,
+              width: MediaQuery.of(context).size.width >= 720 ? 140 : 115,
               child: TextFormField(
+                style: TextStyle(
+                    fontSize:
+                        MediaQuery.of(context).size.width >= 720 ? 14 : 12),
                 controller: widget.hargaController,
                 decoration: const InputDecoration(
                   labelText: 'Harga (per barang)',
@@ -398,8 +414,16 @@ class _BuatPembelianState extends State<BuatPembelian> {
                           children: [
                             Container(
                                 padding: EdgeInsets.only(right: 10),
-                                width: 230,
+                                width: MediaQuery.of(context).size.width >= 720
+                                    ? 230
+                                    : 180,
                                 child: TextFormField(
+                                  style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width >=
+                                                  720
+                                              ? 14
+                                              : 12),
                                   decoration: const InputDecoration(
                                     labelText: 'Diskon (diskon total)',
                                   ),
@@ -414,9 +438,17 @@ class _BuatPembelianState extends State<BuatPembelian> {
                                   },
                                 )),
                             Container(
-                                width: 230,
+                                width: MediaQuery.of(context).size.width >= 720
+                                    ? 230
+                                    : 180,
                                 padding: EdgeInsets.only(left: 10),
                                 child: TextFormField(
+                                  style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width >=
+                                                  720
+                                              ? 14
+                                              : 12),
                                   decoration: const InputDecoration(
                                     labelText: 'PPN (dalam %)',
                                   ),
@@ -438,11 +470,17 @@ class _BuatPembelianState extends State<BuatPembelian> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       SizedBox(
-                        width: 320,
-                        height: 50,
+                        width: MediaQuery.of(context).size.width >= 720
+                            ? 350
+                            : 290,
+                        height: 60,
                         child: TextFormField(
                           controller: fileName,
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width >= 720
+                                  ? 14
+                                  : 12,
+                              color: Colors.grey),
                           enabled: false,
                           decoration: InputDecoration(
                             labelText: "Foto nota",
@@ -456,7 +494,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
                       ),
                       SizedBox(
                         height: 50,
-                        width: _foto_proses == null ? 120 : 70,
+                        width: 60,
                         child: ElevatedButton(
                           onPressed: () {
                             if (_foto_proses == null) {
@@ -473,7 +511,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
                             }
                           },
                           child: _foto_proses == null
-                              ? Text('Upload file')
+                              ? Icon(Icons.upload)
                               : const Icon(Icons.delete),
                         ),
                       ),

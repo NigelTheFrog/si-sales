@@ -60,7 +60,12 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
     final response = await http.post(
         Uri.parse(
             "http://192.168.137.1/magang/laporan/pembelian/daftarpembelian.php"),
-        body: {'startdate': startdate, 'enddate': enddate, 'cari': _txtcari});
+        body: {
+          'startdate': startdate,
+          'enddate': enddate,
+          'cari': _txtcari,
+          'type': "1"
+        });
     if (response.statusCode == 200) {
       return response.body;
     } else {

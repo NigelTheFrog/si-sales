@@ -4,16 +4,17 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
+import 'package:pt_coronet_crown/admin/company/daftarkota.dart';
+import 'package:pt_coronet_crown/admin/jabatan/daftarjabatan.dart';
 import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
-import 'package:pt_coronet_crown/class/admin/daftarproduk.dart';
+import 'package:pt_coronet_crown/admin/company/daftarproduk.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:pt_coronet_crown/laporan/event/daftarevent.dart';
 import 'package:pt_coronet_crown/laporan/event/daftarproposal.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/buatlaporanbeli.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
-import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
 import 'package:pt_coronet_crown/mainpage/history.dart';
@@ -89,13 +90,13 @@ class MyApp extends StatelessWidget {
         // "daftarevent": (context) => DaftarEvent(),
 
         //harus dilakukan pengecekan id jabatan
-        "daftarpersonel": (context) => PersonelData(),
-        "daftargrup": (context) => PersonelGroup(),
+        "/daftarpersonel": (context) => PersonelData(),
+        "/daftargrup": (context) => PersonelGroup(),
         "tambahstaff": (context) => CreateAccount(),
         "tambahgrup": (context) => CreateGroup(),
-        "daftarproduk": (context) => DaftarProduk(),
-        // "detailpembelian": (context) => PersonelGroup(),
-        // "detailpenjualan": (context) => PersonelGroup(),
+        "/daftarproduk": (context) => DaftarProduk(),
+        "/daftarjabatan": (context) => DaftarJabatan(),
+        "/daftaroutlet": (context) => DaftarKota(),
       },
     );
   }
