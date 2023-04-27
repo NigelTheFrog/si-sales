@@ -24,6 +24,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -141,8 +142,7 @@ class _HomeState extends State<Home> {
                                 )))),
                     GestureDetector(
                         onTap: () {
-                          Navigator.popAndPushNamed(
-                              context, "/tambahlaporanpenjualan");
+                          Navigator.popAndPushNamed(context, "/kunjunganmasuk");
                         },
                         child: Card(
                             child: SizedBox(

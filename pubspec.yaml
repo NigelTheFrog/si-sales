@@ -127,6 +127,12 @@ flutter:
     - family: Outlet
       fonts:
       - asset: assets/fonts/Outlet.ttf
+    - family: AddImage
+      fonts:
+      - asset: assets/fonts/AddImage.ttf
+    - family: AddPenjualan
+      fonts:
+      - asset: assets/fonts/AddPenjualan.ttf
 
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf

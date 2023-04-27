@@ -10,11 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
-import 'package:pt_coronet_crown/class/cabang.dart';
-import 'package:pt_coronet_crown/class/jabatan.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:pt_coronet_crown/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailPersonel extends StatefulWidget {
@@ -149,6 +146,9 @@ class _DetailPersonelState extends State<DetailPersonel> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       id_jabatan = prefs.getString("idJabatan") ?? '';
+      if (id_jabatan != "1" || id_jabatan != "2") {
+        widget.namaDepan = namaDepanController.text = prefs.getString("idJabatan") ?? '';
+      }
     });
   }
 
@@ -157,17 +157,19 @@ class _DetailPersonelState extends State<DetailPersonel> {
     // TODO: implement initState
     super.initState();
     _loadData();
-    usernameController = widget.username;
-    namaDepanController.text = widget.namaDepan;
-    namaBelakangController.text = widget.namaBelakang;
-    emailController.text = widget.email;
-    nomorTeleponController.text = widget.nomorTelepon;
-    namaCabangController.text = widget.namaCabang;
-    namaJabatanController.text = widget.namaJabatan;
-    namaGrupController.text = widget.namaGrup;
-    _idcabang = widget.idcabang;
-    _idjabatan = widget.idjabatan;
-    _idgrup = widget.idgrup;
+    if (id_jabatan == "1" || id_jabatan == "2") {
+      usernameController = widget.username;
+      namaDepanController.text = widget.namaDepan;
+      namaBelakangController.text = widget.namaBelakang;
+      emailController.text = widget.email;
+      nomorTeleponController.text = widget.nomorTelepon;
+      namaCabangController.text = widget.namaCabang;
+      namaJabatanController.text = widget.namaJabatan;
+      namaGrupController.text = widget.namaGrup;
+      _idcabang = widget.idcabang;
+      _idjabatan = widget.idjabatan;
+      _idgrup = widget.idgrup;
+    }
   }
 
   @override
@@ -182,9 +184,15 @@ class _DetailPersonelState extends State<DetailPersonel> {
       dropdownSearchDecoration: InputDecoration(
         hintText: change == 4
             ? namaCabangController.text
-            : namaJabatanController.text,
+            : change == 5
+                ? namaJabatanController.text
+                : namaGrupController.text,
         hintStyle: TextStyle(color: Colors.black),
-        labelText: change == 4 ? "Daftar Cabang" : "Daftar Jabatan",
+        labelText: change == 4
+            ? "Daftar Cabang"
+            : change == 5
+                ? "Daftar Jabatan"
+                : "Daftar Grup",
       ),
       mode: Mode.MENU,
       showSearchBox: false,
@@ -213,8 +221,10 @@ class _DetailPersonelState extends State<DetailPersonel> {
           }
           return _jabatan as List<dynamic>;
         } else {
-          var response = await http.post(Uri.parse(
-              "http://192.168.137.1/magang/admin/jabatan/daftarjabatan.php"));
+          var response = await http.post(
+              Uri.parse(
+                  "http://192.168.137.1/magang/admin/personel/personeldata/personelgrup.php"),
+              body: {'id_cabang': _idcabang});
 
           if (response.statusCode == 200) {
             json = jsonDecode(response.body);
@@ -234,12 +244,14 @@ class _DetailPersonelState extends State<DetailPersonel> {
           namaJabatanController.text = value['jabatan'];
         } else {
           _idgrup = value['id'];
-          namaGrupController.text = value['jabatan'];
+          namaGrupController.text = value['nama_grup'];
         }
       },
       itemAsString: change == 4
           ? (item) => item['nama_cabang']
-          : (item) => item['jabatan'],
+          : change == 5
+              ? (item) => item['jabatan']
+              : (item) => item['nama_grup'],
     );
   }
 
@@ -293,7 +305,9 @@ class _DetailPersonelState extends State<DetailPersonel> {
                       ? Text("Edit Nomor Telepon")
                       : change == 4
                           ? Text("Edit Cabang")
-                          : Text("Edit Jabatan"),
+                          : change == 5
+                              ? Text("Edit Jabatan")
+                              : Text("Edit Grup "),
           content: Container(
               height: 110,
               width: 300,
@@ -315,7 +329,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
                         ),
                       ],
                     )
-                  : change == 4 || change == 5
+                  : change == 4 || change == 5 || change == 6
                       ? generateCombo(change)
                       : TextField(
                           controller: change == 2
@@ -457,9 +471,6 @@ class _DetailPersonelState extends State<DetailPersonel> {
                             decoration: const InputDecoration(
                               labelText: 'Cabang',
                             ),
-                            onChanged: (value) {
-                              nama_belakang = value;
-                            },
                             enabled: false,
                           )),
                       Tooltip(
@@ -485,9 +496,6 @@ class _DetailPersonelState extends State<DetailPersonel> {
                             decoration: const InputDecoration(
                               labelText: 'Jabatan',
                             ),
-                            onChanged: (value) {
-                              nama_belakang = value;
-                            },
                             enabled: false,
                           )),
                       Tooltip(
@@ -501,41 +509,84 @@ class _DetailPersonelState extends State<DetailPersonel> {
                     ],
                   )
                 : Text("Jabatan: ${namaJabatanController.text}")),
+        Padding(
+            padding: EdgeInsets.all(10),
+            child: id_jabatan == "1" || id_jabatan == "2"
+                ? Row(
+                    children: [
+                      SizedBox(
+                          width: 440,
+                          child: TextField(
+                            controller: namaGrupController,
+                            decoration: const InputDecoration(
+                              labelText: 'Grup',
+                            ),
+                            enabled: false,
+                          )),
+                      Tooltip(
+                        child: IconButton(
+                            onPressed: () {
+                              editDialog(6);
+                            },
+                            icon: Icon(Icons.edit)),
+                        message: "Ubah Grup",
+                      )
+                    ],
+                  )
+                : Text("Grup: ${namaGrupController.text}")),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Detail Personil"),
-        ),
+    if (id_jabatan == "1" || id_jabatan == "2") {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text("Detail Personil"),
+          ),
+          body: SingleChildScrollView(
+            child: Container(
+                padding: EdgeInsets.only(top: 30),
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                        "DATA PERSONEL ${namaDepanController.text} ${namaBelakangController.text}"
+                            .toUpperCase(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    Container(
+                        padding: EdgeInsets.only(top: 20),
+                        child: MediaQuery.of(context).size.width >= 720
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[showPicture(), buildData()],
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[showPicture(), buildData()]))
+                  ],
+                )),
+          ));
+    } else {
+      return Scaffold(
         body: SingleChildScrollView(
-          child: Container(
-              padding: EdgeInsets.only(top: 30),
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                      "DATA PERSONEL ${namaDepanController.text} ${namaBelakangController.text}"
-                          .toUpperCase(),
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Container(
-                      padding: EdgeInsets.only(top: 20),
-                      child: MediaQuery.of(context).size.width >= 720
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[showPicture(), buildData()],
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[showPicture(), buildData()]))
-                ],
-              )),
-        ));
+            child: Container(
+                padding: EdgeInsets.only(top: 50),
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                child: MediaQuery.of(context).size.width >= 720
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[showPicture(), buildData()],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[showPicture(), buildData()]))),
+      );
+    }
   }
 }

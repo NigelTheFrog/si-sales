@@ -154,7 +154,8 @@ class _dynamicWidgetJualState extends State<dynamicWidgetJual> {
 }
 
 class BuatPenjualan extends StatefulWidget {
-  BuatPenjualan({Key? key}) : super(key: key);
+  int id;
+  BuatPenjualan({super.key, required this.id});
   @override
   _BuatPenjualanState createState() {
     return _BuatPenjualanState();
@@ -164,7 +165,6 @@ class BuatPenjualan extends StatefulWidget {
 class _BuatPenjualanState extends State<BuatPenjualan> {
   late Timer timer;
   double heightAddItem = 0;
-  int id = Random().nextInt(4294967296);
   String _id_outlet = "",
       _username = "",
       _ppn = "",
@@ -216,7 +216,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
         Uri.parse(
             "http://192.168.137.1/magang/laporan/penjualan/buatlaporan.php"),
         body: {
-          'id': id.toString(),
+          'id': widget.id.toString(),
           'id_outlet': _id_outlet,
           'username': _username,
           'foto': base64Image,
@@ -234,7 +234,11 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
         dispose();
-        Navigator.popAndPushNamed(context, "/daftarpenjualan");
+        if (id_jabatan == "1" || id_jabatan == "2") {
+          Navigator.popAndPushNamed(context, "/daftarpenjualan");
+        } else {
+          Navigator.pop(context);
+        }
       } else if (json['Error'] ==
           "Got a packet bigger than 'max_allowed_packet' bytes") {
         setState(() {
@@ -245,7 +249,12 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
           warningDialog(context,
               "${json['Error']}\nSilahkan contact leader anda untuk menambahkan jumlah stock pada sistem");
         });
-        Navigator.popAndPushNamed(context, "/daftarpenjualan");
+        dispose();
+        if (id_jabatan == "1" || id_jabatan == "2") {
+          Navigator.popAndPushNamed(context, "/daftarpenjualan");
+        } else {
+          Navigator.pop(context);
+        }
       }
     } else {
       throw Exception('Failed to read API');
@@ -330,7 +339,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
               if (id_jabatan == "1" || id_jabatan == "2") {
                 Navigator.popAndPushNamed(context, "/daftarpenjualan");
               } else {
-                Navigator.popAndPushNamed(context, "/homepage");
+                Navigator.pop(context);
               }
             },
           ),

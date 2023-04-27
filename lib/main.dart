@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
 import 'package:pt_coronet_crown/mainpage/history.dart';
 import 'package:pt_coronet_crown/mainpage/home.dart';
+import 'package:pt_coronet_crown/mainpage/visit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image/image.dart' as img;
 
@@ -82,9 +84,11 @@ class MyApp extends StatelessWidget {
       routes: {
         "/daftarpembelian": (context) => DaftarPembelian(),
         "/daftarpenjualan": (context) => DaftarPenjualan(),
-        "/tambahlaporanpenjualan": (context) => BuatPenjualan(),
+        "/tambahlaporanpenjualan": (context) =>
+            BuatPenjualan(id: Random().nextInt(4294967296)),
         "/tambahlaporanpembelian": (context) => BuatPembelian(),
         "/homepage": (context) => MyApp(),
+        "/kunjunganmasuk": (contex) => Visit(),
 
         // "daftarproposal": (context) => DaftarProposal(),
         // "daftarevent": (context) => DaftarEvent(),
