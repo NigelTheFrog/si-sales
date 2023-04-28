@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class DetailVisit extends StatefulWidget {
   int type;
-  int id_visit;
+  String id_visit;
   DetailVisit({super.key, required this.type, required this.id_visit});
   @override
   State<StatefulWidget> createState() {
@@ -21,13 +21,12 @@ class _DetailVisitState extends State<DetailVisit> {
   Kunjungan? kunjungan;
   TextEditingController deskripsi = TextEditingController();
   TextEditingController outlet = TextEditingController();
-  var bukti;
+  var bukti, id_nota;
 
   Future<String> fetchData() async {
     final response = await http.post(
-        Uri.parse(
-            "http://192.168.137.1/magang/laporan/penjualan/detailpenjualan.php"),
-        body: {'id': widget.id_visit.toString()});
+        Uri.parse("http://192.168.137.1/magang/absensi/visit/detailvisit.php"),
+        body: {'id': widget.id_visit});
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -43,6 +42,7 @@ class _DetailVisitState extends State<DetailVisit> {
         deskripsi.text = kunjungan!.deskripsi;
         outlet.text = kunjungan!.nama_toko;
         bukti = kunjungan!.foto;
+        id_nota = kunjungan!.id_nota;
       });
     });
   }
@@ -125,29 +125,29 @@ class _DetailVisitState extends State<DetailVisit> {
                         Column(
                           children: [
                             Text("Bukti Kunjungan\n"),
-                            if (bukti == null || bukti == "")
-                              ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white),
-                                  onPressed: () {},
-                                  child: Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: SizedBox(
-                                          width: 60,
-                                          height: 60,
-                                          child: Icon(
-                                            AddImage.add_image,
-                                            size: 40,
-                                            color: Colors.grey,
-                                          ))))
-                            else
-                              GestureDetector(
-                                onTap: () {},
-                                child: SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: Image.memory(base64Decode(bukti))),
-                              )
+                            bukti == ""
+                                ? GestureDetector(
+                                    onTap: () {},
+                                    child: SizedBox(
+                                        width: 60,
+                                        height: 60,
+                                        child:
+                                            Image.memory(base64Decode(bukti))),
+                                  )
+                                : ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white),
+                                    onPressed: () {},
+                                    child: Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: SizedBox(
+                                            width: 60,
+                                            height: 60,
+                                            child: Icon(
+                                              AddImage.add_image,
+                                              size: 40,
+                                              color: Colors.grey,
+                                            ))))
                           ],
                         ),
                         Padding(
@@ -155,26 +155,25 @@ class _DetailVisitState extends State<DetailVisit> {
                             child: Column(
                               children: [
                                 Text("Tambah Penjualan\n"),
-                                if (kunjungan!.id_nota == null)
-                                  ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.white),
-                                      onPressed: () {},
-                                      child: Padding(
-                                          padding: EdgeInsets.all(10),
-                                          child: SizedBox(
-                                              width: 60,
-                                              height: 60,
-                                              child: Icon(
-                                                AddPenjualan.doc_add,
-                                                size: 40,
-                                                color: Colors.grey,
-                                              ))))
-                                else
-                                  TextButton(
-                                      onPressed: () {},
-                                      child:
-                                          Text(kunjungan!.id_nota.toString()))
+                                id_nota == null
+                                    ? ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.white),
+                                        onPressed: () {},
+                                        child: Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: SizedBox(
+                                                width: 60,
+                                                height: 60,
+                                                child: Icon(
+                                                  AddPenjualan.doc_add,
+                                                  size: 40,
+                                                  color: Colors.grey,
+                                                ))))
+                                    : TextButton(
+                                        onPressed: () {},
+                                        child:
+                                            Text(kunjungan!.id_nota.toString()))
                               ],
                             )),
                       ],

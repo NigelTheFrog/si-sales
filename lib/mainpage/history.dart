@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pt_coronet_crown/class/admin/absen/visit.dart';
 import 'package:pt_coronet_crown/class/transaksi/pembelian.dart';
 import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
@@ -9,6 +10,7 @@ import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
 import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/detailpenjualan.dart';
+import 'package:pt_coronet_crown/mainpage/detailvisit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -23,10 +25,9 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  Future<String> fetchDataHistoryPenjualan() async {
+  Future<String> fetchDataHistoryVisit() async {
     final response = await http.post(
-        Uri.parse(
-            "http://192.168.137.1/magang/laporan/penjualan/daftarpenjualan.php"),
+        Uri.parse("http://192.168.137.1/magang/absensi/visit/historyvisit.php"),
         body: {'username': username, 'idjabatan': '3', 'limit': '100'});
     if (response.statusCode == 200) {
       return response.body;
@@ -62,8 +63,8 @@ class _HistoryState extends State<History> {
     _loadData();
   }
 
-  Widget daftarHistoryPenjualan(data) {
-    List<Penjualan> penjualan2 = [];
+  Widget daftarHistoryVisit(data) {
+    List<Kunjungan> visit2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
       return Align(
@@ -71,12 +72,12 @@ class _HistoryState extends State<History> {
         child: Text("Tidak ada data tersedia"),
       );
     } else {
-      for (var mov in json['data']) {
-        Penjualan penjualan = Penjualan.fromJson(mov);
-        penjualan2.add(penjualan);
+      for (var vis in json['data']) {
+        Kunjungan visit = Kunjungan.fromJson(vis);
+        visit2.add(visit);
       }
       return ListView.builder(
-          itemCount: penjualan2.length,
+          itemCount: visit2.length,
           itemBuilder: (BuildContext ctxt, int index) {
             return SingleChildScrollView(
                 child: Container(
@@ -89,8 +90,9 @@ class _HistoryState extends State<History> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => DetailPenjualan(
-                                            laporan_id: penjualan2[index].id,
+                                      builder: (context) => DetailVisit(
+                                            type: 0,
+                                            id_visit: visit2[index].id,
                                           )));
                             },
                             child: Card(
@@ -98,33 +100,19 @@ class _HistoryState extends State<History> {
                                 child: SizedBox(
                                     width: 800,
                                     child: ListTile(
-                                        title: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                "Nama toko: ${penjualan2[index].nama_toko}",
-                                                style: TextStyle(fontSize: 11),
-                                              ),
-                                              Text(
-                                                  "Tanggal: ${penjualan2[index].tanggal}",
-                                                  style:
-                                                      TextStyle(fontSize: 11)),
-                                            ]),
-                                        subtitle: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                                "Jumlah penjualan: ${penjualan2[index].jumlah_barang}",
-                                                style: TextStyle(fontSize: 11)),
-                                            Text(
-                                                "Total Penjualan: Rp. ${NumberFormat('###,000').format((penjualan2[index].total_penjualan - penjualan2[index].diskon) + (((penjualan2[index].total_penjualan - penjualan2[index].diskon) * (penjualan2[index].ppn / 100.00))))}",
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                ))
-                                          ],
-                                        )))))
+                                      trailing: Text(
+                                          "Tanggal: ${visit2[index].tanggal}",
+                                          style: TextStyle(fontSize: 11)),
+                                      title: Text(
+                                        "Nama toko: ${visit2[index].nama_toko}",
+                                        style: TextStyle(fontSize: 11),
+                                      ),
+                                      subtitle: Text(
+                                          visit2[index].status == 0
+                                              ? "Status: Belum Check-Out"
+                                              : "Status: Sudah Check-Out",
+                                          style: TextStyle(fontSize: 11)),
+                                    ))))
                       ],
                     )));
           });
@@ -222,10 +210,10 @@ class _HistoryState extends State<History> {
         height: MediaQuery.of(context).size.height - 150,
         width: MediaQuery.of(context).size.width,
         child: FutureBuilder(
-            future: fetchDataHistoryPenjualan(),
+            future: fetchDataHistoryVisit(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return daftarHistoryPenjualan(snapshot.data.toString());
+                return daftarHistoryVisit(snapshot.data.toString());
               } else {
                 return Center(child: CircularProgressIndicator());
               }
@@ -247,11 +235,11 @@ class _HistoryState extends State<History> {
                     title: TabBar(tabs: [
                   Tab(
                     icon: Icon(
-                      ClipBoardCheck.clipboard_check,
-                      size: 20,
+                      Icons.location_on,
+                      size: 25,
                     ),
                     child: Text(
-                      "Riwayat Penjualan",
+                      "Riwayat Visit",
                       style: TextStyle(fontSize: 10),
                       textAlign: TextAlign.center,
                     ),

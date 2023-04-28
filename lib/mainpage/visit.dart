@@ -8,6 +8,7 @@ import 'package:pt_coronet_crown/customicon/add_image_icons.dart';
 import 'package:pt_coronet_crown/customicon/add_penjualan_icons.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/mainpage/detailvisit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Visit extends StatefulWidget {
   Visit({Key? key}) : super(key: key);
@@ -19,24 +20,37 @@ class Visit extends StatefulWidget {
 
 class _VisitState extends State<Visit> {
   List _outlet = [];
-  String _id_outlet = "", controllerOutlet = "";
+  String _id_outlet = "",
+      controllerOutlet = "",
+      username = "",
+      date = "",
+      deskripsi = "";
   int id = Random().nextInt(4294967296);
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadData();
+    date = DateTime.now().toString().substring(0, 10);
+  }
+
+  _loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs.getString("username") ?? '';
+    });
+  }
 
   void submit(BuildContext context) async {
     final response = await http.post(
-        Uri.parse(
-            "http://192.168.137.1/magang/laporan/penjualan/buatlaporan.php"),
+        Uri.parse("http://192.168.137.1/magang/absensi/visit/visit_in.php"),
         body: {
-          // 'id': widget.id.toString(),
-          // 'id_outlet': _id_outlet,
-          // 'username': _username,
-          // 'foto': base64Image,
-          // 'diskon': _diskon,
-          // 'ppn': _ppn,
-          // 'id_cabang': idCabang,
-          // 'harga': jsonEncode(harga),
-          // 'quantity': jsonEncode(quantity),
-          // 'id_produk': jsonEncode(id_produk)
+          'id': "$id-$_id_outlet-$username-$date",
+          'tanggal': date,
+          'deskripsi': deskripsi,
+          'id_outlet': _id_outlet,
+          'username': username
         });
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
@@ -49,13 +63,28 @@ class _VisitState extends State<Visit> {
             MaterialPageRoute(
                 builder: (context) => DetailVisit(
                       type: 1,
-                      id_visit: id,
+                      id_visit: "$id-$_id_outlet-$username-$date",
                     )));
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Sukses menyimpan data kunjungan')));
     }
+  }
+
+  void alertCheckInDialog(context) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: const Text('Peringatan'),
+              content: Text("Mohon untuk melakukan check in terlebih dahulu"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            ));
   }
 
   @override
@@ -149,6 +178,9 @@ class _VisitState extends State<Visit> {
                         labelText: 'Add Description (Maksimal 5 baris)',
                       ),
                       onChanged: (value) {
+                        setState(() {
+                          deskripsi = value;
+                        });
                         // _diskon = value;
                       },
                     ),
@@ -165,7 +197,9 @@ class _VisitState extends State<Visit> {
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white),
-                                onPressed: () {},
+                                onPressed: () {
+                                  alertCheckInDialog(context);
+                                },
                                 child: Padding(
                                     padding: EdgeInsets.all(10),
                                     child: SizedBox(
@@ -186,7 +220,9 @@ class _VisitState extends State<Visit> {
                                 ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      alertCheckInDialog(context);
+                                    },
                                     child: Padding(
                                         padding: EdgeInsets.all(10),
                                         child: SizedBox(
@@ -206,9 +242,11 @@ class _VisitState extends State<Visit> {
                     height: 50,
                     margin: const EdgeInsets.all(10),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        submit(context);
+                      },
                       child: const Center(
-                        child: Text('Submit'),
+                        child: Text('Check In'),
                       ),
                     ),
                   ),
