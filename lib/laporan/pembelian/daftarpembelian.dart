@@ -398,42 +398,38 @@ class _DaftarPembelianState extends State<DaftarPembelian> {
 
   @override
   Widget build(BuildContext context) {
-    if (idjabatan == "1" || idjabatan == "2") {
-      return Scaffold(
-          appBar: AppBar(
-            title: Text("Daftar Pembelian"),
-          ),
-          drawer: MyDrawer(),
-          body: buildContainer(context));
-    } else if (idjabatan == "3") {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text("Daftar Pembelian"),
-          leading: BackButton(
-            onPressed: () {
-              Navigator.popAndPushNamed(context, "homepage");
-            },
-          ),
-        ),
-        body: Center(
-          child: Text(
-            "Anda tidak memiliki akses ke halaman ini \nSilahkan kontak admin",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
+    if (idjabatan != "3") {
+      if (idjabatan == "1" || idjabatan == "2") {
+        return Scaffold(
+            appBar: AppBar(
+              title: Text("Daftar Pembelian"),
+            ),
+            drawer: MyDrawer(),
+            body: buildContainer(context));
+      } else {
+        return Scaffold(
+            appBar: AppBar(
+              leading: BackButton(
+                onPressed: () {
+                  Navigator.popAndPushNamed(context, "homepage");
+                },
+              ),
+              title: Text("Daftar Pembelian"),
+            ),
+            body: buildContainer(context));
+      }
     } else {
       return Scaffold(
           appBar: AppBar(
             title: Text("Daftar Pembelian"),
-            leading: BackButton(
-              onPressed: () {
-                Navigator.popAndPushNamed(context, "homepage");
-              },
-            ),
           ),
-          body: buildContainer(context));
+          body: Center(
+            child: Text(
+              "Anda tidak memiliki akses ke halaman ini \nSilahkan kontak admin",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ));
     }
   }
 }

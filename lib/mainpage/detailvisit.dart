@@ -63,8 +63,10 @@ class _DetailVisitState extends State<DetailVisit> {
             onPressed: () {
               if (widget.type == 1) {
                 Navigator.popAndPushNamed(context, "/homepage");
-              } else {
+              } else if (widget.type == 2) {
                 Navigator.pop(context);
+              } else {
+                Navigator.popAndPushNamed(context, "/dailyvisit");
               }
             },
           ),

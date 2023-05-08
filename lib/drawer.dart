@@ -90,6 +90,24 @@ class _MyDrawerState extends State<MyDrawer> {
                       Navigator.popAndPushNamed(context, "/daftargrup");
                     },
                   ),
+                  ListTile(
+                    title: const Text("Daftar Kehadiran"),
+                    leading: const Icon(
+                      Icons.check_rounded,
+                    ),
+                    onTap: () {
+                      Navigator.popAndPushNamed(context, "/daftargrup");
+                    },
+                  ),
+                  ListTile(
+                    title: const Text("Kunjungan"),
+                    leading: const Icon(
+                      Icons.location_on,
+                    ),
+                    onTap: () {
+                      Navigator.popAndPushNamed(context, "/daftarkunjungan");
+                    },
+                  ),
                 ],
               ),
               ListTile(

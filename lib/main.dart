@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
+import 'package:pt_coronet_crown/admin/attendence/dailyvisit.dart';
 import 'package:pt_coronet_crown/admin/company/daftarkota.dart';
 import 'package:pt_coronet_crown/admin/jabatan/daftarjabatan.dart';
 import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
@@ -82,8 +83,6 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'Home'),
       debugShowCheckedModeBanner: false,
       routes: {
-        "/daftarpembelian": (context) => DaftarPembelian(),
-        "/daftarpenjualan": (context) => DaftarPenjualan(),
         "/tambahlaporanpenjualan": (context) =>
             BuatPenjualan(id: Random().nextInt(4294967296)),
         "/tambahlaporanpembelian": (context) => BuatPembelian(),
@@ -94,6 +93,9 @@ class MyApp extends StatelessWidget {
         // "daftarevent": (context) => DaftarEvent(),
 
         //harus dilakukan pengecekan id jabatan
+        "/daftarpembelian": (context) => DaftarPembelian(),
+        "/daftarpenjualan": (context) => DaftarPenjualan(),
+        "/daftarkunjungan": (context) => DailyVisit(),
         "/daftarpersonel": (context) => PersonelData(),
         "/daftargrup": (context) => PersonelGroup(),
         "tambahstaff": (context) => CreateAccount(),
