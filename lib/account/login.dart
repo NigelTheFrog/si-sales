@@ -14,10 +14,10 @@ class MyLogin extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'PT Coronet Crown',
       theme: ThemeData(
-          primaryColor: Colors.blue,
-          ),
+        primaryColor: Colors.blue,
+      ),
       home: Login(),
     );
   }
@@ -35,6 +35,7 @@ class _LoginState extends State<Login> {
   String _password = "";
   String error_login = "";
   String picture = "null";
+  bool isLoading = false;
 
 //   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 //if (Platform.isAndroid) {
@@ -52,7 +53,7 @@ class _LoginState extends State<Login> {
 
   void doLogin() async {
     final response = await http.post(
-        Uri.parse("http://192.168.137.1/magang/account/login.php"),
+        Uri.parse("https://otccoronet.com/otc/account/login.php"),
         body: {'username': _username, 'password': _password});
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
@@ -70,19 +71,23 @@ class _LoginState extends State<Login> {
         prefs.setString("idCabang", json["id_cabang"]);
         prefs.setString("cabang", json["cabang"]);
         prefs.setString("idGrup", json["id_grup"]);
+        prefs.setString("grup", json["grup"]);
         main();
       } else {
         if (json['message'] == "1") {
           setState(() {
+            isLoading = false;
             error_login = "Akun anda telah diblok, silahkan kontak admin";
           });
         } else {
           setState(() {
+            isLoading = false;
             error_login = "Password anda salah";
           });
         }
       }
     } else {
+      isLoading = false;
       throw Exception('Failed to read API');
     }
   }
@@ -147,13 +152,21 @@ class _LoginState extends State<Login> {
                                     borderRadius: BorderRadius.circular(20)),
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    doLogin();
+                                    setState(() {
+                                      isLoading = true;
+                                      doLogin();
+                                    });
                                   },
-                                  child: const Text(
-                                    'Sign In',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 16),
-                                  ),
+                                  child: isLoading == true
+                                      ? CircularProgressIndicator(
+                                          color: Colors.white,
+                                        )
+                                      : const Text(
+                                          'Sign In',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16),
+                                        ),
                                 ),
                               )),
                         ]))))));

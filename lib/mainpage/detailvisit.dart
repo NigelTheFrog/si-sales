@@ -161,7 +161,10 @@ class _DetailVisitState extends State<DetailVisit> {
                                     ? ElevatedButton(
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.white),
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.popAndPushNamed(context,
+                                              "/tambahlaporanpenjualan");
+                                        },
                                         child: Padding(
                                             padding: EdgeInsets.all(10),
                                             child: SizedBox(

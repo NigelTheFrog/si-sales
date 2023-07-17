@@ -36,7 +36,7 @@ class _dynamicWidgetJualState extends State<dynamicWidgetJual> {
     Map json;
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/admin/product/daftarproductcabang.php"),
+            "https://otccoronet.com/otc/admin/product/daftarproductcabang.php"),
         body: {"idCabang": idCabang});
     if (response.statusCode == 200) {
       json = jsonDecode(response.body);
@@ -214,7 +214,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
     }
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/laporan/penjualan/buatlaporan.php"),
+            "https://otccoronet.com/otc/laporan/penjualan/buatlaporan.php"),
         body: {
           'id': widget.id.toString(),
           'id_outlet': _id_outlet,
@@ -370,7 +370,7 @@ class _BuatPenjualanState extends State<BuatPenjualan> {
                         Map json;
                         var response = await http.post(
                             Uri.parse(
-                                "http://192.168.137.1/magang/outlet/daftaroutlet.php"),
+                                "https://otccoronet.com/otc/outlet/daftaroutlet.php"),
                             body: {'cari': text});
 
                         if (response.statusCode == 200) {

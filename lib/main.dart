@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
-
+//Kendala di hadir kemarin gaada sinyal. Karena tidak ada sinyal foto tidak bisa masuk
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
@@ -13,6 +12,7 @@ import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:pt_coronet_crown/admin/company/daftarproduk.dart';
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/laporan/event/buatproposal.dart';
 import 'package:pt_coronet_crown/laporan/event/daftarevent.dart';
 import 'package:pt_coronet_crown/laporan/event/daftarproposal.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/buatlaporanbeli.dart';
@@ -25,7 +25,7 @@ import 'package:pt_coronet_crown/mainpage/visit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image/image.dart' as img;
 
-String username = "", idjabatan = "";
+String username = "", idjabatan = "", idcabang = "";
 var avatar = "";
 
 Future<String> checkUser() async {
@@ -41,6 +41,11 @@ Future<String> getIdJabatan() async {
 Future<String> getAvatar() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getString("avatar") ?? '';
+}
+
+Future<String> getIdCabang() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("idCabang") ?? '';
 }
 
 void main() {
@@ -61,6 +66,10 @@ void main() {
   getAvatar().then((String result) {
     avatar = result;
   });
+
+  getIdCabang().then((String result) {
+    idcabang = result;
+  });
 }
 
 void doLogout() async {
@@ -76,7 +85,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'PT Coronet Crown',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -84,13 +93,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         "/tambahlaporanpenjualan": (context) =>
-            BuatPenjualan(id: Random().nextInt(4294967296)),
+            BuatPenjualan(id: Random().nextInt(2)),
         "/tambahlaporanpembelian": (context) => BuatPembelian(),
         "/homepage": (context) => MyApp(),
         "/kunjunganmasuk": (contex) => Visit(),
 
-        // "daftarproposal": (context) => DaftarProposal(),
-        // "daftarevent": (context) => DaftarEvent(),
+        "/daftarproposal": (context) => DaftarProposal(),
+        // "/daftarevent": (context) => DaftarEvent(),
 
         //harus dilakukan pengecekan id jabatan
         "/daftarpembelian": (context) => DaftarPembelian(),
@@ -103,6 +112,7 @@ class MyApp extends StatelessWidget {
         "/daftarproduk": (context) => DaftarProduk(),
         "/daftarjabatan": (context) => DaftarJabatan(),
         "/daftaroutlet": (context) => DaftarKota(),
+        "/ajukanproposal": (context) => BuatProposal(id_cabang: idcabang),
       },
     );
   }

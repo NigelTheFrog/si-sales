@@ -19,7 +19,6 @@ class dynamicWidgetBeli extends StatefulWidget {
   TextEditingController quantityController = TextEditingController();
   TextEditingController hargaController = TextEditingController();
   int idProdukController = 0;
-  String controllerProduct = "";
   dynamicWidgetBeli({Key? key}) : super(key: key);
   @override
   _dynamicWidgetBeliState createState() {
@@ -28,82 +27,38 @@ class dynamicWidgetBeli extends StatefulWidget {
 }
 
 class _dynamicWidgetBeliState extends State<dynamicWidgetBeli> {
-  late Timer timer;
+  List produk = [];
 
-  Future<List> daftarproduct() async {
-    Map json;
-    final response = await http.post(
-      Uri.parse("http://192.168.137.1/magang/admin/product/daftarproduct.php"),
+  Widget comboProduct() {
+    return SizedBox(
+      width: 480,
+      child: DropdownSearch<dynamic>(
+        dropdownSearchDecoration: InputDecoration(
+          labelText: "Daftar Personil",
+        ),
+        mode: Mode.MENU,
+        showSearchBox: false,
+        onFind: (text) async {
+          Map json;
+          var response = await http.post(
+            Uri.parse(
+                "https://otccoronet.com/otc/admin/product/daftarproduct.php"),
+          );
+
+          if (response.statusCode == 200) {
+            json = jsonDecode(response.body);
+            setState(() {
+              produk = json['data'];
+            });
+          }
+          return produk as List<dynamic>;
+        },
+        onChanged: (value) {
+          widget.idProdukController = value['id'] as int;
+        },
+        itemAsString: (item) => item['jenis'],
+      ),
     );
-    if (response.statusCode == 200) {
-      json = jsonDecode(response.body);
-      return json['data'];
-    } else {
-      throw Exception('Failed to read API');
-    }
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
-      setState(() {
-        generateDaftarProduct();
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    timer.cancel();
-  }
-
-  Widget comboProduct = Text("");
-
-  void generateDaftarProduct() {
-    List<Produk> produks;
-    var data = daftarproduct();
-    data.then((value) {
-      produks = List<Produk>.from(value.map((i) {
-        return Produk.fromJson(i);
-      }));
-      setState(() {
-        comboProduct = DropdownButtonHideUnderline(
-            child: DropdownButton(
-                hint: widget.controllerProduct == ""
-                    ? Text(
-                        "Daftar Product",
-                        style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width >= 720
-                                ? 14
-                                : 12),
-                      )
-                    : Text(
-                        widget.controllerProduct,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: MediaQuery.of(context).size.width >= 720
-                                ? 14
-                                : 12),
-                      ),
-                isDense: false,
-                items: produks.map((produk) {
-                  return DropdownMenuItem(
-                    child: Text(produk.jenis),
-                    value: [produk.id, produk.jenis],
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    widget.idProdukController = value![0] as int;
-                    widget.controllerProduct = value[1].toString();
-                  });
-                }));
-      });
-    });
   }
 
   @override
@@ -116,7 +71,7 @@ class _dynamicWidgetBeliState extends State<dynamicWidgetBeli> {
           SizedBox(
             height: 50,
             width: MediaQuery.of(context).size.width >= 720 ? 150 : 136,
-            child: comboProduct,
+            child: comboProduct(),
           ),
           SizedBox(
               height: 50,
@@ -209,7 +164,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
     }
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/laporan/pembelian/buatlaporan.php"),
+            "https://otccoronet.com/otc/laporan/pembelian/buatlaporan.php"),
         body: {
           'id': id.toString(),
           'id_supplier': _id_supplier,
@@ -344,7 +299,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
                         Map json;
                         var response = await http.post(
                             Uri.parse(
-                                "http://192.168.137.1/magang/supplier/daftarsupplier.php"),
+                                "https://otccoronet.com/otc/supplier/daftarsupplier.php"),
                             body: {'cari': text});
 
                         if (response.statusCode == 200) {
