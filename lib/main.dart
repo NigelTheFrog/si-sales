@@ -112,7 +112,7 @@ class MyApp extends StatelessWidget {
         "/daftarproduk": (context) => DaftarProduk(),
         "/daftarjabatan": (context) => DaftarJabatan(),
         "/daftaroutlet": (context) => DaftarKota(),
-        "/ajukanproposal": (context) => BuatProposal(id_cabang: idcabang),
+        "/ajukanproposal": (context) => BuatProposal(id_cabang: idcabang, username : username),
       },
     );
   }
