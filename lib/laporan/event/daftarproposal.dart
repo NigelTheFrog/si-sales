@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
 import 'package:pt_coronet_crown/laporan/event/detailproposal.dart';
-import "package:universal_html/html.dart";
+// import "package:universal_html/html.dart";
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/drawer.dart';
@@ -94,7 +94,8 @@ class _DaftarProposalState extends State<DaftarProposal> {
                         child: Text("Lokasi", textAlign: TextAlign.center))),
                 DataColumn(
                     label: Expanded(
-                        child: Text("Tanggal", textAlign: TextAlign.center))),
+                        child: Text("Tanggal \nPengajuan",
+                            textAlign: TextAlign.center))),
                 DataColumn(
                     label: Expanded(
                         child: Text("Penanggung \nJawab",
@@ -102,6 +103,10 @@ class _DaftarProposalState extends State<DaftarProposal> {
                 DataColumn(
                     label: Expanded(
                         child: Text("Status \nProposal",
+                            textAlign: TextAlign.center))),
+                DataColumn(
+                    label: Expanded(
+                        child: Text("Tanggal \nEvent",
                             textAlign: TextAlign.center))),
               ], rows: [])));
     } else {
@@ -135,7 +140,8 @@ class _DaftarProposalState extends State<DaftarProposal> {
                           child: Text("Lokasi", textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Tanggal", textAlign: TextAlign.center))),
+                          child: Text("Tanggal \nPengajuan",
+                              textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
                           child: Text("Penanggung \nJawab",
@@ -143,6 +149,10 @@ class _DaftarProposalState extends State<DaftarProposal> {
                   DataColumn(
                       label: Expanded(
                           child: Text("Status \nProposal",
+                              textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Tanggal \nEvent",
                               textAlign: TextAlign.center))),
                 ],
                 rows: event2
@@ -189,7 +199,7 @@ class _DaftarProposalState extends State<DaftarProposal> {
                               alignment: Alignment.center,
                               child: SizedBox(
                                   width: 110,
-                                  child: Text(element.tanggal,
+                                  child: Text(element.pengajuan,
                                       textAlign: TextAlign.center)))),
                           DataCell(Align(
                               alignment: Alignment.center,
@@ -238,6 +248,12 @@ class _DaftarProposalState extends State<DaftarProposal> {
                                           Icons.check,
                                           color: Colors.green,
                                         )))),
+                          DataCell(Align(
+                              alignment: Alignment.center,
+                              child: SizedBox(
+                                  width: 110,
+                                  child: Text(element.tanggal,
+                                      textAlign: TextAlign.center)))),
                           // DataCell(Align(
                           //     alignment: Alignment.center,
                           //     child: Text(

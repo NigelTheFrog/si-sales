@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart';
 import 'package:pt_coronet_crown/customicon/add_image_icons.dart';
 import 'package:pt_coronet_crown/customicon/add_penjualan_icons.dart';
 import 'package:http/http.dart' as http;
@@ -106,7 +105,7 @@ class _VisitState extends State<Visit> {
               child: Column(
                 children: [
                   Container(
-                      alignment: Alignment.topLeft,
+                      alignment: Alignment.center,
                       padding: EdgeInsets.all(10),
                       child: Text(
                         "Lokasi",
@@ -118,7 +117,8 @@ class _VisitState extends State<Visit> {
                     margin: EdgeInsets.only(left: 10, right: 10),
                     child: Align(
                         alignment: Alignment.center,
-                        child: Text("Ini adalah kotak location")),
+                        child: Image.network(
+                            "https://otccoronet.com/otc/asset/maps.jpeg")),
                   ),
                   Container(
                     padding: EdgeInsets.only(left: 10, right: 10, top: 10),

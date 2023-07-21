@@ -37,7 +37,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/laporan/penjualan/detailpenjualan.php"),
+            "https://otccoronet.com/otc/laporan/penjualan/detailpenjualan.php"),
         body: {'id': widget.laporan_id});
     if (response.statusCode == 200) {
       return response.body;
@@ -49,7 +49,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
   void update(BuildContext context, type) async {
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/laporan/penjualan/ubahlaporan.php"),
+            "https://otccoronet.com/otc/laporan/penjualan/ubahlaporan.php"),
         body: {
           'id': widget.laporan_id,
           'type': type.toString(),
@@ -167,7 +167,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
                             Map json;
                             var response = await http.post(
                                 Uri.parse(
-                                    "http://192.168.137.1/magang/outlet/daftaroutlet.php"),
+                                    "https://otccoronet.com/otc/outlet/daftaroutlet.php"),
                                 body: {'cari': text});
 
                             if (response.statusCode == 200) {
@@ -380,8 +380,7 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                    "Outlet: ${_penjualan!.nama_toko} \n ${_penjualan!.alamat}",
+                Text("Outlet: ${_penjualan!.nama_toko}",
                     textAlign: TextAlign.center,
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -400,6 +399,10 @@ class _DetailPenjualanState extends State<DetailPenjualan> {
               ],
             ),
           ),
+          Flexible(
+              child: Text(_penjualan!.alamat,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)))
         ]));
   }
 

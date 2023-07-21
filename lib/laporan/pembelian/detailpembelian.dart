@@ -30,7 +30,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/laporan/pembelian/detailpembelian.php"),
+            "https://otccoronet.com/otc/laporan/pembelian/detailpembelian.php"),
         body: {'id': widget.laporan_id});
     if (response.statusCode == 200) {
       return response.body;
@@ -42,7 +42,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
   void update(BuildContext context, type) async {
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/laporan/pembelian/ubahlaporan.php"),
+            "https://otccoronet.com/otc/laporan/pembelian/ubahlaporan.php"),
         body: {
           'id': widget.laporan_id,
           'type': type.toString(),
@@ -144,7 +144,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
                             Map json;
                             var response = await http.post(
                                 Uri.parse(
-                                    "http://192.168.137.1/magang/supplier/daftarsupplier.php"),
+                                    "https://otccoronet.com/otc/supplier/daftarsupplier.php"),
                                 body: {'cari': text});
 
                             if (response.statusCode == 200) {
@@ -205,11 +205,11 @@ class _DetailPembelianState extends State<DetailPembelian> {
   Widget showPicture() {
     if (kIsWeb) {
       return Container(
-      width: 500,
-      height: 600,
-      alignment: Alignment.topCenter,
-      child: Image.memory(base64Decode(_pembelian!.foto)),
-    );
+        width: 500,
+        height: 600,
+        alignment: Alignment.topCenter,
+        child: Image.memory(base64Decode(_pembelian!.foto)),
+      );
     } else {
       return FittedBox(
         alignment: Alignment.topCenter,
@@ -223,7 +223,9 @@ class _DetailPembelianState extends State<DetailPembelian> {
         alignment: Alignment.topCenter,
         height: MediaQuery.of(context).size.height,
         width: 500,
-        padding: kIsWeb? EdgeInsets.only(left: 20): EdgeInsets.only(left: 0, top: 10),
+        padding: kIsWeb
+            ? EdgeInsets.only(left: 20)
+            : EdgeInsets.only(left: 0, top: 10),
         child: Column(children: [
           Text("ID Laporan: ${_pembelian!.id}",
               textAlign: TextAlign.center,
@@ -427,7 +429,9 @@ class _DetailPembelianState extends State<DetailPembelian> {
             alignment: Alignment.topLeft,
             padding: EdgeInsets.all(20),
             child: kIsWeb
-                ? Row(mainAxisAlignment: MainAxisAlignment.start,children: [showPicture(), showColumnData(context)])
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [showPicture(), showColumnData(context)])
                 : Column(children: [showPicture(), showColumnData(context)])));
   }
 

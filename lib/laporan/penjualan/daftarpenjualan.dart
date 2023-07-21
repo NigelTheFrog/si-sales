@@ -70,7 +70,7 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/laporan/penjualan/daftarpenjualan.php"),
+            "https://otccoronet.com/otc/laporan/penjualan/daftarpenjualan.php"),
         body: {
           'startdate': startdate,
           'enddate': enddate,

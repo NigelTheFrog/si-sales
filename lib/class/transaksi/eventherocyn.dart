@@ -1,5 +1,5 @@
 class EventHerocyn {
-  final String id, nama, tanggal;
+  final String id, nama, pengajuan, tanggal;
   final List? produk,
       kebutuhan,
       personil,
@@ -21,6 +21,7 @@ class EventHerocyn {
       {required this.id,
       required this.tanggal,
       required this.nama,
+      required this.pengajuan,
       this.alamat,
       this.username,
       this.nama_depan,
@@ -48,6 +49,7 @@ class EventHerocyn {
     return EventHerocyn(
         id: json['id'] as String,
         tanggal: json['tanggal'] as String,
+        pengajuan: json['tanggal_pengajuan'] as String,
         nama: json['nama'] as String,
         alamat: json['alamat'] as String?,
         tujuan: json['tujuan'] as String?,

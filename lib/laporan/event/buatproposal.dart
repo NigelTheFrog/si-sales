@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
@@ -156,8 +157,24 @@ class BuatProposal extends StatefulWidget {
 class _BuatProposalState extends State<BuatProposal> {
   TextEditingController controllerLatarBelakang = TextEditingController(),
       controllerTujuan = TextEditingController(),
-      controllerStrategi = TextEditingController();
-  List personel = [], target = [];
+      controllerStrategi = TextEditingController(),
+      startTimeController = TextEditingController(),
+      endTimeController = TextEditingController(),
+      dateController = TextEditingController();
+  String id_kota = "",
+      alamat = "",
+      kota = "",
+      provinsi = "",
+      nama = "",
+      date = "",
+      time = "",
+      id_kecamatan = "",
+      id_kelurahan = "";
+  List personel = [],
+      target = [],
+      parameter = [],
+      kecamatan = [],
+      kelurahan = [];
   List<dynamicWidgetPersonil> dynamicPersonel = [];
   List<dynamicWidgetTarget> dynamicTarget = [];
   double heightAddPersonel = 0, heightAddTarget = 0;
@@ -180,6 +197,180 @@ class _BuatProposalState extends State<BuatProposal> {
       dynamicTarget.add(dynamicWidgetTarget());
       heightAddTarget += 55;
     });
+  }
+
+  void bacaData() async {
+    final response = await http.post(
+        Uri.parse(
+            "https://otccoronet.com/otc/laporan/event/properties/lokasi.php"),
+        body: {'id': widget.id_cabang, 'type': '0'});
+    if (response.statusCode == 200) {
+      setState(() {
+        Map json = jsonDecode(response.body);
+        kota = json['data'][0]['kota'];
+        provinsi = json['data'][0]['provinsi'];
+      });
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  // void submit(BuildContext context) async {
+  //   final response = await http.post(
+  //       Uri.parse(
+  //           "https://otccoronet.com/otc/laporan/penjualan/buatlaporan.php"),
+  //       body: {
+  //         'id': widget.id.toString(),
+  //         'nama': nama,
+  //         'lokasi': alamat,
+  //         'tanggal': base64Image,
+  //         'waktu_mulai': _diskon,
+  //         'waktu_selesai': _ppn,
+  //         'strategi': idCabang,
+  //         'tujuan': _ppn,
+  //         'latar_belakang': idCabang,
+  //         'parameter': jsonEncode(parameter),
+  //         'target': jsonEncode(target),
+  //         'id_produk': jsonEncode(personel)
+  //       });
+  //   if (response.statusCode == 200) {
+  //     Map json = jsonDecode(response.body);
+  //     if (json['result'] == 'success') {
+  //       if (!mounted) return;
+  //       ScaffoldMessenger.of(context)
+  //           .showSnackBar(SnackBar(content: Text('Sukses Menambah Data')));
+  //       Navigator.popAndPushNamed(context, "/daftarproposal");
+  //     }
+  //     // else if (json['Error'] ==
+  //     //     "Got a packet bigger than 'max_allowed_packet' bytes") {
+  //     //   setState(() {
+  //     //     warningDialog(context, "Ukuran gambar terlalu besar");
+  //     //   });
+  //     // } else {
+  //     //   setState(() {
+  //     //     warningDialog(context,
+  //     //         "${json['Error']}\nSilahkan contact leader anda untuk menambahkan jumlah stock pada sistem");
+  //     //   });
+
+  //     // }
+  //   } else {
+  //     throw Exception('Failed to read API');
+  //   }
+  // }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    bacaData();
+    initializeDateFormatting();
+    dateController.text = DateFormat.yMMMMEEEEd('id').format(DateTime.now());
+    date = DateTime.now().toString().substring(0, 10);
+    startTimeController.text = DateFormat.Hm()
+        .format(DateTime.now().copyWith(hour: 8, minute: 0, second: 0));
+    endTimeController.text = DateFormat.Hm()
+        .format(DateTime.now().copyWith(hour: 16, minute: 0, second: 0));
+  }
+
+  Widget datePicker() {
+    return SizedBox(
+      height: 55,
+      width: 260,
+      child: Row(children: [
+        Expanded(
+            child: TextFormField(
+          decoration: InputDecoration(
+            labelText: "Tanggal Event",
+          ),
+          controller: dateController,
+        )),
+        ElevatedButton(
+            onPressed: () {
+              showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2200))
+                  .then((value) {
+                setState(() {
+                  date = value.toString().substring(0, 10);
+                  String formattedDate =
+                      DateFormat.yMMMMEEEEd('id').format(value!);
+                  dateController.text = formattedDate;
+                });
+              });
+            },
+            child: Icon(
+              Icons.calendar_today_sharp,
+              color: Colors.white,
+              size: 24.0,
+            ))
+      ]),
+    );
+  }
+
+  Widget startTimePicker() {
+    return SizedBox(
+      height: 55,
+      width: 125,
+      child: Row(children: [
+        Expanded(
+            child: TextFormField(
+          decoration: InputDecoration(
+            labelText: "Mulai",
+          ),
+          controller: startTimeController,
+        )),
+        ElevatedButton(
+            onPressed: () {
+              showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(),
+              ).then((value) {
+                setState(() {
+                  startTimeController.text = value!.format(context);
+                });
+              });
+            },
+            child: Icon(
+              Icons.access_time_outlined,
+              color: Colors.white,
+              size: 24.0,
+            ))
+      ]),
+    );
+  }
+
+  Widget endTimePicker() {
+    return SizedBox(
+      height: 55,
+      width: 125,
+      child: Row(children: [
+        Expanded(
+            child: TextFormField(
+          decoration: InputDecoration(
+            labelText: "Selesai",
+          ),
+          controller: endTimeController,
+        )),
+        ElevatedButton(
+            onPressed: () {
+              showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(),
+              ).then((value) {
+                setState(() {
+                  endTimeController.text = value!.format(context);
+                });
+              });
+            },
+            child: Icon(
+              Icons.access_time_outlined,
+              color: Colors.white,
+              size: 24.0,
+            ))
+      ]),
+    );
   }
 
   Widget addPersonel() {
@@ -255,7 +446,6 @@ class _BuatProposalState extends State<BuatProposal> {
                         setState(() {
                           dynamicTarget.removeAt(index);
                           heightAddTarget -= 55;
-                          print(dynamicTarget);
                         });
                       },
                       icon: Icon(Icons.delete),
@@ -273,7 +463,6 @@ class _BuatProposalState extends State<BuatProposal> {
           onPressed: () {
             setState(() {
               addDynamicTarget();
-              print(dynamicTarget);
             });
           },
           child: Text(
@@ -291,7 +480,102 @@ class _BuatProposalState extends State<BuatProposal> {
         "LOKASI",
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
-      
+      RichText(
+        text: TextSpan(
+          style: const TextStyle(
+            fontSize: 13.0,
+            color: Colors.black,
+          ),
+          children: <TextSpan>[
+            TextSpan(text: '\nKota: '),
+            TextSpan(
+                text: kota,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            TextSpan(text: ', Provinsi: '),
+            TextSpan(
+                text: provinsi,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SizedBox(
+              height: 50,
+              width: 240,
+              child: DropdownSearch<dynamic>(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: "Kecamatan",
+                ),
+                mode: Mode.MENU,
+                showSearchBox: true,
+                onFind: (text) async {
+                  Map json;
+                  var response = await http.post(
+                      Uri.parse(
+                          "https://otccoronet.com/otc/laporan/event/properties/lokasi.php"),
+                      body: {
+                        'cari': text,
+                        'id': widget.id_cabang,
+                        'type': '1'
+                      });
+                  if (response.statusCode == 200) {
+                    setState(() {
+                      json = jsonDecode(response.body);
+                      kecamatan = json['data'];
+                    });
+                  }
+                  return kecamatan as List<dynamic>;
+                },
+                onChanged: (value) {
+                  setState(() {
+                    id_kecamatan = value['id'];
+                  });
+                },
+                itemAsString: (item) => item['kecamatan'],
+              )),
+          SizedBox(
+              height: 50,
+              width: 240,
+              child: DropdownSearch<dynamic>(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: "Kelurahan",
+                ),
+                mode: Mode.MENU,
+                showSearchBox: true,
+                onFind: (text) async {
+                  Map json;
+                  var response = await http.post(
+                      Uri.parse(
+                          "https://otccoronet.com/otc/laporan/event/properties/lokasi.php"),
+                      body: {'cari': text, 'id': id_kecamatan, 'type': '2'});
+
+                  if (response.statusCode == 200) {
+                    json = jsonDecode(response.body);
+                    setState(() {
+                      if (json['result'] == "success") {
+                        kelurahan = json['data'];
+                      }
+                    });
+                  }
+                  return kelurahan as List<dynamic>;
+                },
+                onChanged: (value) {
+                  id_kelurahan = value['id'];
+                },
+                itemAsString: (item) => item['kelurahan'],
+              )),
+        ],
+      ),
+      TextField(
+        // controller: controllerLatarBelakang,
+        // minLines: 1,
+        // maxLines: 50,
+        decoration: const InputDecoration(
+          labelText: 'Alamat',
+        ),
+      )
     ]);
   }
 
@@ -340,6 +624,18 @@ class _BuatProposalState extends State<BuatProposal> {
     ]);
   }
 
+  Widget buildNamaId() {
+    return Column(children: [
+      Text("ID EVENT: ", style: TextStyle(fontWeight: FontWeight.bold)),
+      TextField(
+        controller: controllerTujuan,
+        decoration: const InputDecoration(
+          labelText: 'Nama Event',
+        ),
+      )
+    ]);
+  }
+
   Widget tampilData(BuildContext context) {
     return SingleChildScrollView(
         child: Container(
@@ -347,28 +643,46 @@ class _BuatProposalState extends State<BuatProposal> {
       alignment: Alignment.topCenter,
       padding: EdgeInsets.only(top: 20, bottom: 20),
       child: Column(children: [
-        // Align(
-        //     alignment: Alignment.topLeft,
-        //     child: Row(
-        //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //         children: [
-        //           Text("ID Event: ${widget.event_id}",
-        //               textAlign: TextAlign.center,
-        //               style:
-        //                   TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        //           Text(
-        //               "Penanggung Jawab: ${widget.nama_depan} ${widget.nama_belakang}",
-        //               textAlign: TextAlign.center,
-        //               style:
-        //                   TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
-        //         ])),
         Container(
           alignment: Alignment.topLeft,
           padding: EdgeInsets.only(top: 20),
           child: Table(
             children: [
               TableRow(children: [
-                Container(width: 500, padding: EdgeInsets.only(right: 5)),
+                Container(
+                    width: 500,
+                    padding: EdgeInsets.only(right: 5),
+                    child: buildNamaId()),
+                Container(
+                    width: 500,
+                    padding: EdgeInsets.only(left: 5),
+                    child: Column(
+                      children: [
+                        Text("TANGGAL DAN WAKTU EVENT",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              datePicker(),
+                              startTimePicker(),
+                              endTimePicker()
+                            ])
+                      ],
+                    )),
+              ])
+            ],
+          ),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: EdgeInsets.only(top: 20),
+          child: Table(
+            children: [
+              TableRow(children: [
+                Container(
+                    width: 500,
+                    padding: EdgeInsets.only(right: 5),
+                    child: lokasi()),
                 //     child: lokasi()),
                 Container(
                     width: 500,
@@ -414,6 +728,23 @@ class _BuatProposalState extends State<BuatProposal> {
             ],
           ),
         ),
+        Container(
+          margin: EdgeInsets.only(top: 50),
+          height: 50,
+          width: 1050,
+          child: ElevatedButton(
+            onPressed: () {
+              setState(() {
+                print("Submit Data");
+              });
+            },
+            child: Text(
+              'Submit',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+
         // Container(
         //   alignment: Alignment.topLeft,
         //   padding: EdgeInsets.only(top: 20),
@@ -450,6 +781,7 @@ class _BuatProposalState extends State<BuatProposal> {
         body: Container(
             padding: EdgeInsets.only(top: 20),
             alignment: Alignment.topCenter,
+            height: MediaQuery.of(context).size.height + 50,
             child: tampilData(context)));
 
     //ListView(children: [tampilData()])));

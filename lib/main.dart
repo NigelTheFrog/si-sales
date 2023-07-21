@@ -202,7 +202,6 @@ class _MyHomePageState extends State<MyHomePage> {
           onPressed: () {
             doLogout();
           },
-          backgroundColor: Colors.orange,
           label: Text("Logout", style: TextStyle(color: Colors.white)),
           icon: const Icon(Icons.logout),
         ),
