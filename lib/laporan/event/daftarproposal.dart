@@ -172,15 +172,11 @@ class _DaftarProposalState extends State<DaftarProposal> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   DetailProposal(
-                                                      event_id: element.id,
-                                                      nama_depan: element
-                                                          .nama_depan
-                                                          .toString(),
-                                                      nama_belakang: element
-                                                          .nama_belakang
-                                                          .toString(),
-                                                      username: element.username
-                                                          .toString())));
+                                                    event_id: element.id,
+                                                    penanggung_jawab: element
+                                                        .penanggung_jawab
+                                                        .toString(),
+                                                  )));
                                     },
                                     child: Text(element.id,
                                         textAlign: TextAlign.center),
@@ -195,19 +191,16 @@ class _DaftarProposalState extends State<DaftarProposal> {
                                   width: 170,
                                   child: Text(element.alamat.toString(),
                                       textAlign: TextAlign.center)))),
-                          DataCell(Align(
+                          DataCell(Container(
                               alignment: Alignment.center,
-                              child: SizedBox(
-                                  width: 110,
-                                  child: Text(element.pengajuan,
-                                      textAlign: TextAlign.center)))),
-                          DataCell(Align(
+                              width: 110,
+                              child: Text(element.pengajuan,
+                                  textAlign: TextAlign.center))),
+                          DataCell(Container(
                               alignment: Alignment.center,
-                              child: SizedBox(
-                                  width: 150,
-                                  child: Text(
-                                      "${element.nama_depan.toString()} \n${element.nama_belakang.toString()}",
-                                      textAlign: TextAlign.center)))),
+                              width: 150,
+                              child: Text(element.penanggung_jawab.toString(),
+                                  textAlign: TextAlign.center))),
                           // DataCell(Align(
                           //     alignment: Alignment.center,
                           //     child: SizedBox(
@@ -236,18 +229,56 @@ class _DaftarProposalState extends State<DaftarProposal> {
                           //         //           textAlign: TextAlign.center),
                           //         //     ))
                           //             ))),
-                          DataCell(Align(
-                              alignment: Alignment.center,
-                              child: Tooltip(
-                                  message: element.status_proposal == 0
-                                      ? "Proposal belum disetujui"
-                                      : "Proposal sudah disetujui",
-                                  child: element.status_proposal == 0
-                                      ? Icon(Icons.close, color: Colors.red)
-                                      : Icon(
-                                          Icons.check,
-                                          color: Colors.green,
-                                        )))),
+                          DataCell(Container(
+                            alignment: Alignment.topCenter,
+                            width: 100, height: 100,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: element.persetujuan?.length,
+                                itemBuilder: (BuildContext ctxt, int index) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                          "${element.persetujuan![index]['jabatan']} "),
+                                      Tooltip(
+                                          message: element.persetujuan![index]
+                                                      ['status_proposal'] ==
+                                                  1
+                                              ? "Proposal sedang diproses, harap cek berkala"
+                                              : element.persetujuan![index]
+                                                          ['status_proposal'] ==
+                                                      2
+                                                  ? "Proposal sudah disetujui oleh ${element.persetujuan![index]['jabatan']}"
+                                                  : "Proposal ditolak, silahkan tekan tombol X untuk melihat keterangan",
+                                          child: element.persetujuan![index]
+                                                      ['status_proposal'] ==
+                                                  1
+                                              ? Icon(Icons.info_outline,
+                                                  color: Colors.yellow)
+                                              : element.persetujuan![index]
+                                                          ['status_proposal'] ==
+                                                      2
+                                                  ? Icon(
+                                                      Icons.check,
+                                                      color: Colors.green,
+                                                    )
+                                                  : Icon(Icons.close,
+                                                      color: Colors.red))
+                                    ],
+                                  );
+                                }),
+                            // child: Tooltip(
+                            //     message: element.status_proposal == 0
+                            //         ? "Proposal belum disetujui"
+                            //         : "Proposal sudah disetujui",
+                            //     child: element.status_proposal == 0
+                            //         ? Icon(Icons.close, color: Colors.red)
+                            //         : Icon(
+                            //             Icons.check,
+                            //             color: Colors.green,
+                            //           ))
+                          )),
                           DataCell(Align(
                               alignment: Alignment.center,
                               child: SizedBox(
