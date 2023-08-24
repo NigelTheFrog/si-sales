@@ -8,17 +8,20 @@ import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class DetailProposal extends StatefulWidget {
+class DetailEvent extends StatefulWidget {
   String event_id, penanggung_jawab;
-  DetailProposal(
-      {super.key, required this.event_id, required this.penanggung_jawab});
+  DetailEvent({
+    super.key,
+    required this.event_id,
+    required this.penanggung_jawab,
+  });
   @override
-  _DetailProposalState createState() {
-    return _DetailProposalState();
+  _DetailEventState createState() {
+    return _DetailEventState();
   }
 }
 
-class _DetailProposalState extends State<DetailProposal> {
+class _DetailEventState extends State<DetailEvent> {
   String username = "", keterangan = "";
   bool status_alasan = false;
   EventHerocyn? _event;
@@ -26,7 +29,7 @@ class _DetailProposalState extends State<DetailProposal> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "https://otccoronet.com/otc/laporan/event/detailproposal.php"),
+            "https://otccoronet.com/otc/laporan/event/detailevent.php"),
         body: {'id': widget.event_id});
     if (response.statusCode == 200) {
       return response.body;
@@ -142,7 +145,7 @@ class _DetailProposalState extends State<DetailProposal> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "TARGET KEGIATAN",
+          "Target Kegiatan",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Container(
@@ -242,7 +245,7 @@ class _DetailProposalState extends State<DetailProposal> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "KEBUTUHAN TAMBAHAN",
+          "Estimasi Biaya",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Container(
@@ -260,7 +263,7 @@ class _DetailProposalState extends State<DetailProposal> {
                       columns: [
                         DataColumn(
                             label: Expanded(
-                                child: Text("Komponen Barang",
+                                child: Text("Komponen Biaya",
                                     textAlign: TextAlign.center))),
                         DataColumn(
                             label: Expanded(
@@ -309,7 +312,7 @@ class _DetailProposalState extends State<DetailProposal> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "GIMMICK",
+          "Tambahan Gimmick",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         Container(

@@ -99,6 +99,7 @@ class MyApp extends StatelessWidget {
         "/kunjunganmasuk": (contex) => Visit(),
 
         "/daftarproposal": (context) => DaftarProposal(),
+        "/daftarevent": (context) => DaftarEvent(),
         // "/daftarevent": (context) => DaftarEvent(),
 
         //harus dilakukan pengecekan id jabatan
@@ -112,7 +113,8 @@ class MyApp extends StatelessWidget {
         "/daftarproduk": (context) => DaftarProduk(),
         "/daftarjabatan": (context) => DaftarJabatan(),
         "/daftaroutlet": (context) => DaftarKota(),
-        "/ajukanproposal": (context) => BuatProposal(id_cabang: idcabang, username : username),
+        "/ajukanproposal": (context) =>
+            BuatProposal(id_cabang: idcabang, username: username),
       },
     );
   }

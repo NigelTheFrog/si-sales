@@ -111,6 +111,63 @@ class dynamicWidgetGimmick extends StatelessWidget {
   }
 }
 
+class dynamicWidgetProduct extends StatelessWidget {
+  String id_cabang;
+  dynamicWidgetProduct({super.key, required this.id_cabang});
+  int harga = 0, id = 0;
+  List produk = [];
+  Widget comboGimmick() {
+    return SizedBox(
+        width: 480,
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          SizedBox(
+            width: 330,
+            child: DropdownSearch<dynamic>(
+                dropdownSearchDecoration: InputDecoration(
+                  labelText: "Daftar Produk",
+                ),
+                mode: Mode.MENU,
+                showSearchBox: false,
+                onFind: (text) async {
+                  Map json;
+                  var response = await http.post(
+                      Uri.parse(
+                          "https://otccoronet.com/otc/admin/product/daftarproductcabang.php"),
+                      body: {'idCabang': id_cabang});
+
+                  if (response.statusCode == 200) {
+                    json = jsonDecode(response.body);
+                    produk = json['data'];
+                  }
+                  return produk as List<dynamic>;
+                },
+                onChanged: (value) {
+                  id = value['id'];
+                  harga = value['harga'];
+                },
+                itemAsString: (item) => item['barang']),
+          ),
+          SizedBox(
+              width: 110,
+              height: 55,
+              child: TextField(
+                decoration: const InputDecoration(
+                  labelText: 'Harga satuan (dalam Rp)',
+                ),
+                onChanged: (value) {
+                  harga = int.parse(value);
+                },
+              ))
+        ]));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return comboGimmick();
+  }
+}
+
 class dynamicWidgetKebutuhanTambahan extends StatelessWidget {
   String komponen = "";
   int estimasi = 0;

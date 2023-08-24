@@ -15,6 +15,7 @@ class EventHerocyn {
       penanggung_jawab,
       // nama_belakang,
       alamat;
+  final int? status;
   final List? persetujuan;
 
   EventHerocyn(
@@ -31,7 +32,7 @@ class EventHerocyn {
       this.tujuan,
       this.latar_belakang,
       this.strategi,
-
+      this.status,
       // this.jumlah_penjualan,
       // this.total_penjualan,
       this.persetujuan,
@@ -56,6 +57,7 @@ class EventHerocyn {
         strategi: json['strategi'] as String?,
         // username: json['username'] as String?,
         penanggung_jawab: json['penanggung_jawab'] as String?,
+        status: json['status'] as int?,
         //nama_belakang: json['nama_belakang'] as String?,
         persetujuan: json['persetujuan'],
         kebutuhan: json['kebutuhan'],
