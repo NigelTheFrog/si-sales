@@ -10,8 +10,14 @@ import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:provider/provider.dart';
 import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
 import 'package:measure_size/measure_size.dart';
+import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
+import 'package:pt_coronet_crown/customicon/transaction_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+List existedPengunjung = <String?>[];
 
 class dynamicWidgetGimmick extends StatelessWidget {
   String barang, quantityProposal;
@@ -22,11 +28,11 @@ class dynamicWidgetGimmick extends StatelessWidget {
       required this.barang,
       required this.hargaProposal,
       required this.quantityProposal});
-  int jumlahRealisasi = 0;
+  TextEditingController jumlahRealisasi = TextEditingController();
 
   Widget proposalGimmick() {
     return SizedBox(
-      width: 340,
+      width: 440,
       child: Text(
           "Nama barang: ${barang}, Harga: Rp. ${NumberFormat('###,000').format(hargaProposal)}, Estimasi jumlah: ${quantityProposal} "),
     );
@@ -35,21 +41,20 @@ class dynamicWidgetGimmick extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 55,
-      width: 490,
+      width: 600,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           proposalGimmick(),
           SizedBox(
               width: 150,
+              height: 50,
               child: TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Realisasi Jumlah',
                 ),
+                controller: jumlahRealisasi,
                 keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  jumlahRealisasi = int.parse(value);
-                },
               )),
         ],
       ),
@@ -60,7 +65,7 @@ class dynamicWidgetGimmick extends StatelessWidget {
 class dynamicWidgetKebutuhanTambahan extends StatelessWidget {
   String komponen;
   int id, estimasi;
-  String isiRealisasi = "";
+  TextEditingController isiRealisasi = TextEditingController();
   dynamicWidgetKebutuhanTambahan(
       {super.key,
       required this.komponen,
@@ -68,7 +73,7 @@ class dynamicWidgetKebutuhanTambahan extends StatelessWidget {
       required this.id});
   Widget proposalKebutuhan() {
     return SizedBox(
-      width: 340,
+      width: 490,
       child: Text(
           "Komponen kebutuhan: ${komponen}, Estimasi: Rp. ${NumberFormat('###,000').format(estimasi)}, "),
     );
@@ -78,20 +83,19 @@ class dynamicWidgetKebutuhanTambahan extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 55,
-      width: 490,
+      width: 600,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           proposalKebutuhan(),
           SizedBox(
-              width: 150,
+              width: 100,
               child: TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Realisasi',
                 ),
+                controller: isiRealisasi,
                 keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  isiRealisasi = value;
-                },
               ))
         ],
       ),
@@ -103,7 +107,7 @@ class dynamicWidgetTarget extends StatefulWidget {
   int id;
   String parameter;
   String isiProposal;
-  String isiRealisasi = "";
+  TextEditingController isiRealisasi = TextEditingController();
   dynamicWidgetTarget(
       {super.key,
       required this.id,
@@ -126,26 +130,28 @@ class _dynamicWidgetTargetState extends State<dynamicWidgetTarget> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
+      padding: EdgeInsets.only(bottom: 5),
       height: 55,
       width: 490,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           realisasiTarget(),
           if (widget.parameter.contains("Estimasi"))
             SizedBox(
-                width: 150,
+                width: 225,
                 child: TextFormField(
                   decoration: const InputDecoration(
                     labelText: 'Realisasi',
                   ),
                   keyboardType: TextInputType.number,
-                  onChanged: (value) {
-                    widget.isiRealisasi = value;
-                  },
+                  controller: widget.isiRealisasi,
                 ))
           else
-            Text("Realisasi: Terisi otomatis")
+            SizedBox(
+                width: 225,
+                child: Text("Realisasi: Terisi otomatis oleh sistem"))
         ],
       ),
     );
@@ -154,9 +160,12 @@ class _dynamicWidgetTargetState extends State<dynamicWidgetTarget> {
 
 class dyanmicDokumentasi extends StatefulWidget {
   var dokumentasi;
-  dyanmicDokumentasi({
-    super.key,
-  });
+  String tanggal;
+  TextEditingController alamatController = TextEditingController(),
+      tanggalController = TextEditingController(),
+      waktuController = TextEditingController();
+
+  dyanmicDokumentasi({super.key, required this.tanggal});
   @override
   _dyanmicDokumentasiState createState() {
     return _dyanmicDokumentasiState();
@@ -177,8 +186,7 @@ class _dyanmicDokumentasiState extends State<dyanmicDokumentasi> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget pickPicture() {
     return SizedBox(
         height: 300,
         width: 300,
@@ -188,7 +196,9 @@ class _dyanmicDokumentasiState extends State<dyanmicDokumentasi> {
             },
             child: Container(
               alignment: Alignment.center,
-              color: Colors.grey[400],
+              color: widget.dokumentasi == null
+                  ? Colors.grey[400]
+                  : Colors.transparent,
               child: widget.dokumentasi == null
                   ? Icon(
                       Icons.camera_alt_outlined,
@@ -198,46 +208,188 @@ class _dyanmicDokumentasiState extends State<dyanmicDokumentasi> {
                   : Image.memory(widget.dokumentasi),
             )));
   }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    widget.tanggalController.text = widget.tanggal;
+    if (widget.waktuController.text == "") {
+      widget.waktuController.text = DateFormat.Hm()
+          .format(DateTime.now().copyWith(hour: 8, minute: 0, second: 0));
+    }
+  }
+
+  Widget buildKeterangan() {
+    return SizedBox(
+        width: 480,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text("KETERANGAN"),
+            Row(
+              children: [
+                SizedBox(
+                    width: 180,
+                    child: TextField(
+                        enabled: false,
+                        decoration: const InputDecoration(
+                          labelText: 'Tanggal',
+                        ),
+                        controller: widget.tanggalController)),
+                Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: ElevatedButton(
+                      onPressed: () {
+                        showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        ).then((value) {
+                          setState(() {
+                            if (value != null) {
+                              widget.waktuController.text =
+                                  '${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}';
+                            }
+                          });
+                        });
+                      },
+                      child: Icon(
+                        Icons.access_time_outlined,
+                        color: Colors.white,
+                        size: 24.0,
+                      )),
+                ),
+                Container(
+                    width: 200,
+                    padding: EdgeInsets.only(left: 5),
+                    child: TextFormField(
+                      enabled: false,
+                      decoration: InputDecoration(
+                        labelText: "Waktu",
+                      ),
+                      controller: widget.waktuController,
+                    ))
+              ],
+            ),
+            SizedBox(
+                width: 480,
+                child: TextField(
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Alamat (Max 3 baris)',
+                    ),
+                    controller: widget.alamatController))
+          ],
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        margin: EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(width: 1, color: Colors.grey))),
+        child: Table(
+          children: [
+            TableRow(children: [
+              Container(
+                width: 500,
+                margin: EdgeInsets.only(right: 5),
+                padding: EdgeInsets.all(10),
+                child: pickPicture(),
+              ),
+              Container(
+                  width: 400,
+                  margin: EdgeInsets.only(left: 5),
+                  padding: EdgeInsets.all(10),
+                  child: buildKeterangan()),
+
+              // child: ),
+            ])
+          ],
+        ));
+  }
 }
 
 class dynamicWidgetPenjualanProduct extends StatelessWidget {
   String id_event;
-  dynamicWidgetPenjualanProduct({super.key, required this.id_event});
-  int quantity = 0, id_produk = 0;
+  dynamicWidgetPengunjung productParameter;
+  dynamicWidgetPenjualanProduct(
+      {super.key, required this.id_event, required this.productParameter});
+
+  TextEditingController quantityController = TextEditingController(),
+      controllerKeterangan = TextEditingController();
+
+  int id_produk = 0, harga = 0;
   List product = [];
+
   Widget comboProduct() {
     return Container(
         width: 400,
         alignment: Alignment.topLeft,
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          SizedBox(
-              width: 300,
-              child: DropdownSearch<dynamic>(
-                  dropdownSearchDecoration: InputDecoration(
-                    labelText: "Daftar Produk",
-                  ),
-                  mode: Mode.MENU,
-                  showSearchBox: false,
-                  onFind: (text) async {
-                    Map json;
-                    var response = await http.post(
-                        Uri.parse(
-                            "https://otccoronet.com/otc/laporan/event/properties/eventproduct.php"),
-                        body: {'id_event': id_event});
+          Stack(children: [
+            SizedBox(
+                width: 300,
+                child: DropdownSearch<dynamic>(
+                    dropdownSearchDecoration: InputDecoration(
+                      border: InputBorder.none,
+                      labelText: "",
+                    ),
+                    mode: Mode.MENU,
+                    showSearchBox: false,
+                    emptyBuilder: (context, searchEntry) => Center(
+                          child: Text("Tidak ada data ditemukan"),
+                        ),
+                    onFind: (text) async {
+                      Map json;
+                      var response = await http.post(
+                          Uri.parse(
+                              "https://otccoronet.com/otc/laporan/event/properties/eventproduct.php"),
+                          body: {
+                            'id_event': id_event,
+                            'parameter':
+                                jsonEncode(productParameter.existedProduct)
+                          });
 
-                    if (response.statusCode == 200) {
-                      json = jsonDecode(response.body);
-                      product = json['data'];
-                    }
-                    return product as List<dynamic>;
-                  },
-                  onChanged: (value) {
-                    id_produk = value['id'];
-                    quantity = value['harga'];
-                  },
-                  itemAsString: (item) =>
-                      "${item['jenis']} - Rp. ${NumberFormat('###,000').format(item['harga'])}/pcs")),
+                      if (response.statusCode == 200) {
+                        json = jsonDecode(response.body);
+                        product = json['data'];
+                      }
+                      return product as List<dynamic>;
+                    },
+                    onChanged: (value) {
+                      if (productParameter.existedProduct.isEmpty) {
+                        productParameter.existedProduct.add(value['id']);
+                      } else {
+                        if (id_produk != 0) {
+                          int index = productParameter.existedProduct
+                              .indexWhere((parameter) =>
+                                  parameter.startsWith(value['id']));
+                          productParameter.existedProduct[index] = value['id'];
+                        } else {
+                          productParameter.existedProduct.add(value['id']);
+                        }
+                      }
+                      id_produk = value['id'];
+                      harga = value['harga'];
+                      controllerKeterangan.text =
+                          "${value['jenis']} - Rp. ${NumberFormat('###,000').format(value['harga'])}/pcs";
+                      print(productParameter.existedProduct);
+                    },
+                    itemAsString: (item) =>
+                        "${item['jenis']} - Rp. ${NumberFormat('###,000').format(item['harga'])}/pcs")),
+            Container(
+              width: 250,
+              color: Colors.white,
+              child: TextField(
+                  maxLines: 1,
+                  decoration: const InputDecoration(labelText: 'Daftar Produk'),
+                  controller: controllerKeterangan,
+                  enabled: false),
+            )
+          ]),
           SizedBox(
               width: 75,
               child: TextFormField(
@@ -245,9 +397,7 @@ class dynamicWidgetPenjualanProduct extends StatelessWidget {
                   labelText: 'Quantity',
                 ),
                 keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  quantity = int.parse(value);
-                },
+                controller: quantityController,
               ))
         ]));
   }
@@ -258,34 +408,128 @@ class dynamicWidgetPenjualanProduct extends StatelessWidget {
   }
 }
 
-class dynamicWidgetPengunjungBaru extends StatefulWidget {
-  String nama = "", telepon = "", alamat = "", username = "", id_event;
-  int gender = 0, usia = 0;
-  List productBought = [];
-  dynamicWidgetPengunjungBaru({super.key, required this.id_event});
+class dynamicWidgetPengunjung extends StatefulWidget {
+  String username = "";
+  List productBought = [], pengunjung = [];
+  TextEditingController controllerNama = TextEditingController(),
+      controllerTelepon = TextEditingController(),
+      controllerAlamat = TextEditingController(),
+      controllerUsername = TextEditingController(),
+      controllerUsia = TextEditingController(),
+      controllerGender = TextEditingController(),
+      controllerKeterangan = TextEditingController();
+  List existedProduct = [];
+  int gender = 0;
+  String? id_event;
+  bool? isLama;
+  int? idxPengunjung;
+  List<dynamicWidgetPenjualanProduct> dynamicPenjualan = [];
+  double heigtAddProduct = 0;
+
+  dynamicWidgetPengunjung(
+      {super.key, this.id_event, this.idxPengunjung, this.isLama});
   @override
-  _dynamicWidgetPengunjungBaruState createState() {
-    return _dynamicWidgetPengunjungBaruState();
+  _dynamicWidgetPengunjungState createState() {
+    return _dynamicWidgetPengunjungState();
   }
 }
 
-class _dynamicWidgetPengunjungBaruState
-    extends State<dynamicWidgetPengunjungBaru> {
-  List<String> genderList = <String>[
-    'Laki-laki',
-    'Perempuan',
-  ];
-  double heigtAddProduct = 0;
-  List<dynamicWidgetPenjualanProduct> dynamicPenjualan = [];
+class _dynamicWidgetPengunjungState extends State<dynamicWidgetPengunjung> {
+  String selectedItem = "";
+
   addProductBaru() {
     setState(() {
       if (widget.productBought.isNotEmpty) {
         widget.productBought = [];
       }
-      dynamicPenjualan
-          .add(dynamicWidgetPenjualanProduct(id_event: widget.id_event));
-      heigtAddProduct += 50;
+      widget.dynamicPenjualan.add(dynamicWidgetPenjualanProduct(
+          id_event: widget.id_event.toString(), productParameter: widget));
+      widget.heigtAddProduct += 55;
     });
+  }
+
+  Widget dataPengunjungBaru() {
+    return Container(
+        alignment: Alignment.topLeft,
+        width: 1050,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Text(
+            'Data Pengunjung Baru\n',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                  width: 90,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Username',
+                    ),
+                    controller: widget.controllerUsername,
+                  )),
+              SizedBox(
+                  width: 175,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Nama Lengkap Pembeli',
+                    ),
+                    controller: widget.controllerNama,
+                  )),
+              SizedBox(
+                  width: 120,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'No Telepon',
+                    ),
+                    controller: widget.controllerTelepon,
+                  )),
+              SizedBox(
+                  width: 50,
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Usia',
+                    ),
+                    controller: widget.controllerUsia,
+                  )),
+              SizedBox(
+                  width: 300,
+                  height: 50,
+                  child: TextField(
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Alamat Pembeli',
+                    ),
+                    controller: widget.controllerAlamat,
+                  )),
+              Container(
+                  alignment: Alignment.bottomCenter,
+                  width: 50,
+                  height: 40,
+                  child: Text("Gender: ")),
+              Container(
+                alignment: Alignment.bottomCenter,
+                height: 68,
+                width: 100,
+                child: DropdownButton(
+                    hint: Text("Gender"),
+                    value: widget.gender,
+                    items: [
+                      DropdownMenuItem(child: Text("Laki-laki"), value: 0),
+                      DropdownMenuItem(child: Text("Wanita"), value: 1),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        widget.gender = value!;
+                      });
+                    }),
+              ),
+            ],
+          ),
+          // Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+
+          // ])
+        ]));
   }
 
   Widget dataPenjualan() {
@@ -295,21 +539,22 @@ class _dynamicWidgetPengunjungBaruState
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       SizedBox(
-          height: heigtAddProduct,
+          height: widget.heigtAddProduct,
           child: ListView.builder(
-            itemCount: dynamicPenjualan.length,
+            itemCount: widget.dynamicPenjualan.length,
             itemBuilder: (_, index) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  dynamicPenjualan[index],
+                  widget.dynamicPenjualan[index],
                   Tooltip(
                     message: "Delete penjualan",
                     child: IconButton(
                       onPressed: () {
                         setState(() {
-                          dynamicPenjualan.removeAt(index);
-                          heigtAddProduct -= 50;
+                          widget.dynamicPenjualan.removeAt(index);
+                          widget.existedProduct.removeAt(index);
+                          widget.heigtAddProduct -= 55;
                         });
                       },
                       icon: Icon(Icons.delete),
@@ -339,129 +584,183 @@ class _dynamicWidgetPengunjungBaruState
     ]);
   }
 
-  Widget dataPengunjung() {
-    return Container(
+  Widget dataPengunjungLama() {
+    return Align(
         alignment: Alignment.topLeft,
-        width: 480,
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text(
-            'Data Pengunjung\n',
+            'Data Pengunjung Lama\n',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                  width: 90,
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
-                    ),
-                    onChanged: (value) {
-                      widget.username = value;
-                    },
-                  )),
-              SizedBox(
-                  width: 175,
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      labelText: 'Nama Lengkap Pembeli',
-                    ),
-                    onChanged: (value) {
-                      widget.nama = value;
-                    },
-                  )),
+              Stack(
+                children: [
+                  SizedBox(
+                      width: 340,
+                      height: 55,
+                      child: DropdownSearch<dynamic>(
+                          dropdownSearchDecoration: InputDecoration(
+                            labelText: "",
+                          ),
+                          mode: Mode.MENU,
+                          showSearchBox: true,
+                          emptyBuilder: (context, searchEntry) => Center(
+                                child: Text("Tidak ada data ditemukan"),
+                              ),
+                          onFind: (text) async {
+                            Map json;
+                            var response = await http.post(
+                                Uri.parse(
+                                    "https://otccoronet.com/otc/admin/event/pengunjungevent.php"),
+                                body: {
+                                  'cari': text,
+                                  'existedPengunjung':
+                                      jsonEncode(existedPengunjung)
+                                });
+
+                            if (response.statusCode == 200) {
+                              json = jsonDecode(response.body);
+                              widget.pengunjung = json['data'];
+                            }
+                            return widget.pengunjung;
+                          },
+                          onChanged: (value) {
+                            if (existedPengunjung.isEmpty) {
+                              existedPengunjung.add("'${value['username']}'");
+                            } else {
+                              if (widget.username != "") {
+                                int index = existedPengunjung.indexWhere(
+                                    (parameter) => parameter
+                                        .startsWith("'${widget.username}'"));
+                                existedPengunjung[index] =
+                                    "'${value['username']}'";
+                              } else {
+                                existedPengunjung.add("'${value['username']}'");
+                              }
+                            }
+                            widget.username = value['username'];
+                            widget.controllerTelepon.text =
+                                value['nomor_telepon'];
+                            widget.controllerUsia.text =
+                                value['usia'].toString();
+                            widget.controllerAlamat.text = value['alamat'];
+                            widget.controllerKeterangan.text =
+                                "${value['username']} - ${value['nama']}";
+                            if (value['gender'] == 0) {
+                              widget.controllerGender.text = "Laki-laki";
+                            } else {
+                              widget.controllerGender.text = "Perempuan";
+                            }
+                          },
+                          itemAsString: (item) =>
+                              "${item['username']} - ${item['nama']}")),
+                  SizedBox(
+                      width: 300,
+                      height: 55,
+                      // color: Colors.white,
+                      child: Stack(
+                        children: [
+                          Container(color: Colors.white, height: 52),
+                          TextField(
+                              maxLines: 1,
+                              decoration: const InputDecoration(
+                                  labelText: 'Daftar Pengunjung',
+                                  border: InputBorder.none),
+                              controller: widget.controllerKeterangan,
+                              enabled: false)
+                        ],
+                      ))
+                ],
+              ),
               SizedBox(
                   width: 120,
                   child: TextField(
                     decoration: const InputDecoration(
                       labelText: 'No Telepon',
                     ),
-                    onChanged: (value) {
-                      widget.telepon = value;
-                    },
+                    controller: widget.controllerTelepon,
+                    enabled: false,
                   )),
               SizedBox(
-                  width: 50,
+                  width: 300,
+                  height: 55,
+                  child: TextField(
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Alamat Pembeli',
+                    ),
+                    controller: widget.controllerAlamat,
+                    readOnly: true,
+                  )),
+              SizedBox(
+                  width: 35,
                   child: TextField(
                     decoration: const InputDecoration(
                       labelText: 'Usia',
                     ),
-                    onChanged: (value) {
-                      widget.usia = int.parse(value);
-                    },
+                    controller: widget.controllerUsia,
+                    enabled: false,
                   )),
+              Container(
+                alignment: Alignment.bottomCenter,
+                width: 100,
+                child: TextField(
+                  decoration: const InputDecoration(
+                    labelText: 'Gender',
+                  ),
+                  controller: widget.controllerGender,
+                  enabled: false,
+                ),
+              ),
             ],
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            SizedBox(
-                width: 300,
-                child: TextField(
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Alamat Pembeli',
-                  ),
-                  onChanged: (value) {
-                    widget.alamat = value;
-                  },
-                )),
-            Container(
-                alignment: Alignment.bottomCenter,
-                width: 50,
-                height: 40,
-                child: Text("Gender: ")),
-            Container(
-              alignment: Alignment.bottomCenter,
-              height: 68,
-              width: 100,
-              child: DropdownButton(
-                  hint: Text("Gender"),
-                  value: widget.gender,
-                  items: [
-                    DropdownMenuItem(child: Text("Laki-laki"), value: 0),
-                    DropdownMenuItem(child: Text("Wanita"), value: 1),
-                  ],
-                  onChanged: (value) {
-                    setState(() {
-                      widget.gender = value!;
-                    });
-                  }),
-            ),
-          ])
+          // Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [])
         ]));
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 1000,
-      alignment: Alignment.topLeft,
-      padding: EdgeInsets.only(top: 20),
-      // child: Row(
-      //   children: [dataPengunjung()],
-      // )
-      child: Table(
-        children: [
-          TableRow(children: [
-            Container(
-              decoration: BoxDecoration(border: Border.all(width: 1)),
-              width: 500,
-              margin: EdgeInsets.only(right: 5),
-              padding: EdgeInsets.all(10),
-              child: dataPengunjung(),
-            ),
-            Container(
-                decoration: BoxDecoration(border: Border.all(width: 1)),
-                width: 500,
-                margin: EdgeInsets.only(left: 5),
-                padding: EdgeInsets.all(10),
-                child: dataPenjualan()),
+        width: 1000,
+        alignment: Alignment.topLeft,
+        padding: EdgeInsets.only(top: 20),
+        child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            elevation: 5,
+            child: ExpansionTile(
+              title: Text(
+                "PENGUNJUNG ${widget.idxPengunjung.toString()}",
+                textAlign: TextAlign.center,
+                style: (TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 1000,
+                      // margin: EdgeInsets.only(
+                      //     right: 5, left: 5, top: 10, bottom: 10),
+                      padding: EdgeInsets.all(10),
+                      child: widget.isLama == true
+                          ? dataPengunjungLama()
+                          : dataPengunjungBaru(),
+                    ),
+                    Container(
+                        width: 500,
+                        margin: EdgeInsets.only(
+                            right: 5, left: 5, top: 10, bottom: 10),
+                        // padding: EdgeInsets.all(10),
+                        child: dataPenjualan())
+                  ],
 
-            // child: ),
-          ])
-        ],
-      ),
-    );
+                  // child: ),
+                ),
+              ],
+            )));
   }
 }
 
@@ -476,28 +775,31 @@ class BuatLaporanEvent extends StatefulWidget {
 }
 
 class _BuatLaporanEventState extends State<BuatLaporanEvent> {
-  TextEditingController startTimeController = TextEditingController(),
-      endTimeController = TextEditingController(),
-      dateController = TextEditingController();
+  int index = 0, pengunjung = 0;
+  TextEditingController evaluasiController = TextEditingController();
   List dokumentasi = [],
       target = [],
       gimmick = [],
       kebutuhanTambahan = [],
       pengunjungBaru = [],
-      pengunjungLama = [];
+      pengunjungLama = [],
+      stok = [],
+      widgetStock = [];
   List<dyanmicDokumentasi> dynamicDokumentasi = [];
   List<dynamicWidgetTarget> dynamicTarget = [];
   List<dynamicWidgetGimmick> dynamicGimmick = [];
   List<dynamicWidgetKebutuhanTambahan> dynamicKebutuhanTambahan = [];
-  List<dynamicWidgetPengunjungBaru> dynamicPengunjungBaru = [];
+  List<dynamicWidgetPengunjung> dynamicPengunjung = [];
   double heightAddDokumentasi = 0,
       heightAddTarget = 0,
       heightAddGimmick = 0,
       heightAddKebutuhanTambahan = 0,
-      heightAddPengunjungBaru = 0;
+      heightAddPengunjungBaru = 0,
+      heightAddPengunjung = 0;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String username = "", keterangan = "";
+  String username = "", keterangan = "", id_cabang = "";
   EventHerocyn? _event;
+  bool isDialogShow = false;
 
   addDynamicGimmick(id, barang, hargaProposal, quantityProposal) {
     setState(() {
@@ -547,44 +849,58 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
       if (dokumentasi.isNotEmpty) {
         dokumentasi = [];
       }
-      dynamicDokumentasi.add(dyanmicDokumentasi());
-      heightAddDokumentasi += 300;
-    });
-  }
-
-  addPengungjungBaru() {
-    setState(() {
-      if (pengunjungBaru.isNotEmpty) {
-        pengunjungBaru = [];
-      }
-      dynamicPengunjungBaru.add(dynamicWidgetPengunjungBaru(
-        id_event: widget.event_id,
+      dynamicDokumentasi.add(dyanmicDokumentasi(
+        tanggal: _event!.tanggal,
       ));
-      heightAddPengunjungBaru += 200;
+      heightAddDokumentasi += 320;
     });
   }
 
-  // void submit(BuildContext context) async {
-  //   final response = await http.post(
-  //       Uri.parse("https://otccoronet.com/otc/laporan/event/buatproposal.php"),
-  //       body: {
-  //         'id': widget.event_id,
-  //         'target': jsonEncode(target),
-  //         'kebutuhan_tambahan': jsonEncode(kebutuhanTambahan),
-  //         'gimmick': jsonEncode(gimmick),
-  //       });
-  //   if (response.statusCode == 200) {
-  //     Map json = jsonDecode(response.body);
-  //     if (json['result'] == 'success') {
-  //       if (!mounted) return;
-  //       ScaffoldMessenger.of(context)
-  //           .showSnackBar(SnackBar(content: Text('Laporan telah diajukan')));
-  //       Navigator.popAndPushNamed(context, "/daftarproposal");
-  //     }
-  //   } else {
-  //     throw Exception('Failed to read API');
-  //   }
-  // }
+  addPengungjung(isLama) {
+    setState(() {
+      pengunjung++;
+      if (pengunjungLama.isNotEmpty) {
+        pengunjungLama = [];
+      }
+      dynamicPengunjung.add(dynamicWidgetPengunjung(
+        id_event: widget.event_id,
+        idxPengunjung: pengunjung,
+        isLama: isLama,
+      ));
+      heightAddPengunjung += 300;
+    });
+  }
+
+  void submit(BuildContext context) async {
+    final response = await http.post(
+        Uri.parse("https://otccoronet.com/otc/laporan/event/buatlaporan.php"),
+        body: {
+          'id': widget.event_id,
+          'pengunjungBaru': jsonEncode(pengunjungBaru),
+          'pengunjungLama': jsonEncode(pengunjungLama),
+          'target': jsonEncode(target),
+          'kebutuhan_tambahan': jsonEncode(kebutuhanTambahan),
+          'gimmick': jsonEncode(gimmick),
+          'dokumentasi': jsonEncode(dokumentasi),
+          'stok': jsonEncode(stok),
+          'evaluasi': evaluasiController.text,
+          'id_cabang': id_cabang
+        });
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      print(response.body.toString());
+      if (json['result'] == 'success') {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Laporan telah diajukan')));
+        Navigator.popAndPushNamed(context, "/daftarevent");
+      } else {
+        warningDialog(json['message']);
+      }
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
 
   Future<String> fetchData() async {
     final response = await http.post(
@@ -598,11 +914,44 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
     }
   }
 
+  _loadDataCabang() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      id_cabang = prefs.getString("idCabang") ?? '';
+    });
+  }
+
   bacaData() {
     fetchData().then((value) {
       Map json = jsonDecode(value);
       _event = EventHerocyn.fromJson(json['data']);
-      setState(() {});
+      setState(() {
+        if (dynamicTarget.isEmpty) {
+          for (int t = 0; t < _event!.target!.length; t++) {
+            addDynamicTarget(
+                _event!.target![t]['id'],
+                _event!.target![t]['parameter'],
+                _event!.target![t]['target_proposal'].toString());
+          }
+        }
+        if (dynamicGimmick.isEmpty) {
+          for (int g = 0; g < _event!.gimmick!.length; g++) {
+            addDynamicGimmick(
+                _event!.gimmick![g]['id'],
+                _event!.gimmick![g]['barang'],
+                _event!.gimmick![g]['harga'],
+                _event!.gimmick![g]['quantity_proposal'].toString());
+          }
+        }
+        if (dynamicKebutuhanTambahan.isEmpty) {
+          for (int k = 0; k < _event!.kebutuhan!.length; k++) {
+            addDynamicKebutuhanTambahan(
+                _event!.kebutuhan![k]['id'],
+                _event!.kebutuhan![k]['komponen'],
+                _event!.kebutuhan![k]['estimasi']);
+          }
+        }
+      });
     });
   }
 
@@ -611,6 +960,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
     // TODO: implement initState
     super.initState();
     bacaData();
+    _loadDataCabang();
     initializeDateFormatting();
   }
 
@@ -622,7 +972,6 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
       ),
       Container(
         alignment: Alignment.topCenter,
-        width: 500,
         child: ListView.builder(
             shrinkWrap: true,
             itemCount: 1,
@@ -631,13 +980,19 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                   columns: [
                     DataColumn(
                         label: Expanded(
-                            child: Text(
-                      "Username",
-                      textAlign: TextAlign.center,
-                    ))),
+                            child:
+                                Text("Username", textAlign: TextAlign.center))),
                     DataColumn(
                         label: Expanded(
                             child: Text("Nama", textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child:
+                                Text("Telepon", textAlign: TextAlign.center))),
+                    DataColumn(
+                        label: Expanded(
+                            child:
+                                Text("E-mail", textAlign: TextAlign.center))),
                     DataColumn(
                         label: Expanded(
                             child:
@@ -656,6 +1011,14 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                                     textAlign: TextAlign.center))),
                             DataCell(Align(
                                 alignment: Alignment.center,
+                                child: Text(element['no_telp'],
+                                    textAlign: TextAlign.center))),
+                            DataCell(Align(
+                                alignment: Alignment.center,
+                                child: Text(element['email'],
+                                    textAlign: TextAlign.center))),
+                            DataCell(Align(
+                                alignment: Alignment.center,
                                 child: Text(element['jabatan'],
                                     textAlign: TextAlign.center))),
                           ]))
@@ -667,165 +1030,148 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
 
   Widget updateKebutuhan() {
     if (_event!.kebutuhan != null) {
-      if (dynamicKebutuhanTambahan.isEmpty) {
-        for (int i = 0; i < _event!.kebutuhan!.length; i++) {
-          addDynamicKebutuhanTambahan(_event!.target![i]['id'],
-              _event!.target![i]['komponen'], _event!.target![i]['estimasi']);
-        }
-      }
-      return Column(children: [
-        Text(
-          "KEBUTUHAN TAMBAHAN",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-            height: heightAddKebutuhanTambahan,
-            child: ListView.builder(
-              itemCount: dynamicKebutuhanTambahan.length,
-              itemBuilder: (_, index) {
-                return dynamicKebutuhanTambahan[index];
-              },
-            )),
-      ]);
+      return Container(
+          padding: EdgeInsets.only(bottom: 10),
+          height: heightAddKebutuhanTambahan + 10,
+          child: ListView.builder(
+            itemCount: dynamicKebutuhanTambahan.length,
+            itemBuilder: (_, index) {
+              return dynamicKebutuhanTambahan[index];
+            },
+          ));
     } else {
-      return Column(children: [
-        Text(
-          "KEBUTUHAN TAMBAHAN\n",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text("Tidak terdapat kebutuhan tambahan pada Event ini"),
-      ]);
+      return Container(
+          padding: EdgeInsets.only(bottom: 10, top: 10),
+          child: Text("Tidak terdapat kebutuhan tambahan pada Event ini"));
     }
   }
 
   Widget updateGimmick() {
     if (_event!.gimmick != null) {
-      if (dynamicGimmick.isEmpty) {
-        for (int i = 0; i < _event!.gimmick!.length; i++) {
-          addDynamicGimmick(
-              _event!.gimmick![i]['id'],
-              _event!.gimmick![i]['barang'],
-              _event!.gimmick![i]['harga'],
-              _event!.gimmick![i]['quantity_proposal'].toString());
-        }
-      }
-      return Column(children: [
-        Text(
-          "GIMMICK",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-            height: heightAddGimmick,
-            child: ListView.builder(
-              itemCount: dynamicGimmick.length,
-              itemBuilder: (_, index) {
-                return dynamicGimmick[index];
-              },
-            )),
-      ]);
+      return Container(
+          padding: EdgeInsets.only(bottom: 10),
+          height: heightAddGimmick + 10,
+          child: ListView.builder(
+            itemCount: dynamicGimmick.length,
+            itemBuilder: (_, index) {
+              return dynamicGimmick[index];
+            },
+          ));
     } else {
-      return Column(children: [
-        Text(
-          "GIMMICK\n",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text("Tidak terdapat gimmick pada Event ini"),
-      ]);
+      return Container(
+          padding: EdgeInsets.only(bottom: 10, top: 10),
+          child: Text("Tidak terdapat gimmick pada Event ini"));
     }
   }
 
   Widget updateTarget() {
-    if (dynamicTarget.isEmpty) {
-      for (int i = 0; i < _event!.target!.length; i++) {
-        addDynamicTarget(
-            _event!.target![i]['id'],
-            _event!.target![i]['parameter'],
-            _event!.target![i]['target_proposal'].toString());
-      }
-    }
-    return Column(children: [
-      Text(
-        "TARGET",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      SizedBox(
-          height: heightAddTarget,
-          child: ListView.builder(
-            itemCount: dynamicTarget.length,
-            itemBuilder: (_, index) {
-              return dynamicTarget[index];
-            },
-          )),
-    ]);
+    return Container(
+        padding: EdgeInsets.only(bottom: 10),
+        height: heightAddTarget + 10,
+        child: ListView.builder(
+          itemCount: dynamicTarget.length,
+          itemBuilder: (_, index) {
+            return dynamicTarget[index];
+          },
+        ));
   }
 
-  Widget addPengunjungBaru() {
-    return Column(children: [
-      Text(
-        "PENGUNJUNG BARU\n",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      SizedBox(
-          height: heightAddPengunjungBaru,
-          child: ListView.builder(
-            itemCount: dynamicPengunjungBaru.length,
-            itemBuilder: (_, index) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+  Widget buildPengunjung() {
+    return SizedBox(
+        width: 1050,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          SizedBox(
+              // width: 1050,
+              height: heightAddPengunjung,
+              child: ListView.builder(
+                itemCount: dynamicPengunjung.length,
+                itemBuilder: (_, index) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      dynamicPengunjung[index],
+                      Padding(
+                          padding: EdgeInsets.only(left: 5),
+                          child: Tooltip(
+                            message: "Delete Pengunjung",
+                            child: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  dynamicPengunjung.removeAt(index);
+                                  if (existedPengunjung.isNotEmpty) {
+                                    try {
+                                      existedPengunjung.removeAt(index);
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                    // if (existedPengunjung[index] != null) {
+
+                                    // }
+                                  }
+                                  heightAddPengunjung -= 300;
+                                });
+                              },
+                              icon: Icon(Icons.delete),
+                            ),
+                          ))
+                    ],
+                  );
+                },
+              )),
+          Container(
+              margin: EdgeInsets.only(top: 10),
+              height: 50,
+              width: 550,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  dynamicPengunjungBaru[index],
-                  Tooltip(
-                    message: "Delete Pengunjung",
-                    child: IconButton(
+                  Container(
+                    padding: EdgeInsets.only(right: 10),
+                    height: 50,
+                    width: 200,
+                    child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          dynamicPengunjungBaru.removeAt(index);
-                          heightAddPengunjungBaru -= 200;
+                          addPengungjung(true);
                         });
                       },
-                      icon: Icon(Icons.delete),
+                      child: Text(
+                        'Tambah Pengujunjung Lama',
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  )
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 10),
+                    height: 50,
+                    width: 200,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          addPengungjung(false);
+                        });
+                      },
+                      child: Text(
+                        'Tambah Pengujunjung Baru',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
                 ],
-              );
-            },
-          )),
-      Container(
-        margin: EdgeInsets.only(top: 10),
-        height: 50,
-        width: 50,
-        child: ElevatedButton(
-          onPressed: () {
-            setState(() {
-              addPengungjungBaru();
-            });
-          },
-          child: Text(
-            '+',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    ]);
+              )),
+        ]));
   }
 
   Widget addDokumentasi() {
     return Column(children: [
-      Text(
-        "DOKUMENTASI\n",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
       SizedBox(
-          height: heightAddDokumentasi,
+          height: heightAddDokumentasi + 20,
           child: ListView.builder(
             itemCount: dynamicDokumentasi.length,
             itemBuilder: (_, index) {
               return Container(
                   padding: EdgeInsets.only(top: 10),
                   alignment: Alignment.center,
-                  width: 300,
-                  height: 300,
                   child: Stack(
                     children: [
                       Align(
@@ -851,7 +1197,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
             },
           )),
       Container(
-        margin: EdgeInsets.only(top: 10),
+        margin: EdgeInsets.only(top: 10, bottom: 10),
         height: 50,
         width: 50,
         child: ElevatedButton(
@@ -868,6 +1214,169 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
         ),
       ),
     ]);
+  }
+
+  Widget multiTabIndicator() {
+    return Container(
+        alignment: Alignment.topCenter,
+        width: 1050,
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          GestureDetector(
+              onTap: () {
+                setState(() {
+                  index = 0;
+                });
+              },
+              child: Container(
+                width: 180,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: index == 0 ? Colors.blue : Colors.grey,
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Icon(
+                          Icons.info_outline,
+                          color: Colors.white,
+                        )),
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          "General Information",
+                          style: TextStyle(color: Colors.white),
+                        ))
+                  ],
+                ),
+              )),
+          GestureDetector(
+              onTap: () {
+                setState(() {
+                  index = 1;
+                });
+              },
+              child: Container(
+                width: 180,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: index == 1 ? Colors.blue : Colors.grey,
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        )),
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          "Personil",
+                          style: TextStyle(color: Colors.white),
+                        ))
+                  ],
+                ),
+              )),
+          GestureDetector(
+              onTap: () {
+                setState(() {
+                  index = 2;
+                });
+              },
+              child: Container(
+                width: 180,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: index == 2 ? Colors.blue : Colors.grey,
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Icon(
+                          EventChart.chart_line,
+                          color: Colors.white,
+                        )),
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          "Realisasi",
+                          style: TextStyle(color: Colors.white),
+                        ))
+                  ],
+                ),
+              )),
+          GestureDetector(
+              onTap: () {
+                setState(() {
+                  index = 3;
+                });
+              },
+              child: Container(
+                width: 180,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: index == 3 ? Colors.blue : Colors.grey,
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Icon(
+                          Transaction.attach_money,
+                          color: Colors.white,
+                        )),
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          "Penjualan",
+                          style: TextStyle(color: Colors.white),
+                        ))
+                  ],
+                ),
+              )),
+          GestureDetector(
+              onTap: () {
+                setState(() {
+                  index = 4;
+                });
+              },
+              child: Container(
+                width: 180,
+                height: 55,
+                decoration: BoxDecoration(
+                  color: index == 4 ? Colors.blue : Colors.grey,
+                  borderRadius: BorderRadius.all(Radius.circular(30)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Icon(
+                          Icons.note_alt_outlined,
+                          color: Colors.white,
+                        )),
+                    Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          "Evaluasi",
+                          style: TextStyle(color: Colors.white),
+                        ))
+                  ],
+                ),
+              ))
+        ]));
   }
 
   Widget lokasi() {
@@ -895,7 +1404,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                   TextSpan(
                       text: _event!.lokasi![index]['kecamatan'],
                       style: const TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: '\nKota: '),
+                  TextSpan(text: ', Kota: '),
                   TextSpan(
                       text: _event!.lokasi![index]['kota'],
                       style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -914,37 +1423,209 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
     ]);
   }
 
-  Widget latarBelakang() {
-    return Column(children: [
-      Text(
-        "LATAR BELAKANG\n",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      Text(_event!.latar_belakang!.toString(),
-          style: TextStyle(
-            height: 1.5,
-          )),
-    ]);
+  Widget buildFinalisasi() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "DOKUMENTASI KEGIATAN",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [addDokumentasi()],
+                ))),
+        Padding(
+            padding: EdgeInsets.only(bottom: 10, top: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "EVALUASI",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: TextField(
+                        controller: evaluasiController,
+                        decoration: const InputDecoration(
+                          labelText: 'Isikan evaluasi kegiatan (max 5 baris)',
+                        ),
+                        maxLines: 5,
+                      ),
+                    )
+                  ],
+                ))),
+      ],
+    );
   }
 
-  Widget strategi() {
-    return Column(children: [
-      Text("STRATEGI\n", style: TextStyle(fontWeight: FontWeight.bold)),
-      Text(_event!.strategi!.toString(),
-          style: TextStyle(
-            height: 1.5,
-          )),
-    ]);
+  Widget buildTarget() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "TARGET",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [updateTarget()],
+                ))),
+        Padding(
+            padding: EdgeInsets.only(bottom: 10, top: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "KEBUTUHAN TAMBAHAN",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [updateKebutuhan()],
+                ))),
+        Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "GIMMICK",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [updateGimmick()],
+                )))
+      ],
+    );
   }
 
-  Widget tujuan() {
-    return Column(children: [
-      Text("TUJUAN\n", style: TextStyle(fontWeight: FontWeight.bold)),
-      Text(_event!.tujuan.toString(),
-          style: TextStyle(
-            height: 1.5,
-          )),
-    ]);
+  Widget buildGeneralInformation() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "LATAR BELAKANG",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [
+                    Container(
+                        margin: EdgeInsets.only(
+                            left: 40, right: 40, top: 10, bottom: 10),
+                        child: Text(_event!.latar_belakang!.toString(),
+                            style: TextStyle(
+                              height: 1.5,
+                            )))
+                  ],
+                ))),
+        Padding(
+            padding: EdgeInsets.only(bottom: 10, top: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "TUJUAN",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [
+                    Container(
+                        margin: EdgeInsets.only(
+                            left: 40, right: 40, top: 10, bottom: 10),
+                        child: Text(_event!.tujuan!.toString(),
+                            style: TextStyle(
+                              height: 1.5,
+                            )))
+                  ],
+                ))),
+        Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 5,
+                child: ExpansionTile(
+                  title: Text(
+                    "STRATEGI ",
+                    textAlign: TextAlign.center,
+                    style: (TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  children: [
+                    Container(
+                        margin: EdgeInsets.only(
+                            left: 40, right: 40, top: 10, bottom: 10),
+                        child: Text(_event!.strategi!.toString(),
+                            style: TextStyle(
+                              height: 1.5,
+                            )))
+                  ],
+                )))
+      ],
+    );
+  }
+
+  warningDialog(message) {
+    if (isDialogShow == false) {
+      isDialogShow = true;
+      return showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+                title: Row(
+                  children: [Icon(Icons.warning), Text("  PERINGATAN")],
+                ),
+                content: SizedBox(width: 500, child: Text(message)),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context, 'Tidak');
+                      isDialogShow = false;
+                    },
+                    child: const Text('Ok'),
+                  ),
+                ],
+              ));
+    } else {
+      return;
+    }
+  }
+
+  countIndex(type) {
+    setState(() {
+      if (type == 1)
+        index++;
+      else
+        index--;
+    });
   }
 
   Widget tampilData(BuildContext context) {
@@ -963,7 +1644,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text("Penanggung Jawab: ${widget.penanggung_jawab}",
+                  Text("Nama Event: ${_event!.nama}",
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
@@ -971,156 +1652,307 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
         Container(
           alignment: Alignment.topLeft,
           padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: lokasi()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: tabelPersonil()),
-              ])
-            ],
-          ),
+          child:
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Container(
+                width: 500,
+                padding: EdgeInsets.only(right: 5),
+                child: lokasi()),
+            Text("Penanggung Jawab: ${widget.penanggung_jawab}",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ]),
         ),
         Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: latarBelakang()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: tujuan()),
-              ])
-            ],
-          ),
-        ),
+            alignment: Alignment.topLeft,
+            padding: EdgeInsets.only(top: 20),
+            child: multiTabIndicator()),
         Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: strategi()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: updateTarget()),
-              ])
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: updateKebutuhan()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: updateGimmick()),
-              ])
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: addDokumentasi()),
-                Container(
-                  width: 500,
-                  padding: EdgeInsets.only(left: 5),
-                ),
-              ])
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.topLeft,
-          width: 1050,
-          padding: EdgeInsets.only(top: 20),
-          child: addPengunjungBaru(),
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 50),
-          height: 50,
-          width: 1050,
-          child: ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState != null &&
-                  !_formKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Harap data yang kosong diisi kembali')));
-              } else {
-                dynamicKebutuhanTambahan.forEach((widget) =>
-                    kebutuhanTambahan.add([widget.id, widget.isiRealisasi]));
-                dynamicGimmick.forEach((widget) =>
-                    gimmick.add([widget.id, widget.jumlahRealisasi]));
-                dynamicTarget.forEach(
-                    (widget) => target.add([widget.id, widget.isiRealisasi]));
-                dynamicDokumentasi
-                    .forEach((widget) => target.add([widget.dokumentasi]));
-                //   showDialog<String>(
-                //       context: context,
-                //       builder: (BuildContext context) => AlertDialog(
-                //             title: const Text('Peringatan'),
-                //             content: Text(
-                //                 "Apakah anda yakin hendak mem-finalisasi proposal? \nData pada proposal tidak dapat diubah, kecuali proposal tidak disetujui"),
-                //             actions: <Widget>[
-                //               TextButton(
-                //                 onPressed: () {
-                //                   //submit(context);
-                //                 },
-                //                 child: const Text('Iya'),
-                //               ),
-                //               TextButton(
-                //                 onPressed: () => Navigator.pop(context, 'Tidak'),
-                //                 child: const Text('Tidak'),
-                //               ),
-                //             ],
-                //           ));
-                for (int i = 0; i < target.length; i++) {
-                  print(target[i]);
+            alignment: Alignment.topLeft,
+            padding: EdgeInsets.only(top: 20),
+            child: index == 0
+                ? buildGeneralInformation()
+                : index == 1
+                    ? tabelPersonil()
+                    : index == 2
+                        ? buildTarget()
+                        : index == 3
+                            ? buildPengunjung()
+                            : buildFinalisasi()),
+        Align(
+            alignment: index == 0
+                ? Alignment.bottomRight
+                : index == 4
+                    ? Alignment.bottomLeft
+                    : Alignment.bottomCenter,
+            child: index == 0
+                ? Container(
+                    margin: EdgeInsets.only(top: 50),
+                    height: 50,
+                    width: 100,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          countIndex(1);
+                        },
+                        child: Icon(Icons.keyboard_double_arrow_right)),
+                  )
+                : index == 4
+                    ? Container(
+                        margin: EdgeInsets.only(top: 50),
+                        height: 50,
+                        width: 100,
+                        child: ElevatedButton(
+                            onPressed: () {
+                              countIndex(0);
+                            },
+                            child: Icon(Icons.keyboard_double_arrow_left)),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                            Container(
+                              margin: EdgeInsets.only(top: 50),
+                              height: 50,
+                              width: 100,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    countIndex(0);
+                                  },
+                                  child:
+                                      Icon(Icons.keyboard_double_arrow_left)),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 50),
+                              height: 50,
+                              width: 100,
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    countIndex(1);
+                                  },
+                                  child:
+                                      Icon(Icons.keyboard_double_arrow_right)),
+                            )
+                          ])),
+        if (index == 4)
+          Container(
+            margin: EdgeInsets.only(top: 50),
+            height: 50,
+            width: 1050,
+            child: ElevatedButton(
+              onPressed: () {
+                bool isKebutuhanOK = false,
+                    isGimmickOk = false,
+                    isTargetOk = false,
+                    isDokumentasiOk = false,
+                    isPengunjungOk = false,
+                    isStokOK = false;
+                if (dynamicKebutuhanTambahan.isNotEmpty) {
+                  for (var element in dynamicKebutuhanTambahan) {
+                    if (element.isiRealisasi.text != "") {
+                      isKebutuhanOK = true;
+                      kebutuhanTambahan
+                          .add([element.id, element.isiRealisasi.text]);
+                    } else {
+                      isKebutuhanOK = false;
+                      warningDialog(
+                          "Terdapat kekosongan data pada kebutuhan tambahan bagian realisasi biaya kebutuhan.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                      break;
+                    }
+                  }
+                } else {
+                  isKebutuhanOK = true;
                 }
-                print("\n");
-                for (int i = 0; i < kebutuhanTambahan.length; i++) {
-                  print(kebutuhanTambahan[i]);
+                if (dynamicGimmick.isNotEmpty) {
+                  for (var widget in dynamicGimmick) {
+                    if (widget.jumlahRealisasi.text != "") {
+                      isGimmickOk = true;
+                      gimmick.add([
+                        widget.id,
+                        widget.jumlahRealisasi.text,
+                        widget.hargaProposal
+                      ]);
+                    } else {
+                      isGimmickOk = false;
+                      warningDialog(
+                          "Terdapat kekosongan data pada gimmick bagian jumlah realisasi.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                      break;
+                    }
+                  }
+                } else {
+                  isGimmickOk = true;
                 }
-                print("\n");
-                for (int i = 0; i < gimmick.length; i++) {
-                  print(gimmick[i]);
+                for (var widget in dynamicTarget) {
+                  isTargetOk = true;
+                  if (widget.id != 1 ||
+                      (widget.id == 1 && widget.isiRealisasi.text != "")) {
+                    target.add([widget.id, widget.isiRealisasi.text]);
+                  } else {
+                    isTargetOk = false;
+                    warningDialog(
+                        "Terdapat kekosongan data pada target bagian realisasi jumlah pengunjung.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                    break;
+                  }
                 }
-              }
-            },
-            child: Text(
-              'Submit',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+
+                // if (dynamicDokumentasi.isNotEmpty) {
+                //   for (var widget in dynamicDokumentasi) {
+                //     if (widget.alamatController.text != "" &&
+                //         widget.dokumentasi != null) {
+                //       isDokumentasiOk = true;
+                //       dokumentasi.add([
+                //         base64Encode(widget.dokumentasi),
+                //         widget.waktuController.text,
+                //         widget.alamatController.text
+                //       ]);
+                //     } else if (widget.alamatController.text == "") {
+                //       isDokumentasiOk = false;
+                //       warningDialog(
+                //           "Terdapat kekosongan data pada dokumentasi bagian alamat.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                //       break;
+                //     } else {
+                //       isDokumentasiOk = false;
+                //       warningDialog(
+                //           "Foto dokumentasi masih kosong.\nHarap melakukan pengunggahan foto sebelum melakukan finalisasi");
+                //       break;
+                //     }
+                //   }
+                // } else {
+                //   isDokumentasiOk = false;
+                //   warningDialog(
+                //       "Tidak ada dokumentasi tercatat. Harap unggah dokumentasi beserta datanya agar laporan dapat divaliadasi");
+                // }
+
+                // if (dynamicPengunjung.isNotEmpty) {
+                //   for (var widget in dynamicPengunjung) {
+                //     if (widget.dynamicPenjualan.isNotEmpty) {
+                //       for (var element in widget.dynamicPenjualan) {
+                //         if (element.quantityController.text != "") {
+                //           isStokOK = true;
+                //           stok.add([
+                //             element.id_produk,
+                //             int.parse(element.quantityController.text)
+                //           ]);
+                //           widget.productBought.add([
+                //             element.id_produk,
+                //             int.parse(element.quantityController.text),
+                //             element.harga
+                //           ]);
+                //         } else {
+                //           isStokOK = false;
+                //           warningDialog(
+                //               "Terdapat kekosongan data pada penjualan product bagian jumlah produk yang terjual.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                //           break;
+                //         }
+                //       }
+                //       if (isStokOK == false) {
+                //         break;
+                //       } else {
+                //         if (widget.isLama == true) {
+                //           if (widget.username == "") {
+                //             isPengunjungOk = false;
+                //             warningDialog(
+                //                 "Terdapat data pengunjung lama yang masih kosong.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                //             break;
+                //           } else {
+                //             isPengunjungOk = true;
+                //             pengunjungLama
+                //                 .add([widget.username, widget.productBought]);
+                //           }
+                //         } else {
+                //           if (widget.controllerUsername.text == "" ||
+                //               widget.controllerNama.text == "" ||
+                //               widget.controllerTelepon.text == "" ||
+                //               widget.controllerUsia.text == "" ||
+                //               widget.controllerAlamat.text == "") {
+                //             isPengunjungOk = false;
+                //             warningDialog(
+                //                 "Terdapat kekosongan data pada pengisian pengunjung baru.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                //             break;
+                //           } else {
+                //             isPengunjungOk = true;
+                //             pengunjungBaru.add([
+                //               widget.controllerUsername.text,
+                //               widget.controllerNama.text,
+                //               widget.controllerTelepon.text,
+                //               widget.controllerUsia.text,
+                //               widget.controllerAlamat.text,
+                //               widget.gender,
+                //               widget.productBought
+                //             ]);
+                //           }
+                //         }
+                //       }
+                //     } else {
+                //       isStokOK = false;
+                //       warningDialog(
+                //           "Ada data pengunjung yang tidak melakukan pembelian product.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                //       break;
+                //     }
+                //   }
+                // } else {
+                //   warningDialog(
+                //       "Tidak ada pengunjung tercatat. Harap melengkapi data pengunjung beserta data penjualannya");
+                // }
+
+                // if (isKebutuhanOK == true &&
+                //     isTargetOk == true &&
+                //     isGimmickOk == true &&
+                //     isDokumentasiOk == true &&
+                //     isStokOK == true &&
+                //     isPengunjungOk == true &&
+                //     evaluasiController.text != "") {
+                //   print(id_cabang);
+
+                showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                          title: const Text('Peringatan'),
+                          content: Text(
+                              "Apakah anda yakin hendak mem-finalisasi laporan? \nData pada laporan tidak dapat diubah, kecuali laporan tidak disetujui"),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                submit(context);
+                              },
+                              child: const Text('Iya'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                kebutuhanTambahan = [];
+                                gimmick = [];
+                                target = [];
+                                dokumentasi = [];
+                                pengunjungBaru = [];
+                                pengunjungLama = [];
+                                stok = [];
+                                Navigator.pop(context, 'Tidak');
+                              },
+                              child: const Text('Tidak'),
+                            ),
+                          ],
+                        ));
+                // } else {
+                //   kebutuhanTambahan = [];
+                //   gimmick = [];
+                //   target = [];
+                //   dokumentasi = [];
+                //   pengunjungBaru = [];
+                //   pengunjungLama = [];
+                //   stok = [];
+                //   for (var widget in dynamicPengunjung) {
+                //     widget.productBought = [];
+                //   }
+                //   if (evaluasiController.text == "") {
+                //     warningDialog("Harap lengkapi data evaluasi");
+                //   }
+                // }
+              },
+              child: Text(
+                'Submit',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-        ),
       ]),
     ));
   }

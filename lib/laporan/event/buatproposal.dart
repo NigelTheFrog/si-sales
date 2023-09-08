@@ -10,6 +10,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
 import 'package:measure_size/measure_size.dart';
 
+List existedPersonil = [],
+    existedGimmick = [],
+    existedProduct = [],
+    existedTarget = [];
+
 class dynamicWidgetPersonil extends StatelessWidget {
   String id_cabang;
   dynamicWidgetPersonil({super.key, required this.id_cabang});
@@ -25,12 +30,19 @@ class dynamicWidgetPersonil extends StatelessWidget {
         ),
         mode: Mode.MENU,
         showSearchBox: true,
+        emptyBuilder: (context, searchEntry) => Center(
+          child: Text("Tidak ada data ditemukan"),
+        ),
         onFind: (text) async {
           Map json;
           var response = await http.post(
               Uri.parse(
                   "https://otccoronet.com/otc/laporan/event/properties/eventpersonel.php"),
-              body: {'cari': text, 'id': id_cabang});
+              body: {
+                'cari': text,
+                'id': id_cabang,
+                'existedPersonil': jsonEncode(existedPersonil)
+              });
 
           if (response.statusCode == 200) {
             json = jsonDecode(response.body);
@@ -39,6 +51,17 @@ class dynamicWidgetPersonil extends StatelessWidget {
           return pengguna as List<dynamic>;
         },
         onChanged: (value) {
+          if (existedPersonil.isEmpty) {
+            existedPersonil.add("'${value['username']}'");
+          } else {
+            if (username != "") {
+              int index = existedPersonil.indexWhere(
+                  (parameter) => parameter.startsWith("'$username'"));
+              existedPersonil[index] = "'${value['username']}'";
+            } else {
+              existedPersonil.add("'${value['username']}'");
+            }
+          }
           username = value['username'];
         },
         itemAsString: (item) =>
@@ -71,12 +94,19 @@ class dynamicWidgetGimmick extends StatelessWidget {
                 ),
                 mode: Mode.MENU,
                 showSearchBox: true,
+                emptyBuilder: (context, searchEntry) => Center(
+                      child: Text("Tidak ada data ditemukan"),
+                    ),
                 onFind: (text) async {
                   Map json;
                   var response = await http.post(
                       Uri.parse(
                           "https://otccoronet.com/otc/admin/gimmick/daftargimmickcabang.php"),
-                      body: {'cari': text, 'id': id_cabang});
+                      body: {
+                        'cari': text,
+                        'id': id_cabang,
+                        'existedGimmick': existedGimmick
+                      });
 
                   if (response.statusCode == 200) {
                     json = jsonDecode(response.body);
@@ -85,6 +115,17 @@ class dynamicWidgetGimmick extends StatelessWidget {
                   return gimmick as List<dynamic>;
                 },
                 onChanged: (value) {
+                  if (existedGimmick.isEmpty) {
+                    existedGimmick.add(id);
+                  } else {
+                    if (id != 0) {
+                      int index = existedGimmick
+                          .indexWhere((parameter) => parameter.startsWith(id));
+                      existedGimmick[index] = id;
+                    } else {
+                      existedGimmick.add(id);
+                    }
+                  }
                   id = value['id'];
                   harga = value['harga'];
                 },
@@ -134,7 +175,10 @@ class dynamicWidgetProduct extends StatelessWidget {
                   var response = await http.post(
                       Uri.parse(
                           "https://otccoronet.com/otc/admin/product/daftarproductcabang.php"),
-                      body: {'idCabang': id_cabang});
+                      body: {
+                        'idCabang': id_cabang,
+                        'existedProduct': existedProduct
+                      });
 
                   if (response.statusCode == 200) {
                     json = jsonDecode(response.body);
@@ -143,6 +187,17 @@ class dynamicWidgetProduct extends StatelessWidget {
                   return produk as List<dynamic>;
                 },
                 onChanged: (value) {
+                  if (existedProduct.isEmpty) {
+                    existedProduct.add(id);
+                  } else {
+                    if (id != 0) {
+                      int index = existedProduct
+                          .indexWhere((parameter) => parameter.startsWith(id));
+                      existedProduct[index] = id;
+                    } else {
+                      existedProduct.add(id);
+                    }
+                  }
                   id = value['id'];
                   harga = value['harga'];
                 },
@@ -232,9 +287,9 @@ class _dynamicWidgetTargetState extends State<dynamicWidgetTarget> {
         onFind: (text) async {
           Map json;
           var response = await http.post(
-            Uri.parse(
-                "https://otccoronet.com/otc/laporan/event/properties/eventtarget.php"),
-          );
+              Uri.parse(
+                  "https://otccoronet.com/otc/laporan/event/properties/eventtarget.php"),
+              body: {'existedTarget': existedTarget});
           if (response.statusCode == 200) {
             json = jsonDecode(response.body);
             setState(() {
@@ -245,6 +300,17 @@ class _dynamicWidgetTargetState extends State<dynamicWidgetTarget> {
         },
         onChanged: (value) {
           setState(() {
+            if (existedTarget.isEmpty) {
+              existedTarget.add(widget.id);
+            } else {
+              if (widget.id != 0) {
+                int index = existedTarget
+                    .indexWhere((parameter) => parameter.startsWith(widget.id));
+                existedTarget[index] = widget.id;
+              } else {
+                existedTarget.add(widget.id);
+              }
+            }
             widget.id = value['id'];
 
             if (value['parameter'].contains("Estimasi") ||
@@ -317,7 +383,6 @@ class _BuatProposalState extends State<BuatProposal> {
       provinsi = "",
       nama = "",
       date = "",
-      time = "",
       strategi = "",
       tujuan = "",
       latarBelakang = "",
@@ -588,6 +653,7 @@ class _BuatProposalState extends State<BuatProposal> {
                       onPressed: () {
                         setState(() {
                           dynamicPersonel.removeAt(index);
+                          existedPersonil.removeAt(index);
                           heightAddPersonel -= 50;
                         });
                       },
@@ -690,6 +756,7 @@ class _BuatProposalState extends State<BuatProposal> {
                       onPressed: () {
                         setState(() {
                           dynamicGimmick.removeAt(index);
+                          existedGimmick.removeAt(index);
                           heightAddGimmick -= 50;
                         });
                       },
@@ -741,6 +808,7 @@ class _BuatProposalState extends State<BuatProposal> {
                       onPressed: () {
                         setState(() {
                           dynamicTarget.removeAt(index);
+                          existedTarget.removeAt(index);
                           heightAddTarget -= 55;
                         });
                       },

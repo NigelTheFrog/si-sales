@@ -382,7 +382,7 @@ class _DetailProposalState extends State<DetailProposal> {
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
                       title: const Text('Keterangan / Alasan Penolakan'),
-                      content: Container(
+                      content: SizedBox(
                           height: 300,
                           width: 300,
                           child: ListView.builder(
