@@ -1,14 +1,13 @@
-class Jabatan {
-  final String jabatan, keterangan;
-  final int id;
+class Provinsi {
+  final String id, provinsi;
+  final List? kota;
 
-  Jabatan({required this.id, required this.jabatan, required this.keterangan});
+  Provinsi({required this.id, required this.provinsi, this.kota});
 
-  factory Jabatan.fromJson(Map<String, dynamic> json) {
-    return Jabatan(
-      id: json['id'] as int,
-      jabatan: json['jabatan'] as String,
-      keterangan: json['keterangan'] as String,
-    );
+  factory Provinsi.fromJson(Map<String, dynamic> json) {
+    return Provinsi(
+        id: json['id'] as String,
+        provinsi: json['provinsi'] as String,
+        kota: json['kota']);
   }
 }

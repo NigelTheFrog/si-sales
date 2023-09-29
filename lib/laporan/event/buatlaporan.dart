@@ -274,7 +274,9 @@ class _dyanmicDokumentasiState extends State<dyanmicDokumentasi> {
             SizedBox(
                 width: 480,
                 child: TextField(
+                    minLines: 1,
                     maxLines: 3,
+                    keyboardType: TextInputType.multiline,
                     decoration: const InputDecoration(
                       labelText: 'Alamat (Max 3 baris)',
                     ),
@@ -496,7 +498,9 @@ class _dynamicWidgetPengunjungState extends State<dynamicWidgetPengunjung> {
                   width: 300,
                   height: 50,
                   child: TextField(
+                    keyboardType: TextInputType.multiline,
                     maxLines: 3,
+                    minLines: 1,
                     decoration: const InputDecoration(
                       labelText: 'Alamat Pembeli',
                     ),
@@ -775,7 +779,7 @@ class BuatLaporanEvent extends StatefulWidget {
 }
 
 class _BuatLaporanEventState extends State<BuatLaporanEvent> {
-  int index = 0, pengunjung = 0;
+  int index = 0, pengunjung = 0, total_biaya = 0, total_penjualan = 0;
   TextEditingController evaluasiController = TextEditingController();
   List dokumentasi = [],
       target = [],
@@ -871,6 +875,16 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
     });
   }
 
+  void clearData() {
+    kebutuhanTambahan.clear();
+    gimmick.clear();
+    target.clear();
+    dokumentasi.clear();
+    pengunjungBaru.clear();
+    pengunjungLama.clear();
+    stok.clear();
+  }
+
   void submit(BuildContext context) async {
     final response = await http.post(
         Uri.parse("https://otccoronet.com/otc/laporan/event/buatlaporan.php"),
@@ -891,9 +905,10 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
       print(response.body.toString());
       if (json['result'] == 'success') {
         if (!mounted) return;
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Laporan telah diajukan')));
-        Navigator.popAndPushNamed(context, "/daftarevent");
+        clearData();
+        // ScaffoldMessenger.of(context)
+        //     .showSnackBar(SnackBar(content: Text('Laporan telah diajukan')));
+        // Navigator.popAndPushNamed(context, "/daftarevent");
       } else {
         warningDialog(json['message']);
       }
@@ -1752,6 +1767,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                       isKebutuhanOK = true;
                       kebutuhanTambahan
                           .add([element.id, element.isiRealisasi.text]);
+                      total_biaya += int.parse(element.isiRealisasi.text);
                     } else {
                       isKebutuhanOK = false;
                       warningDialog(
@@ -1771,6 +1787,8 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                         widget.jumlahRealisasi.text,
                         widget.hargaProposal
                       ]);
+                      total_biaya += (int.parse(widget.jumlahRealisasi.text) *
+                          widget.hargaProposal);
                     } else {
                       isGimmickOk = false;
                       warningDialog(
@@ -1781,118 +1799,139 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                 } else {
                   isGimmickOk = true;
                 }
-                for (var widget in dynamicTarget) {
-                  isTargetOk = true;
-                  if (widget.id != 1 ||
-                      (widget.id == 1 && widget.isiRealisasi.text != "")) {
-                    target.add([widget.id, widget.isiRealisasi.text]);
-                  } else {
-                    isTargetOk = false;
-                    warningDialog(
-                        "Terdapat kekosongan data pada target bagian realisasi jumlah pengunjung.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
-                    break;
+                if (dynamicDokumentasi.isNotEmpty) {
+                  for (var widget in dynamicDokumentasi) {
+                    if (widget.alamatController.text != "" &&
+                        widget.dokumentasi != null) {
+                      isDokumentasiOk = true;
+                      dokumentasi.add([
+                        base64Encode(widget.dokumentasi),
+                        widget.waktuController.text,
+                        widget.alamatController.text
+                      ]);
+                    } else if (widget.alamatController.text == "") {
+                      isDokumentasiOk = false;
+                      warningDialog(
+                          "Terdapat kekosongan data pada dokumentasi bagian alamat.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                      break;
+                    } else {
+                      isDokumentasiOk = false;
+                      warningDialog(
+                          "Foto dokumentasi masih kosong.\nHarap melakukan pengunggahan foto sebelum melakukan finalisasi");
+                      break;
+                    }
                   }
+                } else {
+                  isDokumentasiOk = false;
+                  warningDialog(
+                      "Tidak ada dokumentasi tercatat. Harap unggah dokumentasi beserta datanya agar laporan dapat divaliadasi");
                 }
 
-                // if (dynamicDokumentasi.isNotEmpty) {
-                //   for (var widget in dynamicDokumentasi) {
-                //     if (widget.alamatController.text != "" &&
-                //         widget.dokumentasi != null) {
-                //       isDokumentasiOk = true;
-                //       dokumentasi.add([
-                //         base64Encode(widget.dokumentasi),
-                //         widget.waktuController.text,
-                //         widget.alamatController.text
-                //       ]);
-                //     } else if (widget.alamatController.text == "") {
-                //       isDokumentasiOk = false;
-                //       warningDialog(
-                //           "Terdapat kekosongan data pada dokumentasi bagian alamat.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
-                //       break;
-                //     } else {
-                //       isDokumentasiOk = false;
-                //       warningDialog(
-                //           "Foto dokumentasi masih kosong.\nHarap melakukan pengunggahan foto sebelum melakukan finalisasi");
-                //       break;
-                //     }
-                //   }
-                // } else {
-                //   isDokumentasiOk = false;
-                //   warningDialog(
-                //       "Tidak ada dokumentasi tercatat. Harap unggah dokumentasi beserta datanya agar laporan dapat divaliadasi");
-                // }
+                if (dynamicPengunjung.isNotEmpty) {
+                  for (var widget in dynamicPengunjung) {
+                    if (widget.dynamicPenjualan.isNotEmpty) {
+                      for (var element in widget.dynamicPenjualan) {
+                        if (element.quantityController.text != "") {
+                          isStokOK = true;
+                          stok.add([
+                            element.id_produk,
+                            int.parse(element.quantityController.text)
+                          ]);
+                          widget.productBought.add([
+                            element.id_produk,
+                            int.parse(element.quantityController.text),
+                            element.harga
+                          ]);
+                          total_penjualan +=
+                              (int.parse(element.quantityController.text) *
+                                  element.harga);
+                        } else {
+                          isStokOK = false;
+                          warningDialog(
+                              "Terdapat kekosongan data pada penjualan product bagian jumlah produk yang terjual.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                          break;
+                        }
+                      }
+                      if (isStokOK == false) {
+                        break;
+                      } else {
+                        if (widget.isLama == true) {
+                          if (widget.username == "") {
+                            isPengunjungOk = false;
+                            warningDialog(
+                                "Terdapat data pengunjung lama yang masih kosong.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                            break;
+                          } else {
+                            isPengunjungOk = true;
+                            pengunjungLama
+                                .add([widget.username, widget.productBought]);
+                          }
+                        } else {
+                          if (widget.controllerUsername.text == "" ||
+                              widget.controllerNama.text == "" ||
+                              widget.controllerTelepon.text == "" ||
+                              widget.controllerUsia.text == "" ||
+                              widget.controllerAlamat.text == "") {
+                            isPengunjungOk = false;
+                            warningDialog(
+                                "Terdapat kekosongan data pada pengisian pengunjung baru.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                            break;
+                          } else {
+                            isPengunjungOk = true;
+                            pengunjungBaru.add([
+                              widget.controllerUsername.text,
+                              widget.controllerNama.text,
+                              widget.controllerTelepon.text,
+                              widget.controllerUsia.text,
+                              widget.controllerAlamat.text,
+                              widget.gender,
+                              widget.productBought
+                            ]);
+                          }
+                        }
+                      }
+                    } else {
+                      isStokOK = false;
+                      warningDialog(
+                          "Ada data pengunjung yang tidak melakukan pembelian product.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                      break;
+                    }
+                  }
+                } else {
+                  warningDialog(
+                      "Tidak ada pengunjung tercatat. Harap melengkapi data pengunjung beserta data penjualannya");
+                }
 
-                // if (dynamicPengunjung.isNotEmpty) {
-                //   for (var widget in dynamicPengunjung) {
-                //     if (widget.dynamicPenjualan.isNotEmpty) {
-                //       for (var element in widget.dynamicPenjualan) {
-                //         if (element.quantityController.text != "") {
-                //           isStokOK = true;
-                //           stok.add([
-                //             element.id_produk,
-                //             int.parse(element.quantityController.text)
-                //           ]);
-                //           widget.productBought.add([
-                //             element.id_produk,
-                //             int.parse(element.quantityController.text),
-                //             element.harga
-                //           ]);
-                //         } else {
-                //           isStokOK = false;
-                //           warningDialog(
-                //               "Terdapat kekosongan data pada penjualan product bagian jumlah produk yang terjual.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
-                //           break;
-                //         }
-                //       }
-                //       if (isStokOK == false) {
-                //         break;
-                //       } else {
-                //         if (widget.isLama == true) {
-                //           if (widget.username == "") {
-                //             isPengunjungOk = false;
-                //             warningDialog(
-                //                 "Terdapat data pengunjung lama yang masih kosong.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
-                //             break;
-                //           } else {
-                //             isPengunjungOk = true;
-                //             pengunjungLama
-                //                 .add([widget.username, widget.productBought]);
-                //           }
-                //         } else {
-                //           if (widget.controllerUsername.text == "" ||
-                //               widget.controllerNama.text == "" ||
-                //               widget.controllerTelepon.text == "" ||
-                //               widget.controllerUsia.text == "" ||
-                //               widget.controllerAlamat.text == "") {
-                //             isPengunjungOk = false;
-                //             warningDialog(
-                //                 "Terdapat kekosongan data pada pengisian pengunjung baru.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
-                //             break;
-                //           } else {
-                //             isPengunjungOk = true;
-                //             pengunjungBaru.add([
-                //               widget.controllerUsername.text,
-                //               widget.controllerNama.text,
-                //               widget.controllerTelepon.text,
-                //               widget.controllerUsia.text,
-                //               widget.controllerAlamat.text,
-                //               widget.gender,
-                //               widget.productBought
-                //             ]);
-                //           }
-                //         }
-                //       }
-                //     } else {
-                //       isStokOK = false;
-                //       warningDialog(
-                //           "Ada data pengunjung yang tidak melakukan pembelian product.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
-                //       break;
-                //     }
-                //   }
-                // } else {
-                //   warningDialog(
-                //       "Tidak ada pengunjung tercatat. Harap melengkapi data pengunjung beserta data penjualannya");
-                // }
+                for (var widget in dynamicTarget) {
+                  isTargetOk = true;
+                  if (widget.id == 1) {
+                    if (widget.isiRealisasi.text == "") {
+                      isTargetOk = false;
+                      warningDialog(
+                          "Terdapat kekosongan data pada target bagian realisasi jumlah pengunjung.\nHarap melengkapi data tersebut sebelum melakukan finalisasi");
+                      break;
+                    } else {
+                      isTargetOk = true;
+                      target.add([widget.id, widget.isiRealisasi.text]);
+                    }
+                  } else if (widget.id == 2) {
+                    isTargetOk = true;
+                    target.add([widget.id, pengunjungBaru.length]);
+                  } else if (widget.id == 3) {
+                    isTargetOk = true;
+                    target.add([widget.id, pengunjungLama.length]);
+                  } else if (widget.id == 4) {
+                    isTargetOk = true;
+                    target.add([widget.id, total_penjualan]);
+                  } else if (widget.id == 7) {
+                    isTargetOk = true;
+                    target.add([widget.id, total_biaya]);
+                  } else if (widget.id == 8) {
+                    isTargetOk = true;
+                    double value = (total_biaya / total_penjualan) * 100;
+                    target.add([widget.id, value]);
+                  }
+                }
 
                 // if (isKebutuhanOK == true &&
                 //     isTargetOk == true &&
@@ -1913,18 +1952,15 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                             TextButton(
                               onPressed: () {
                                 submit(context);
+                                // print(target);
+                                setState(() {
+                                  clearData();
+                                });
                               },
                               child: const Text('Iya'),
                             ),
                             TextButton(
                               onPressed: () {
-                                kebutuhanTambahan = [];
-                                gimmick = [];
-                                target = [];
-                                dokumentasi = [];
-                                pengunjungBaru = [];
-                                pengunjungLama = [];
-                                stok = [];
                                 Navigator.pop(context, 'Tidak');
                               },
                               child: const Text('Tidak'),
@@ -1964,7 +2000,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
           title: Text("Buat Laporan Event"),
           leading: BackButton(
             onPressed: () {
-              Navigator.popAndPushNamed(context, "/daftarevent");
+              Navigator.popAndPushNamed(context, "/homepage");
             },
           ),
         ),

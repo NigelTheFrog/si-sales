@@ -10,7 +10,7 @@ import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
 import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/detailpenjualan.dart';
-import 'package:pt_coronet_crown/mainpage/detailvisit.dart';
+import 'package:pt_coronet_crown/mainpage/kunjungan/detailvisit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 

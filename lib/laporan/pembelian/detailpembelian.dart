@@ -57,12 +57,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Mengubah Data')));
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => DetailPembelian(
-                      laporan_id: widget.laporan_id,
-                    )));
+        build(context);
       }
     } else {
       throw Exception('Failed to read API');
@@ -441,9 +436,7 @@ class _DetailPembelianState extends State<DetailPembelian> {
         appBar: AppBar(
           title: Text("Detail Pembelian"),
           leading: BackButton(
-            onPressed: () {
-              Navigator.popAndPushNamed(context, "/daftarpembelian");
-            },
+            onPressed: () => Navigator.of(context).pop(),
           ),
         ),
         body: _pembelian == null

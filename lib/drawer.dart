@@ -80,7 +80,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     title: const Text("Personel Data"),
                     leading: const Icon(Icons.account_box),
                     onTap: () {
-                      Navigator.popAndPushNamed(context, "/daftarpersonel");
+                      Navigator.popAndPushNamed(context, "/test");
                     },
                   ),
                   ListTile(

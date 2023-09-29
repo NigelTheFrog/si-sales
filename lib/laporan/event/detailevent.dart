@@ -699,9 +699,9 @@ class _DetailEventState extends State<DetailEvent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Detail PAP"),
-        ),
+        // appBar: AppBar(
+        //   title: Text("Detail PAP"),
+        // ),
         body: _event == null
             ? Container(
                 height: MediaQuery.of(context).size.height,

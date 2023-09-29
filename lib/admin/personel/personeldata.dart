@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:dynamic_height_grid_view/dynamic_height_grid_view.dart'
+    as dynamicGridView;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/admin/personel/detailpersonel.dart';
@@ -25,7 +27,7 @@ class _PersonelDataState extends State<PersonelData> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/admin/personel/personeldata/daftarpersoneldata.php"),
+            "https://otccoronet.com/otc/admin/personel/personeldata/daftarpersoneldata.php"),
         body: {"cari": _txtcari});
     if (response.statusCode == 200) {
       return response.body;
@@ -37,7 +39,7 @@ class _PersonelDataState extends State<PersonelData> {
   void deletePersonel(String username) async {
     final response = await http.post(
         Uri.parse(
-            "http://192.168.137.1/magang/admin/personel/personeldata/deletepersonel.php"),
+            "https://otccoronet.com/otc/admin/personel/personeldata/deletepersonel.php"),
         body: {"username": username});
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
@@ -65,224 +67,231 @@ class _PersonelDataState extends State<PersonelData> {
     _loadData();
   }
 
-  List<Widget> listPersonel(BuildContext context, data) {
-    List<Widget> temp = [];
+  Widget listPersonel(data) {
     List<Person> person2 = [];
     Map json = jsonDecode(data);
-    Widget w = Text("");
     if (json['result'] == "error") {
-      w = Text("");
+      return Container();
     } else {
       for (var pers in json['data']) {
         Person person = Person.fromJson(pers);
         person2.add(person);
       }
-      for (int i = 0; i < person2.length; i++) {
-        w = Card(
-            child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topRight,
-              child: Column(
-                children: [
-                  Tooltip(
-                    message: 'Personnel attendance',
-                    child: IconButton(
-                      icon: Icon(Icons.zoom_in),
-                      onPressed: () {},
-                    ),
-                  ),
-                  Tooltip(
-                    message: 'Edit data personnel',
-                    child: IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => DetailPersonel(
-                                      username: person2[i].username,
-                                      avatar: person2[i].avatar,
-                                      namaDepan: person2[i].nama_depan,
-                                      namaBelakang: person2[i].nama_belakang,
-                                      nomorTelepon: person2[i].no_telp,
-                                      namaJabatan: person2[i].jabatan,
-                                      namaCabang: person2[i].nama_cabang,
-                                      email: person2[i].email,
-                                      idcabang: person2[i].id_cabang,
-                                      idjabatan:
-                                          person2[i].id_jabatan.toString(),
-                                      idgrup: person2[i].id_grup,
-                                      namaGrup: person2[i].nama_grup,
-                                    )));
-                      },
-                    ),
-                  ),
-                  Tooltip(
-                    message: 'Delete Personnel',
-                    child: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text("Warning!"),
-                                content: Text(
-                                    "Dengan menekan tombol iya, \nAnda akan menghapus data user: ${person2[i].username}"),
-                                actions: [
-                                  TextButton(
-                                    child: Text("Cancel"),
-                                    onPressed: () {},
-                                  ),
-                                  TextButton(
-                                    child: Text("Iya"),
-                                    onPressed: () {
-                                      //deletePersonel(person2[i].username);
-                                    },
-                                  )
-                                ],
-                              );
-                            },
-                          );
-                          //deletePersonel(person2[idx].username);
-                        });
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Row(children: [
-              Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                      margin: EdgeInsets.only(top: 1),
-                      width: 100,
-                      height: 131,
-                      child: Image.memory(
-                        base64Decode(person2[i].avatar),
-                      ))),
-              Container(
-                  padding: EdgeInsets.all(5),
-                  width: 220,
-                  child: Column(
-                    children: [
+      return
+          // child: SizedBox(
+          // height: MediaQuery.of(context).size.width,
+          // width: MediaQuery.of(context).size.width,
+          dynamicGridView.DynamicHeightGridView(
+              crossAxisCount: MediaQuery.of(context).size.width >= 800 ? 2 : 1,
+              crossAxisSpacing: 4,
+              itemCount: person2.length,
+              builder: (context, index) {
+                return Card(
+                    elevation: 5,
+                    child: Stack(children: [
                       Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "${person2[i].nama_depan} ${person2[i].nama_belakang} - ${person2[i].jabatan} \n${person2[i].nama_cabang}",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                      Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(person2[i].username)),
+                        alignment: Alignment.topRight,
+                        child: Column(
+                          children: [
+                            Tooltip(
+                              message: 'Personnel attendance',
+                              child: IconButton(
+                                icon: Icon(Icons.zoom_in),
+                                onPressed: () {},
+                              ),
+                            ),
+                            Tooltip(
+                              message: 'Edit data personnel',
+                              child: IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  // Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //         builder: (context) => DetailPersonel(
+                                  //               username: person2[i].username,
+                                  //               avatar: person2[i].avatar,
+                                  //               namaDepan: person2[i].nama_depan,
+                                  //               namaBelakang: person2[i].nama_belakang,
+                                  //               nomorTelepon: person2[i].no_telp,
+                                  //               namaJabatan: person2[i].jabatan,
+                                  //               namaCabang: person2[i].nama_cabang,
+                                  //               email: person2[i].email,
+                                  //               idcabang: person2[i].id_cabang,
+                                  //               idjabatan:
+                                  //                   person2[i].id_jabatan.toString(),
+                                  //               idgrup: person2[i].id_grup,
+                                  //               namaGrup: person2[i].nama_grup,
+                                  //             )));
+                                },
+                              ),
+                            ),
+                            Tooltip(
+                              message: 'Delete Personnel',
+                              child: IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Warning!"),
+                                          content: Text(
+                                              "Dengan menekan tombol iya, \nAnda akan menghapus data user: ${person2[index].username}"),
+                                          actions: [
+                                            TextButton(
+                                              child: Text("Cancel"),
+                                              onPressed: () {},
+                                            ),
+                                            TextButton(
+                                              child: Text("Iya"),
+                                              onPressed: () {
+                                                //deletePersonel(person2[i].username);
+                                              },
+                                            )
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    //deletePersonel(person2[idx].username);
+                                  });
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                       Row(children: [
-                        Icon(Icons.mail),
-                        Text(person2[i].email, textAlign: TextAlign.left)
-                      ]),
-                      Row(children: [
-                        Icon(Icons.phone),
-                        Text(person2[i].no_telp, textAlign: TextAlign.left)
-                      ]),
-                      Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Text("Group : " + person2[i].nama_grup,
-                              textAlign: TextAlign.left)),
-                    ],
-                  )),
-            ]),
-          ],
-        ));
-        temp.add(w);
-      }
+                        Container(
+                            alignment: Alignment.topLeft,
+                            margin: EdgeInsets.only(
+                                top: 5, left: 5, bottom: 5, right: 10),
+                            // child: ClipRRect(borderRadius: BorderRadius.circular(8), child: ,),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(width: 2, color: Colors.orange),
+                            ),
+                            width: 100,
+                            height: 130,
+                            child: Image(
+                              image: MemoryImage(
+                                  base64Decode(person2[index].avatar)),
+                              alignment: Alignment.center,
+                              height: double.infinity,
+                              width: double.infinity,
+                              fit: BoxFit.fill,
+                            )
+                            // child:  Image.memory(
+                            //   base64Decode(person2[index].avatar),
+                            //   // fit: BoxFit.fill,
+                            // )
+                            ),
+                        Container(
+                            padding: EdgeInsets.all(5),
+                            width: 220,
+                            child: Column(children: [
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(
+                                    "${person2[index].nama_depan} ${person2[index].nama_belakang} - ${person2[index].jabatan} \n${person2[index].nama_cabang}",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )),
+                              Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(person2[index].username)),
+                              Row(children: [
+                                Icon(Icons.mail),
+                                Text(person2[index].email,
+                                    textAlign: TextAlign.left)
+                              ]),
+                              Row(children: [
+                                Icon(Icons.phone),
+                                Text(person2[index].no_telp,
+                                    textAlign: TextAlign.left)
+                              ]),
+                              Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Text(
+                                      "Group : " + person2[index].nama_grup,
+                                      textAlign: TextAlign.left)),
+                            ]))
+                      ])
+                    ]));
+              });
     }
-    return temp;
   }
 
   @override
   Widget build(BuildContext context) {
     if (id_jabatan == "1") {
       return Scaffold(
-          appBar: AppBar(
-            title: Text("Personnel Data"),
-          ),
-          drawer: MyDrawer(),
+          // appBar: AppBar(
+          //   title: Text("Personnel Data"),
+          // ),
+          // drawer: MyDrawer(),
           body: Container(
-            alignment: Alignment.topCenter,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.all(10),
-                    padding: EdgeInsets.all(10),
-                    alignment: Alignment.topCenter,
-                    width: 400,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Color.fromARGB(255, 248, 172, 49)),
-                              onPressed: () {
-                                Navigator.popAndPushNamed(
-                                    context, "tambahstaff");
-                              },
-                              child: Text(
-                                "Add New Personnel",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              )),
-                          Container(
-                            height: 50,
-                            width: 175,
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                icon: Icon(Icons.search),
-                                labelText: 'Search Personnel',
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _txtcari = value;
-                                });
-                                // bacaData();
-                              },
-                            ),
-                          )
-                        ]),
-                  ),
-                  Container(
-                      alignment: Alignment.topCenter,
-                      height: MediaQuery.of(context).size.height,
-                      width: 800,
-                      child: FutureBuilder(
-                          future: fetchData(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              return GridView.count(
-                                  crossAxisCount: kIsWeb
-                                      ? MediaQuery.of(context).size.width >= 870
-                                          ? 2
-                                          : 1
-                                      : 1,
-                                  crossAxisSpacing: 4.0,
-                                  childAspectRatio: (800 /
-                                      (MediaQuery.of(context).size.height /
-                                          2.63)),
-                                  mainAxisSpacing: 8.0,
-                                  children: listPersonel(
-                                      context, snapshot.data.toString()));
-                            } else {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                          }))
-                ],
+        alignment: Alignment.topCenter,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
+                alignment: Alignment.topCenter,
+                width: 400,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Color.fromARGB(255, 248, 172, 49)),
+                          onPressed: () {
+                            Navigator.popAndPushNamed(context, "tambahstaff");
+                          },
+                          child: Text(
+                            "Add New Personnel",
+                            style: TextStyle(color: Colors.black, fontSize: 16),
+                          )),
+                      Container(
+                        height: 50,
+                        width: 175,
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.search),
+                            labelText: 'Search Personnel',
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _txtcari = value;
+                            });
+                            // bacaData();
+                          },
+                        ),
+                      )
+                    ]),
               ),
-            ),
-          ));
+              Container(
+                  alignment: Alignment.topCenter,
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  height: MediaQuery.of(context).size.height,
+                  child: FutureBuilder(
+                      future: fetchData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          //return Container();
+                          return listPersonel(snapshot.data.toString());
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                      }))
+            ],
+          ),
+        ),
+      ));
     } else {
       return Scaffold(
         appBar: AppBar(

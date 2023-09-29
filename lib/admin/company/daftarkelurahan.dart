@@ -90,7 +90,7 @@ class _DaftarKelurahanState extends State<DaftarKelurahan> {
     List<Kelurahan> kelurahan2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
-      return Container();
+      return Text("Tidak terdapat data kelurahan");
     } else {
       for (var kel in json['data']) {
         Kelurahan kelurahan = Kelurahan.fromJson(kel);
@@ -109,63 +109,105 @@ class _DaftarKelurahanState extends State<DaftarKelurahan> {
                     title: Text(kelurahan2[index].kelurahan),
                     children: <Widget>[
                       FittedBox(
-                          child: DataTable(
-                              dataRowHeight: 65,
-                              columns: [
-                                DataColumn(
-                                    label: Expanded(
-                                        child: Text(
-                                  "Nama Toko",
-                                  textAlign: TextAlign.center,
-                                ))),
-                                DataColumn(
-                                    label: Expanded(
-                                        child: Text("Alamat",
-                                            textAlign: TextAlign.center))),
-                                DataColumn(
-                                    label: Expanded(
-                                        child: Text("Kode pos",
-                                            textAlign: TextAlign.center))),
-                                DataColumn(
-                                    label: Expanded(
-                                        child: Text("Action",
-                                            textAlign: TextAlign.center))),
-                              ],
-                              rows: kelurahan2[index]
-                                  .outlet!
-                                  .map<DataRow>((element) => DataRow(cells: [
-                                        DataCell(Align(
-                                            alignment: Alignment.center,
-                                            child: Tooltip(
-                                              child: TextButton(
-                                                  onPressed: () {
-                                                    print(element['id']);
-                                                  },
-                                                  child: Text(
-                                                      element['nama_toko'],
-                                                      textAlign:
-                                                          TextAlign.center)),
-                                              message: "Halaman Outlet",
-                                            ))),
-                                        DataCell(Container(
-                                            alignment: Alignment.center,
-                                            width: 270,
-                                            child: Text(element['alamat'],
-                                                style: TextStyle(fontSize: 14),
-                                                textAlign: TextAlign.justify))),
-                                        DataCell(Align(
-                                            alignment: Alignment.center,
-                                            child: Text(element['kodepos'],
+                          child: kelurahan2[index].outlet != null
+                              ? DataTable(
+                                  border: TableBorder(
+                                      verticalInside: BorderSide(
+                                          width: 1,
+                                          style: BorderStyle.solid,
+                                          color: Color.fromARGB(75, 0, 0, 0))),
+                                  headingRowColor:
+                                      MaterialStateColor.resolveWith(
+                                          (states) => Colors.grey.shade600),
+                                  dataRowHeight: 65,
+                                  columns: [
+                                    DataColumn(
+                                        label: Expanded(
+                                            child: Text(
+                                      "Nama Toko",
+                                      textAlign: TextAlign.center,
+                                    ))),
+                                    DataColumn(
+                                        label: Expanded(
+                                            child: Text("Alamat",
                                                 textAlign: TextAlign.center))),
-                                        DataCell(Align(
-                                            alignment: Alignment.center,
-                                            child: Tooltip(
-                                                child: IconButton(
-                                                    icon: Icon(Icons.edit),
-                                                    onPressed: () {}),
-                                                message: "Edit Toko")))
-                                      ]))
-                                  .toList())),
+                                    DataColumn(
+                                        label: Expanded(
+                                            child: Text("Kode pos",
+                                                textAlign: TextAlign.center))),
+                                    DataColumn(
+                                        label: Expanded(
+                                            child: Text("Action",
+                                                textAlign: TextAlign.center))),
+                                  ],
+                                  rows: List<DataRow>.generate(
+                                      kelurahan2[index].outlet!.length,
+                                      (item) => DataRow(
+                                              color: MaterialStateProperty
+                                                  .resolveWith<Color>(
+                                                      (Set<MaterialState>
+                                                          states) {
+                                                // Even rows will have a grey color.
+                                                if (item % 2 == 0) {
+                                                  return Colors.grey.shade300;
+                                                } else {
+                                                  return Colors.grey
+                                                      .shade400; // Use default value for other states and odd rows.
+                                                }
+                                              }),
+                                              cells: [
+                                                DataCell(Align(
+                                                    alignment: Alignment.center,
+                                                    child: Tooltip(
+                                                      child: TextButton(
+                                                          onPressed: () {
+                                                            print(kelurahan2[
+                                                                        index]
+                                                                    .outlet![
+                                                                item]['id']);
+                                                          },
+                                                          child: Text(
+                                                              kelurahan2[index]
+                                                                          .outlet![
+                                                                      item]
+                                                                  ['nama_toko'],
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center)),
+                                                      message: "Halaman Outlet",
+                                                    ))),
+                                                DataCell(Container(
+                                                    alignment: Alignment.center,
+                                                    width: 270,
+                                                    child: Text(
+                                                        kelurahan2[index]
+                                                                .outlet![item]
+                                                            ['alamat'],
+                                                        style: TextStyle(
+                                                            fontSize: 14),
+                                                        textAlign: TextAlign
+                                                            .justify))),
+                                                DataCell(Align(
+                                                    alignment: Alignment.center,
+                                                    child: Text(
+                                                        kelurahan2[index]
+                                                                .outlet![item]
+                                                            ['kodepos'],
+                                                        textAlign:
+                                                            TextAlign.center))),
+                                                DataCell(Align(
+                                                    alignment: Alignment.center,
+                                                    child: Tooltip(
+                                                        child: IconButton(
+                                                            icon: Icon(
+                                                                Icons.edit),
+                                                            onPressed: () {}),
+                                                        message: "Edit Toko")))
+                                              ])).toList())
+                              : Text(
+                                  "Tidak ada data outlet",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                )),
                       Tooltip(
                         message: "Tambah Outlet",
                         child: IconButton(
@@ -189,7 +231,7 @@ class _DaftarKelurahanState extends State<DaftarKelurahan> {
                 ? Text('Menambah kelurahan')
                 : Text('Menambah outlet pada kelurahan ${kelurahan}'),
             content: SizedBox(
-                height: type == 1? 100 : 200,
+                height: type == 1 ? 100 : 200,
                 child: Column(children: [
                   TextField(
                     onChanged: (value) {
@@ -284,7 +326,8 @@ class _DaftarKelurahanState extends State<DaftarKelurahan> {
     if (id_jabatan == "1") {
       return Scaffold(
           appBar: AppBar(
-            title: Text("Daftar Kelurahan dari Kecamatan ${widget.kecamatan}"),
+            leading: BackButton(onPressed: () => main()),
+            title: Text("Daftar Kelurahan"),
           ),
           floatingActionButton: FloatingActionButton(
               onPressed: () {

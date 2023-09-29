@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
@@ -121,49 +122,28 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     List<Penjualan> penjualan2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
-      return SingleChildScrollView(
-          scrollDirection: MediaQuery.of(context).size.width >= 725
-              ? Axis.vertical
-              : Axis.horizontal,
-          child: Container(
-              child: DataTable(columns: [
-            DataColumn(
-                label: Expanded(
-                    child: Text(
-              "ID Laporan",
-              textAlign: TextAlign.center,
-            ))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Penjual", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Tanggal", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Waktu", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child: Text("Jumlah barang", textAlign: TextAlign.center))),
-            DataColumn(
-                label: Expanded(
-                    child:
-                        Text("Total Penjualan", textAlign: TextAlign.center))),
-          ], rows: [])));
+      return Text("Tidak ada data penjualan pada rentang tanggal tersebut",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold));
     } else {
       for (var pen in json['data']) {
         Penjualan penjualan = Penjualan.fromJson(pen);
         penjualan2.add(penjualan);
       }
-      return ListView.builder(
-          scrollDirection: MediaQuery.of(context).size.width >= 725
-              ? Axis.vertical
-              : Axis.horizontal,
-          itemCount: 1,
-          itemBuilder: (BuildContext ctxt, int index) {
-            return Container(
-                child: DataTable(
-                    columns: [
+      if (MediaQuery.of(context).size.width >= 740) {
+        return Padding(
+            padding: EdgeInsets.only(left: 5, right: 5),
+            child: DataTable(
+                border: TableBorder(
+                    verticalInside: BorderSide(
+                        width: 1,
+                        style: BorderStyle.solid,
+                        color: Color.fromARGB(75, 0, 0, 0))),
+                headingRowColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.grey.shade600),
+                dataRowHeight: 75,
+                columnSpacing: 20,
+                columns: [
                   DataColumn(
                       label: Expanded(
                           child: Text(
@@ -181,114 +161,223 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                           child: Text("Waktu", textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
-                          child: Text("Jumlah barang",
+                          child: Text("Outlet", textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child: Text("Jumlah \nbarang",
                               textAlign: TextAlign.center))),
                   DataColumn(
                       label: Expanded(
                           child: Text("Total Penjualan",
                               textAlign: TextAlign.center))),
+                  DataColumn(
+                      label: Expanded(
+                          child:
+                              Text("Foto Nota", textAlign: TextAlign.center))),
                 ],
-                    rows: penjualan2
-                        .map<DataRow>((element) => DataRow(cells: [
+                rows: List<DataRow>.generate(
+                    penjualan2.length,
+                    (index) => DataRow(
+                            color: MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                              // Even rows will have a grey color.
+                              if (index % 2 == 0) {
+                                return Colors.grey.shade300;
+                              } else {
+                                return Colors.grey
+                                    .shade400; // Use default value for other states and odd rows.
+                              }
+                            }),
+                            cells: [
+                              DataCell(Align(
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                    width: 200,
+                                    child: Tooltip(
+                                        message: "Halaman Detail Penjualan",
+                                        child: TextButton(
+                                            style: ButtonStyle(foregroundColor:
+                                                MaterialStateProperty
+                                                    .resolveWith<Color>(
+                                                        (Set<MaterialState>
+                                                            states) {
+                                              if (states.contains(
+                                                  MaterialState.hovered))
+                                                return Colors.blue.shade400;
+                                              return Colors.blue
+                                                  .shade600; // null throus error in flutter 2.2+.
+                                            })),
+                                            child: Text(penjualan2[index].id,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    decoration: TextDecoration
+                                                        .underline)),
+                                            onPressed: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        DetailPenjualan(
+                                                          laporan_id:
+                                                              penjualan2[index]
+                                                                  .id,
+                                                        )))))),
+                              )),
                               DataCell(Align(
                                   alignment: Alignment.center,
-                                  child: element.foto == null ||
-                                          element.foto == ""
-                                      ? Tooltip(
-                                          message: "Halaman Detail",
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              textStyle: const TextStyle(
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          DetailPenjualan(
-                                                            laporan_id:
-                                                                element.id,
-                                                          )));
-                                            },
-                                            child: Text(element.id,
-                                                textAlign: TextAlign.center),
-                                          ))
+                                  child: Text(
+                                      "${penjualan2[index].nama_depan} ${penjualan2[index].nama_belakang}",
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(penjualan2[index].tanggal,
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(penjualan2[index].waktu,
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(penjualan2[index].nama_toko,
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(penjualan2[index].jumlah_barang,
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                      "Rp. ${NumberFormat('###,000').format((penjualan2[index].total_penjualan - penjualan2[index].diskon) + (((penjualan2[index].total_penjualan - penjualan2[index].diskon) * (penjualan2[index].ppn / 100.00))))}",
+                                      textAlign: TextAlign.center))),
+                              DataCell(Align(
+                                  alignment: Alignment.center,
+                                  child: penjualan2[index].foto == null
+                                      ? Text(
+                                          "Penjualan ini tidak\nmenggunakan nota")
                                       : Tooltip(
                                           message: "Foto Nota",
-                                          child: TextButton(
-                                            style: TextButton.styleFrom(
-                                              textStyle: const TextStyle(
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                            onPressed: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) => AlertDialog(
-                                                      content: kIsWeb
-                                                          ? SizedBox(
-                                                              width: 500,
-                                                              height: 500,
-                                                              child:
-                                                                  showFotoNota(
-                                                                      context,
-                                                                      element
-                                                                          .id,
-                                                                      element
-                                                                          .foto))
-                                                          : FittedBox(
-                                                              child: showFotoNota(
-                                                                  context,
-                                                                  element.id,
-                                                                  element
-                                                                      .foto))));
-                                            },
-                                            child: Text(element.id,
-                                                textAlign: TextAlign.center),
-                                          )))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      "${element.nama_depan} ${element.nama_belakang}",
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.tanggal,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.waktu,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(element.jumlah_barang,
-                                      textAlign: TextAlign.center))),
-                              DataCell(Align(
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                      "Rp. ${NumberFormat('###,000').format((element.total_penjualan - element.diskon) + (((element.total_penjualan - element.diskon) * (element.ppn / 100.00))))}",
-                                      textAlign: TextAlign.center))),
-                            ]))
-                        .toList()));
-          });
+                                          child: IconButton(
+                                              style: ButtonStyle(
+                                                  foregroundColor:
+                                                      MaterialStateProperty
+                                                          .resolveWith<
+                                                              Color>((Set<
+                                                                  MaterialState>
+                                                              states) {
+                                                if (states.contains(
+                                                    MaterialState.hovered))
+                                                  return Colors.grey;
+                                                return Colors
+                                                    .black; // null throus error in flutter 2.2+.
+                                              })),
+                                              onPressed: () => showFotoNota(
+                                                  context,
+                                                  penjualan2[index].foto),
+                                              icon:
+                                                  Icon(Icons.remove_red_eye)))))
+                            ]))));
+      } else {
+        return ListView.builder(
+            padding: EdgeInsets.only(left: 5, right: 5),
+            itemCount: penjualan2.length,
+            itemBuilder: (BuildContext ctxt, int index) {
+              return Card(
+                  elevation: 5,
+                  clipBehavior: Clip.hardEdge,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Container(
+                      color: index % 2 == 0
+                          ? Colors.grey.shade200
+                          : Colors.grey.shade400,
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      padding: EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                      child: RichText(
+                          text: TextSpan(
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                color: Colors.black,
+                              ),
+                              children: [
+                            TextSpan(
+                                text: "ID Laporan: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(text: penjualan2[index].id),
+                            TextSpan(
+                                text: "\n\nPenjual: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text:
+                                    "${penjualan2[index].nama_depan} ${penjualan2[index].nama_depan}"),
+                            TextSpan(
+                                text: "\n\nHari, tanggal: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(text: penjualan2[index].tanggal),
+                            TextSpan(
+                                text: ", Waktu: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(text: penjualan2[index].waktu),
+                            TextSpan(
+                                text: "\n\nOutlet: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(text: penjualan2[index].nama_toko),
+                            TextSpan(
+                                text: ", Jumlah Barang: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(text: penjualan2[index].jumlah_barang),
+                            TextSpan(
+                                text: "\nTotal Pembelian: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text:
+                                    "Rp. ${NumberFormat('###,000').format((penjualan2[index].total_penjualan - penjualan2[index].diskon) + (((penjualan2[index].total_penjualan - penjualan2[index].diskon) * (penjualan2[index].ppn / 100.00))))}"),
+                            TextSpan(
+                                text: ", Foto Nota: ",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: IconButton(
+                                    onPressed: () => showFotoNota(
+                                        context, penjualan2[index].foto),
+                                    icon: Icon(
+                                      Icons.remove_red_eye,
+                                      size: 25,
+                                    ))),
+                            TextSpan(
+                                text: "\nHalaman detail penjualan",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => DetailPenjualan(
+                                                laporan_id:
+                                                    penjualan2[index].id,
+                                              ))))
+                          ]))));
+            });
+      }
     }
   }
 
-  Widget showFotoNota(BuildContext context, id, foto) {
-    return Tooltip(
-        message: "Halaman Detail Penjualan",
-        child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DetailPenjualan(
-                            laporan_id: id,
-                          )));
-            },
-            child: Image.memory(base64Decode(foto))));
+  showFotoNota(BuildContext context, foto) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            content: SizedBox(
+                height: 500,
+                width: 500,
+                child: Image.memory(base64Decode(foto)))));
   }
 
   Widget buttonTambahPenjualan(BuildContext context) {
@@ -417,8 +506,8 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                                 : MainAxisAlignment.center,
                         children: <Widget>[
                             if (id_jabatan == "1" || id_jabatan == "2")
-                              buttonTambahPenjualan(context),
-                            kolomCari()
+                              // buttonTambahPenjualan(context),
+                              kolomCari()
                           ])
                     : Column(
                         mainAxisAlignment:
@@ -461,7 +550,8 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
                 child: FutureBuilder(
                     future: fetchData(),
                     builder: (context, snapshot) {
-                      if (snapshot.hasData) {
+                      if (snapshot.hasData &&
+                          snapshot.connectionState == ConnectionState.done) {
                         return daftarpenjualan(
                             snapshot.data.toString(), context);
                       } else {
@@ -479,10 +569,10 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
     if (idjabatan != "3") {
       if (idjabatan == "1" || idjabatan == "2") {
         return Scaffold(
-            appBar: AppBar(
-              title: Text("Daftar Penjualan"),
-            ),
-            drawer: MyDrawer(),
+            // appBar: AppBar(
+            //   title: Text("Daftar Penjualan"),
+            // ),
+            // drawer: MyDrawer(),
             body: buildContainer(context));
       } else {
         return Scaffold(
@@ -498,16 +588,11 @@ class _DaftarPenjualanState extends State<DaftarPenjualan> {
       }
     } else {
       return Scaffold(
-          appBar: AppBar(
-            title: Text("Daftar Penjualan"),
-          ),
-          body: Center(
-            child: Text(
-              "Anda tidak memiliki akses ke halaman ini \nSilahkan kontak admin",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-          ));
+          // appBar: AppBar(
+          //   title: Text("Daftar Penjualan"),
+          // ),
+          // drawer: MyDrawer(),
+          body: buildContainer(context));
     }
   }
 }

@@ -6,25 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/customicon/add_image_icons.dart';
 import 'package:pt_coronet_crown/customicon/add_penjualan_icons.dart';
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/mainpage/detailvisit.dart';
+import 'package:pt_coronet_crown/mainpage/kunjungan/detailvisit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Visit extends StatefulWidget {
-  Visit({Key? key}) : super(key: key);
+class BuatKunjungan extends StatefulWidget {
+  BuatKunjungan({Key? key}) : super(key: key);
   @override
   State<StatefulWidget> createState() {
-    return _VisitState();
+    return _BuatKunjunganState();
   }
 }
 
-class _VisitState extends State<Visit> {
+class _BuatKunjunganState extends State<BuatKunjungan> {
   List _outlet = [];
   String _id_outlet = "",
       controllerOutlet = "",
       username = "",
       date = "",
       deskripsi = "";
-  int id = Random().nextInt(4294967296);
+  int id = Random().nextInt(10);
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _VisitState extends State<Visit> {
     final response = await http.post(
         Uri.parse("http://192.168.137.1/magang/absensi/visit/visit_in.php"),
         body: {
-          'id': "$id-$_id_outlet-$username-$date",
+          'id': "$id/$_id_outlet/$username/$date",
           'tanggal': date,
           'deskripsi': deskripsi,
           'id_outlet': _id_outlet,
@@ -90,7 +90,10 @@ class _VisitState extends State<Visit> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Halaman Kunjungan"),
+          title: Text(
+            "Halaman Kunjungan",
+            style: TextStyle(color: Colors.white),
+          ),
           leading: BackButton(
             onPressed: () {
               Navigator.popAndPushNamed(context, "/homepage");
@@ -175,7 +178,7 @@ class _VisitState extends State<Visit> {
                             MediaQuery.of(context).size.width >= 720 ? 14 : 12,
                       ),
                       decoration: const InputDecoration(
-                        labelText: 'Add Description (Maksimal 5 baris)',
+                        labelText: 'Deskripsi (Maksimal 5 baris)',
                       ),
                       onChanged: (value) {
                         setState(() {

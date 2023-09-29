@@ -70,242 +70,207 @@ class _DaftarProposalState extends State<DaftarProposal> {
     List<EventHerocyn> event2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
-      return SingleChildScrollView(
-          scrollDirection: MediaQuery.of(context).size.width >= 1125
-              ? Axis.vertical
-              : Axis.horizontal,
-          child: Container(
-              alignment: Alignment.center,
-              child: DataTable(columns: [
-                DataColumn(
-                    label: Expanded(
-                        child: Text(
-                  "ID Event",
-                  textAlign: TextAlign.center,
-                ))),
-                DataColumn(
-                    label: Expanded(
-                        child: Text(
-                  "Nama Event",
-                  textAlign: TextAlign.center,
-                ))),
-                DataColumn(
-                    label: Expanded(
-                        child: Text("Lokasi", textAlign: TextAlign.center))),
-                DataColumn(
-                    label: Expanded(
-                        child: Text("Tanggal \nPengajuan",
-                            textAlign: TextAlign.center))),
-                DataColumn(
-                    label: Expanded(
-                        child: Text("Penanggung \nJawab",
-                            textAlign: TextAlign.center))),
-                DataColumn(
-                    label: Expanded(
-                        child: Text("Status \nProposal",
-                            textAlign: TextAlign.center))),
-                DataColumn(
-                    label: Expanded(
-                        child: Text("Tanggal \nEvent",
-                            textAlign: TextAlign.center))),
-              ], rows: [])));
+      return Text(
+        "Tidak ada proposal yang diajukan pada rentang tanggal tersebut",
+        style: TextStyle(fontWeight: FontWeight.bold),
+      );
     } else {
       for (var pen in json['data']) {
         EventHerocyn event = EventHerocyn.fromJson(pen);
         event2.add(event);
       }
-      return ListView.builder(
-          scrollDirection: MediaQuery.of(context).size.width >= 1125
-              ? Axis.vertical
-              : Axis.horizontal,
-          itemCount: 1,
-          itemBuilder: (BuildContext ctxt, int index) {
-            return DataTable(
-                dataRowHeight: 100,
-                columns: [
-                  DataColumn(
-                      label: Expanded(
-                          child: Text(
-                    "ID Event",
-                    textAlign: TextAlign.center,
-                  ))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text(
-                    "Nama Event",
-                    textAlign: TextAlign.center,
-                  ))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text("Lokasi", textAlign: TextAlign.center))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text("Tanggal \nPengajuan",
-                              textAlign: TextAlign.center))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text("Penanggung \nJawab",
-                              textAlign: TextAlign.center))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text("Status \nProposal",
-                              textAlign: TextAlign.center))),
-                  DataColumn(
-                      label: Expanded(
-                          child: Text("Tanggal \nEvent",
-                              textAlign: TextAlign.center))),
-                ],
-                rows: event2
-                    .map<DataRow>((element) => DataRow(cells: [
-                          DataCell(Align(
-                              alignment: Alignment.center,
-                              child: Tooltip(
-                                  message: "Halaman Detail",
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                      textStyle: const TextStyle(
-                                          fontWeight: FontWeight.normal),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  DetailProposal(
-                                                    event_id: element.id,
-                                                    penanggung_jawab: element
-                                                        .penanggung_jawab
-                                                        .toString(),
-                                                  )));
-                                    },
-                                    child: Text(element.id,
-                                        textAlign: TextAlign.center),
-                                  )))),
-                          DataCell(Align(
-                              alignment: Alignment.center,
-                              child: Text(element.nama,
-                                  textAlign: TextAlign.center))),
-                          DataCell(Align(
-                              alignment: Alignment.center,
-                              child: SizedBox(
-                                  width: 170,
-                                  child: Text(element.alamat.toString(),
-                                      textAlign: TextAlign.center)))),
-                          DataCell(Container(
-                              alignment: Alignment.center,
-                              width: 110,
-                              child: Text(element.pengajuan,
-                                  textAlign: TextAlign.center))),
-                          DataCell(Container(
-                              alignment: Alignment.center,
-                              width: 150,
-                              child: Text(element.penanggung_jawab.toString(),
-                                  textAlign: TextAlign.center))),
-                          // DataCell(Align(
-                          //     alignment: Alignment.center,
-                          //     child: SizedBox(
-                          //         width: 75,
-                          //         child: Text(
-                          //             "${element.nama_depan} \n${element.nama_belakang}",
-                          //             textAlign: TextAlign.center),
-                          //         // child: Tooltip(
-                          //         //     message: "Unduh File proposal",
-                          //         //     child: TextButton(
-                          //         //       style: TextButton.styleFrom(
-                          //         //         textStyle: const TextStyle(
-                          //         //             fontWeight: FontWeight.normal),
-                          //         //       ),
-                          //         //       onPressed: () {
-                          //         //         // if (kIsWeb) {
-                          //         //         //   AnchorElement(
-                          //         //         //       href:
-                          //         //         //           "data:application/octet-stream;charset=utf-16le;base64,${element.proposal}")
-                          //         //         //     ..setAttribute("download",
-                          //         //         //         "proposal-${element.id}.pdf")
-                          //         //         //     ..click();
-                          //         //         // }
-                          //         //       },
-                          //         //       child: Text("File Proposal",
-                          //         //           textAlign: TextAlign.center),
-                          //         //     ))
-                          //             ))),
-                          DataCell(Container(
-                            alignment: Alignment.topCenter,
-                            width: 100, height: 100,
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: element.persetujuan?.length,
-                                itemBuilder: (BuildContext ctxt, int index) {
-                                  return Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                          "${element.persetujuan![index]['jabatan']} "),
-                                      Tooltip(
-                                          message: element.persetujuan![index]
-                                                      ['status_proposal'] ==
-                                                  1
-                                              ? "Proposal sedang diproses, harap cek berkala"
-                                              : element.persetujuan![index]
-                                                          ['status_proposal'] ==
-                                                      2
-                                                  ? "Proposal sudah disetujui oleh ${element.persetujuan![index]['jabatan']}"
-                                                  : "Proposal ditolak, silahkan tekan tombol X untuk melihat keterangan",
-                                          child: element.persetujuan![index]
-                                                      ['status_proposal'] ==
-                                                  1
-                                              ? Icon(Icons.info_outline,
-                                                  color: Colors.yellow)
-                                              : element.persetujuan![index]
-                                                          ['status_proposal'] ==
-                                                      2
-                                                  ? Icon(
-                                                      Icons.check,
-                                                      color: Colors.green,
-                                                    )
-                                                  : Icon(Icons.close,
-                                                      color: Colors.red))
-                                    ],
-                                  );
-                                }),
-                            // child: Tooltip(
-                            //     message: element.status_proposal == 0
-                            //         ? "Proposal belum disetujui"
-                            //         : "Proposal sudah disetujui",
-                            //     child: element.status_proposal == 0
-                            //         ? Icon(Icons.close, color: Colors.red)
-                            //         : Icon(
-                            //             Icons.check,
-                            //             color: Colors.green,
-                            //           ))
-                          )),
-                          DataCell(Align(
-                              alignment: Alignment.center,
-                              child: SizedBox(
-                                  width: 110,
-                                  child: Text(element.tanggal,
-                                      textAlign: TextAlign.center)))),
-                          // DataCell(Align(
-                          //     alignment: Alignment.center,
-                          //     child: Text(
-                          //         "Rp. ${NumberFormat('###,000').format(element.jumlah_penjualan.toString())}",
-                          //         textAlign: TextAlign.center))),
-                          // DataCell(Align(
-                          //     alignment: Alignment.center,
-                          //     child: Text(element.jumlah_barang,
-                          //         textAlign: TextAlign.center))),
-                          // DataCell(Align(
-                          //     alignment: Alignment.center,
-                          //     child: Text(
-                          //         "Rp. ${NumberFormat('###,000').format((element.total_penjualan - element.diskon) + (((element.total_penjualan - element.diskon) * (element.ppn / 100.00))))}",
-                          //         textAlign: TextAlign.center))),
-                        ]))
-                    .toList());
-          });
+      return DataTable(
+          dataRowHeight: 100,
+          border: TableBorder(
+              verticalInside: BorderSide(
+                  width: 1,
+                  style: BorderStyle.solid,
+                  color: Color.fromARGB(75, 0, 0, 0))),
+          headingRowColor:
+              MaterialStateColor.resolveWith((states) => Colors.grey.shade600),
+          columns: [
+            DataColumn(
+                label: Expanded(
+                    child: Text(
+              "ID Event",
+              textAlign: TextAlign.center,
+            ))),
+            DataColumn(
+                label: Expanded(
+                    child: Text(
+              "Nama Event",
+              textAlign: TextAlign.center,
+            ))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Lokasi", textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Tanggal \nPengajuan",
+                        textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Penanggung \nJawab",
+                        textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child: Text("Status \nProposal",
+                        textAlign: TextAlign.center))),
+            DataColumn(
+                label: Expanded(
+                    child:
+                        Text("Tanggal \nEvent", textAlign: TextAlign.center))),
+          ],
+          rows: List<DataRow>.generate(
+              event2.length,
+              (index) => DataRow(
+                      color: MaterialStateProperty.resolveWith<Color>(
+                          (Set<MaterialState> states) {
+                        // Even rows will have a grey color.
+                        if (index % 2 == 0) {
+                          return Colors.grey.shade300;
+                        } else {
+                          return Colors.grey
+                              .shade400; // Use default value for other states and odd rows.
+                        }
+                      }),
+                      cells: [
+                        DataCell(Align(
+                            alignment: Alignment.center,
+                            child: Tooltip(
+                                message: "Halaman Detail",
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    textStyle: const TextStyle(
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                DetailProposal(
+                                                  event_id: event2[index].id,
+                                                  penanggung_jawab:
+                                                      event2[index]
+                                                          .penanggung_jawab
+                                                          .toString(),
+                                                )));
+                                  },
+                                  child: Text(event2[index].id,
+                                      textAlign: TextAlign.center),
+                                )))),
+                        DataCell(Align(
+                            alignment: Alignment.center,
+                            child: Text(event2[index].nama,
+                                textAlign: TextAlign.center))),
+                        DataCell(Align(
+                            alignment: Alignment.center,
+                            child: SizedBox(
+                                width: 170,
+                                child: Text(event2[index].alamat.toString(),
+                                    textAlign: TextAlign.center)))),
+                        DataCell(Container(
+                            alignment: Alignment.center,
+                            width: 110,
+                            child: Text(event2[index].pengajuan,
+                                textAlign: TextAlign.center))),
+                        DataCell(Container(
+                            alignment: Alignment.center,
+                            width: 150,
+                            child: Text(
+                                event2[index].penanggung_jawab.toString(),
+                                textAlign: TextAlign.center))),
+                        // DataCell(Align(
+                        //     alignment: Alignment.center,
+                        //     child: SizedBox(
+                        //         width: 75,
+                        //         child: Text(
+                        //             "${element.nama_depan} \n${element.nama_belakang}",
+                        //             textAlign: TextAlign.center),
+                        //         // child: Tooltip(
+                        //         //     message: "Unduh File proposal",
+                        //         //     child: TextButton(
+                        //         //       style: TextButton.styleFrom(
+                        //         //         textStyle: const TextStyle(
+                        //         //             fontWeight: FontWeight.normal),
+                        //         //       ),
+                        //         //       onPressed: () {
+                        //         //         // if (kIsWeb) {
+                        //         //         //   AnchorElement(
+                        //         //         //       href:
+                        //         //         //           "data:application/octet-stream;charset=utf-16le;base64,${element.proposal}")
+                        //         //         //     ..setAttribute("download",
+                        //         //         //         "proposal-${element.id}.pdf")
+                        //         //         //     ..click();
+                        //         //         // }
+                        //         //       },
+                        //         //       child: Text("File Proposal",
+                        //         //           textAlign: TextAlign.center),
+                        //         //     ))
+                        //             ))),
+                        DataCell(Container(
+                          alignment: Alignment.topCenter,
+                          width: 100, height: 100,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: event2[index].persetujuan?.length,
+                              itemBuilder: (BuildContext ctxt, int index) {
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                        "${event2[index].persetujuan![index]['jabatan']} "),
+                                    Tooltip(
+                                        message: event2[index]
+                                                        .persetujuan![index]
+                                                    ['status_proposal'] ==
+                                                1
+                                            ? "Proposal sedang diproses, harap cek berkala"
+                                            : event2[index].persetujuan![index]
+                                                        ['status_proposal'] ==
+                                                    2
+                                                ? "Proposal sudah disetujui oleh ${event2[index].persetujuan![index]['jabatan']}"
+                                                : "Proposal ditolak, silahkan tekan tombol X untuk melihat keterangan",
+                                        child: event2[index].persetujuan![index]
+                                                    ['status_proposal'] ==
+                                                1
+                                            ? Icon(Icons.info_outline,
+                                                color: Colors.yellow)
+                                            : event2[index].persetujuan![index]
+                                                        ['status_proposal'] ==
+                                                    2
+                                                ? Icon(
+                                                    Icons.check,
+                                                    color: Colors.green,
+                                                  )
+                                                : Icon(Icons.close,
+                                                    color: Colors.red))
+                                  ],
+                                );
+                              }),
+                          // child: Tooltip(
+                          //     message: element.status_proposal == 0
+                          //         ? "Proposal belum disetujui"
+                          //         : "Proposal sudah disetujui",
+                          //     child: element.status_proposal == 0
+                          //         ? Icon(Icons.close, color: Colors.red)
+                          //         : Icon(
+                          //             Icons.check,
+                          //             color: Colors.green,
+                          //           ))
+                        )),
+                        DataCell(Align(
+                            alignment: Alignment.center,
+                            child: SizedBox(
+                                width: 110,
+                                child: Text(event2[index].tanggal,
+                                    textAlign: TextAlign.center)))),
+                      ])).toList());
     }
   }
 
-  Widget buildContainer(BuildContext context) {
+  Widget buildContainerDesktop(BuildContext context) {
     return Container(
       alignment: Alignment.topCenter,
       child: SingleChildScrollView(
@@ -568,18 +533,13 @@ class _DaftarProposalState extends State<DaftarProposal> {
   @override
   Widget build(BuildContext context) {
     if (idjabatan == "1" || idjabatan == "2") {
-      return Scaffold(
-          appBar: AppBar(
-            title: Text("Daftar Proposal Event"),
-          ),
-          drawer: MyDrawer(),
-          body: buildContainer(context));
+      return Scaffold(drawer: MyDrawer(), body: buildContainerDesktop(context));
     } else {
       return Scaffold(
           appBar: AppBar(
             title: Text("Daftar Proposal Event"),
           ),
-          body: buildContainer(context));
+          body: buildContainerDesktop(context));
     }
   }
 }
