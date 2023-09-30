@@ -1,18 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
-import 'package:pt_coronet_crown/laporan/event/buatlaporan.dart';
-import 'package:pt_coronet_crown/laporan/event/detailevent.dart';
-import 'package:pt_coronet_crown/laporan/event/detailproposal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/laporan/event/laporan/buatlaporan.dart';
+import 'package:pt_coronet_crown/laporan/event/laporan/detailevent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
-import '../../main.dart';
 
 String nama_depan = "",
     nama_belakang = "",
@@ -495,19 +492,19 @@ class _DaftarEventState extends State<DaftarEvent> {
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Color.fromARGB(255, 248, 172, 49)),
-                                onPressed: () {
-                                  Navigator.popAndPushNamed(
-                                      context, "/ajukanproposal");
-                                },
-                                child: Text(
-                                  "Ajukan Proposal",
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 16),
-                                )),
+                            // ElevatedButton(
+                            //     style: ElevatedButton.styleFrom(
+                            //         backgroundColor:
+                            //             Color.fromARGB(255, 248, 172, 49)),
+                            //     onPressed: () {
+                            //       Navigator.popAndPushNamed(
+                            //           context, "/ajukanproposal");
+                            //     },
+                            //     child: Text(
+                            //       "Ajukan Proposal",
+                            //       style: TextStyle(
+                            //           color: Colors.black, fontSize: 16),
+                            //     )),
                             Container(
                               height: 50,
                               width: 175,
@@ -588,19 +585,19 @@ class _DaftarEventState extends State<DaftarEvent> {
 
   @override
   Widget build(BuildContext context) {
-    if (idjabatan == "1" || idjabatan == "2") {
-      return Scaffold(
-          // appBar: AppBar(
-          //   title: Text("Daftar Event"),
-          // ),
-          drawer: MyDrawer(),
-          body: buildContainer(context));
-    } else {
-      return Scaffold(
-          // appBar: AppBar(
-          //   title: Text("Daftar Event"),
-          // ),
-          body: buildContainer(context));
-    }
+    // if (idjabatan == "1" || idjabatan == "2") {
+    return Scaffold(
+        // appBar: AppBar(
+        //   title: Text("Daftar Event"),
+        // ),
+        drawer: MyDrawer(),
+        body: buildContainer(context));
+    // } else {
+    //   return Scaffold(
+    //       // appBar: AppBar(
+    //       //   title: Text("Daftar Event"),
+    //       // ),
+    //       body: buildContainer(context));
+    // }
   }
 }

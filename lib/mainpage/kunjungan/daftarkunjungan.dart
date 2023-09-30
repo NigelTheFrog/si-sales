@@ -307,20 +307,74 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                           elevation: 5,
                           child: SizedBox(
                               width: 800,
+                              height: 75,
                               child: ListTile(
-                                trailing: Text(
-                                    visit2[index].tanggal,
-                                    style: TextStyle(fontSize: 11)),
-                                title: Text(
-                                  "Nama toko: ${visit2[index].nama_toko}",
-                                  style: TextStyle(fontSize: 11),
-                                ),
-                                subtitle: Text(
-                                    visit2[index].status == 0
-                                        ? "Status: Belum Check-Out"
-                                        : "Status: Sudah Check-Out",
-                                    style: TextStyle(fontSize: 11)),
-                              ))))
+                                  title: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: Column(children: [
+                                        Container(
+                                            alignment: Alignment.topCenter,
+                                            width: double.infinity,
+                                            child: Text(
+                                              visit2[index].nama_toko,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold),
+                                            )),
+                                        Divider(),
+
+                                        // SizedBox(
+                                        //     width: double.infinity,
+                                        //     child: Divider())
+                                      ])),
+                                  leading: Container(
+                                      padding: EdgeInsets.only(top: 15),
+                                      child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(visit2[index].tanggal,
+                                                style: TextStyle(fontSize: 11),
+                                                textAlign: TextAlign.left),
+                                            Text(
+                                                visit2[index].status == 0
+                                                    ? "Status: Belum Check-Out"
+                                                    : "Status: Sudah Check-Out",
+                                                style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: Colors.grey),
+                                                textAlign: TextAlign.left)
+                                          ])),
+                                  // title: Text(visit2[index].tanggal,
+                                  //     style: TextStyle(fontSize: 11)),
+                                  trailing: Padding(
+                                      padding: EdgeInsets.only(top: 15),
+                                      child: Column(children: [
+                                        Text(
+                                            "Waktu In: ${visit2[index].waktu_in}",
+                                            style: TextStyle(fontSize: 11)),
+                                        Text(
+                                            visit2[index].status == 0
+                                                ? "Waktu Out: -"
+                                                : "Waktu Out: ${visit2[index].waktu_out}",
+                                            style: TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.grey))
+                                      ]))
+                                  // title: Text(
+                                  //   "Nama toko: ${visit2[index].nama_toko}",
+                                  //   style: TextStyle(fontSize: 11),
+                                  // ),
+                                  // subtitle: Row(children: [
+                                  //   Text(
+                                  //       visit2[index].status == 0
+                                  //           ? "Status: Belum Check-Out"
+                                  //           : "Status: Sudah Check-Out",
+                                  //       style: TextStyle(fontSize: 11)),
+
+                                  // ])
+                                  ))))
                 ],
               ));
             });

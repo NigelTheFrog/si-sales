@@ -95,6 +95,7 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
             style: TextStyle(color: Colors.white),
           ),
           leading: BackButton(
+            color: Colors.white,
             onPressed: () {
               Navigator.popAndPushNamed(context, "/homepage");
             },

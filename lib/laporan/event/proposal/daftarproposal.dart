@@ -1,16 +1,14 @@
 import 'dart:convert';
 import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
-import 'package:pt_coronet_crown/laporan/event/detailproposal.dart';
 // import "package:universal_html/html.dart";
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/drawer.dart';
+import 'package:pt_coronet_crown/laporan/event/proposal/detailproposal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
-import '../../main.dart';
 
 String nama_depan = "",
     nama_belakang = "",
@@ -286,19 +284,19 @@ class _DaftarProposalState extends State<DaftarProposal> {
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        Color.fromARGB(255, 248, 172, 49)),
-                                onPressed: () {
-                                  Navigator.popAndPushNamed(
-                                      context, "/ajukanproposal");
-                                },
-                                child: Text(
-                                  "Ajukan Proposal",
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 16),
-                                )),
+                            // ElevatedButton(
+                            //     style: ElevatedButton.styleFrom(
+                            //         backgroundColor:
+                            //             Color.fromARGB(255, 248, 172, 49)),
+                            //     onPressed: () {
+                            //       Navigator.popAndPushNamed(
+                            //           context, "/ajukanproposal");
+                            //     },
+                            //     child: Text(
+                            //       "Ajukan Proposal",
+                            //       style: TextStyle(
+                            //           color: Colors.black, fontSize: 16),
+                            //     )),
                             Container(
                               height: 50,
                               width: 175,
@@ -532,14 +530,23 @@ class _DaftarProposalState extends State<DaftarProposal> {
 
   @override
   Widget build(BuildContext context) {
-    if (idjabatan == "1" || idjabatan == "2") {
-      return Scaffold(drawer: MyDrawer(), body: buildContainerDesktop(context));
-    } else {
-      return Scaffold(
-          appBar: AppBar(
-            title: Text("Daftar Proposal Event"),
-          ),
-          body: buildContainerDesktop(context));
-    }
+    // if (idjabatan == "1" || idjabatan == "2") {
+    return Scaffold(
+        floatingActionButton: Tooltip(
+            message: "Buat Proposal",
+            child: FloatingActionButton(
+              onPressed: () =>
+                  Navigator.popAndPushNamed(context, "/kunjunganmasuk"),
+              child: Icon(Icons.add, color: Colors.white),
+            )),
+        drawer: MyDrawer(),
+        body: buildContainerDesktop(context));
+    // } else {
+    //   return Scaffold(
+    //       appBar: AppBar(
+    //         title: Text("Daftar Proposal Event"),
+    //       ),
+    //       body: buildContainerDesktop(context));
+    // }
   }
 }
