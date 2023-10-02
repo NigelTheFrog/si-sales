@@ -16,7 +16,7 @@ class MyLogin extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'PT Coronet Crown',
       theme: ThemeData(
-        primaryColor: Colors.blue,
+        primaryColor: Colors.orange,
       ),
       home: Login(),
     );
@@ -96,7 +96,11 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Login'),
+          backgroundColor: Colors.orange,
+          title: const Text(
+            'Login',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         body: Container(
             margin: const EdgeInsets.all(20),
@@ -148,7 +152,7 @@ class _LoginState extends State<Login> {
                                 height: 50,
                                 width: 300,
                                 decoration: BoxDecoration(
-                                    color: Colors.blue,
+                                    color: Colors.orange,
                                     borderRadius: BorderRadius.circular(20)),
                                 child: ElevatedButton(
                                   onPressed: () {

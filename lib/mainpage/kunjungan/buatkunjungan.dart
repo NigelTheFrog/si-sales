@@ -101,12 +101,15 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
             },
           ),
         ),
-        body: SingleChildScrollView(
-          child: Container(
+        body: Align(
+            alignment: Alignment.topCenter,
+            child: Container(
               height: MediaQuery.of(context).size.height,
               alignment: Alignment.topCenter,
-              width: 720,
-              child: Column(
+              width: 480,
+              child: SingleChildScrollView(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                       alignment: Alignment.center,
@@ -174,6 +177,7 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                       keyboardType: TextInputType.multiline,
                       minLines: 1,
                       maxLines: 5,
+                      
                       style: TextStyle(
                         fontSize:
                             MediaQuery.of(context).size.width >= 720 ? 14 : 12,
@@ -243,20 +247,18 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                     ),
                   ),
                   Container(
-                    height: 50,
-                    margin: const EdgeInsets.all(10),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        submit(context);
-                      },
-                      child: const Center(
-                        child: Text('Check In'),
-                      ),
-                    ),
-                  ),
+                      height: 50,
+                      margin: const EdgeInsets.all(10),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            submit(context);
+                          },
+                          child: const Center(
+                              child: Text('Check In',
+                                  style: TextStyle(color: Colors.white)))))
                 ],
               )),
-        ));
+            )));
   }
   // _loadData() async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();

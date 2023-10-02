@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
 import 'package:pt_coronet_crown/admin/attendence/dailyvisit.dart';
-// import 'package:pt_coronet_crown/admin/company/daftarkota.dart';
 import 'package:pt_coronet_crown/admin/company/daftarprovinsi.dart';
 import 'package:pt_coronet_crown/admin/jabatan/daftarjabatan.dart';
 import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
