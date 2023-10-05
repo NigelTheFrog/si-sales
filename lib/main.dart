@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 //Kendala di hadir kemarin gaada sinyal. Karena tidak ada sinyal foto tidak bisa masuk
 import 'package:flutter/material.dart';
+import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
+import 'package:pt_coronet_crown/absensi/daftarkehadiran.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
 import 'package:pt_coronet_crown/admin/attendence/dailyvisit.dart';
@@ -184,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Container(),
     PersonelData(),
     PersonelGroup(),
-    BuatKunjungan(),
+    DaftarKehadiran(type: idjabatan == "3" ? 0 : 1),
     DaftarKunjungan(
       type: idjabatan == "3" ? 0 : 1,
     ),

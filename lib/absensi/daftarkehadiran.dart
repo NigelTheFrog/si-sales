@@ -1,10 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
+import 'package:pt_coronet_crown/class/admin/absen/absen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -23,7 +29,8 @@ class DaftarKehadiran extends StatefulWidget {
   }
 }
 
-class _DaftarKehadiranState extends State<DaftarKehadiran> {
+class _DaftarKehadiranState extends State<DaftarKehadiran>
+    with WidgetsBindingObserver {
   String _txtcari = "";
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
@@ -32,8 +39,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
 
   Future<String> fetchData() async {
     final response = await http.post(
-        Uri.parse(
-            "https://otccoronet.com/otc/account/kunjungan/daftarkunjungan.php"),
+        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
         body: {
           'username': username,
           'idjabatan': id_jabatan,
@@ -73,14 +79,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
     // initTimer();
   }
 
-  // void initTimer() {
-  //   if (timer != null && timer!.isActive) return;
-
-  //   timer = Timer.periodic(const Duration(seconds: 20), (timer) {
-  //     //job
-  //     setState(() {});
-  //   });
-  // }
   Widget tableContent(isHeader, content) {
     if (isHeader == true) {
       return Expanded(child: Text(content, textAlign: TextAlign.center));
@@ -91,15 +89,15 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
     }
   }
 
-  Widget daftarKunjungan(data, context) {
-    List<Kunjungan> visit2 = [];
+  Widget daftarKehadiran(data, context) {
+    List<Absen> absen2 = [];
     Map json = jsonDecode(data);
     if (json['result'] == "error") {
       return Text("Tidak ada data tersedia");
     } else {
-      for (var vis in json['data']) {
-        Kunjungan visit = Kunjungan.fromJson(vis);
-        visit2.add(visit);
+      for (var abs in json['data']) {
+        Absen absen = Absen.fromJson(abs);
+        absen2.add(absen);
       }
       if (MediaQuery.of(context).size.width >= 740) {
         return Padding(
@@ -116,17 +114,17 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
                     dataRowHeight: 75,
                     columnSpacing: 20,
                     columns: [
-                      DataColumn(label: tableContent(true, "ID Kunjungan")),
-                      DataColumn(label: tableContent(true, "Nama Toko")),
-                      DataColumn(label: tableContent(true, "Username Sales")),
-                      DataColumn(label: tableContent(true, "Nama Sales")),
+                      DataColumn(label: tableContent(true, "ID Absen")),
+                      DataColumn(label: tableContent(true, "Username")),
+                      DataColumn(label: tableContent(true, "Nama Pegawai")),
                       DataColumn(label: tableContent(true, "Tanggal")),
-                      DataColumn(label: tableContent(true, "Waktu In")),
-                      DataColumn(label: tableContent(true, "Waktu Out")),
+                      DataColumn(label: tableContent(true, "Waktu")),
                       DataColumn(label: tableContent(true, "Status")),
+                      DataColumn(label: tableContent(true, "ID Lokasi")),
+                      DataColumn(label: tableContent(true, "Bukti")),
                     ],
                     rows: List<DataRow>.generate(
-                        visit2.length,
+                        absen2.length,
                         (index) => DataRow(
                                 color: MaterialStateProperty.resolveWith<Color>(
                                     (Set<MaterialState> states) {
@@ -139,65 +137,30 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
                                   }
                                 }),
                                 cells: [
-                                  DataCell(Align(
-                                    alignment: Alignment.center,
-                                    child: SizedBox(
-                                        width: 200,
-                                        child: Tooltip(
-                                            message: "Halaman Detail Kunjungan",
-                                            child: TextButton(
-                                                style: ButtonStyle(foregroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith<Color>(
-                                                            (Set<MaterialState>
-                                                                states) {
-                                                  if (states.contains(
-                                                      MaterialState.hovered))
-                                                    return Colors.blue.shade400;
-                                                  return Colors.blue
-                                                      .shade600; // null throus error in flutter 2.2+.
-                                                })),
-                                                child: Text(visit2[index].id,
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        decoration:
-                                                            TextDecoration
-                                                                .underline)),
-                                                onPressed: () => Container()
-                                                //  Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (context) =>
-                                                //             DetailVisit(
-                                                //               id_visit:
-                                                //                   visit2[index]
-                                                //                       .id,
-                                                //               type: 0,
-                                                //             )))
-                                                            ))),
-                                  )),
-                                  DataCell(tableContent(
-                                      false, visit2[index].nama_toko)),
+                                  DataCell(
+                                      tableContent(false, absen2[index].id)),
                                   DataCell(tableContent(false,
-                                      visit2[index].username.toString())),
+                                      absen2[index].username.toString())),
                                   DataCell(tableContent(false,
-                                      "${visit2[index].nama_depan}\n${visit2[index].nama_belakang}")),
+                                      "${absen2[index].nama_depan.toString()} ${absen2[index].nama_belakang.toString()}")),
                                   DataCell(tableContent(
-                                      false, visit2[index].tanggal)),
-                                  DataCell(tableContent(
-                                      false, visit2[index].waktu_in)),
+                                      false, absen2[index].tanggal)),
+                                  DataCell(
+                                      tableContent(false, absen2[index].waktu)),
                                   DataCell(tableContent(
                                     false,
-                                    visit2[index].waktu_out == null
-                                        ? "-"
-                                        : visit2[index].waktu_out.toString(),
-                                  )),
-                                  DataCell(tableContent(
-                                    false,
-                                    visit2[index].status == 0
-                                        ? "Status: Belum Check-Out"
+                                    absen2[index].status == 0
+                                        ? "Status: Absen"
                                         : "Status: Sudah Check-Out",
                                   )),
+                                  DataCell(tableContent(
+                                      false, absen2[index].id_lokasi)),
+                                  DataCell(Align(
+                                      alignment: Alignment.center,
+                                      child: IconButton(
+                                          icon: Icon(Icons.remove_red_eye),
+                                          onPressed: () => showBukti(
+                                              context, absen2[index].bukti)))),
                                 ])))
                 : DataTable(
                     border: TableBorder(
@@ -210,15 +173,14 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
                     dataRowHeight: 75,
                     columnSpacing: 20,
                     columns: [
-                      DataColumn(label: tableContent(true, "ID Kunjungan")),
-                      DataColumn(label: tableContent(true, "Nama Toko")),
+                      DataColumn(label: tableContent(true, "ID Absen")),
                       DataColumn(label: tableContent(true, "Tanggal")),
-                      DataColumn(label: tableContent(true, "Waktu In")),
-                      DataColumn(label: tableContent(true, "Waktu Out")),
+                      DataColumn(label: tableContent(true, "Waktu")),
                       DataColumn(label: tableContent(true, "Status")),
+                      DataColumn(label: tableContent(true, "Bukti")),
                     ],
                     rows: List<DataRow>.generate(
-                        visit2.length,
+                        absen2.length,
                         (index) => DataRow(
                                 color: MaterialStateProperty.resolveWith<Color>(
                                     (Set<MaterialState> states) {
@@ -231,158 +193,107 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
                                   }
                                 }),
                                 cells: [
-                                  DataCell(Align(
-                                    alignment: Alignment.center,
-                                    child: SizedBox(
-                                        width: 200,
-                                        child: Tooltip(
-                                            message: "Halaman Detail Kunjungan",
-                                            child: TextButton(
-                                                style: ButtonStyle(foregroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith<Color>(
-                                                            (Set<MaterialState>
-                                                                states) {
-                                                  if (states.contains(
-                                                      MaterialState.hovered))
-                                                    return Colors.blue.shade400;
-                                                  return Colors.blue
-                                                      .shade600; // null throus error in flutter 2.2+.
-                                                })),
-                                                child: Text(visit2[index].id,
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        decoration:
-                                                            TextDecoration
-                                                                .underline)),
-                                                onPressed: () => Container()
-                                                // Navigator.push(
-                                                //     context,
-                                                //     MaterialPageRoute(
-                                                //         builder: (context) =>
-                                                //             DetailVisit(
-                                                //               id_visit:
-                                                //                   visit2[index]
-                                                //                       .id,
-                                                //               type: 0,
-                                                //             )))
-                                                            ))),
-                                  )),
+                                  DataCell(
+                                      tableContent(false, absen2[index].id)),
                                   DataCell(tableContent(
-                                      false, visit2[index].nama_toko)),
-                                  DataCell(tableContent(
-                                      false, visit2[index].tanggal)),
-                                  DataCell(tableContent(
-                                      false, visit2[index].waktu_in)),
+                                      false, absen2[index].tanggal)),
+                                  DataCell(
+                                      tableContent(false, absen2[index].waktu)),
                                   DataCell(tableContent(
                                     false,
-                                    visit2[index].waktu_out == null
-                                        ? "-"
-                                        : visit2[index].waktu_out.toString(),
-                                  )),
-                                  DataCell(tableContent(
-                                    false,
-                                    visit2[index].status == 0
+                                    absen2[index].status == 0
                                         ? "Status: Belum Check-Out"
                                         : "Status: Sudah Check-Out",
                                   )),
+                                  DataCell(Align(
+                                      alignment: Alignment.center,
+                                      child: IconButton(
+                                          icon: Icon(Icons.remove_red_eye),
+                                          onPressed: () => showBukti(
+                                              context, absen2[index].bukti)))),
                                 ]))));
       } else {
         return ListView.builder(
             padding: EdgeInsets.only(left: 5, right: 5),
-            itemCount: visit2.length,
+            itemCount: absen2.length,
             itemBuilder: (BuildContext ctxt, int index) {
               return SingleChildScrollView(
                   child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  GestureDetector(
-                      onTap: () {
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => DetailVisit(
-                        //               type: 0,
-                        //               id_visit: visit2[index].id,
-                        //             )));
-                      },
-                      child: Card(
-                          elevation: 5,
-                          child: SizedBox(
-                              width: 800,
-                              height: 75,
-                              child: ListTile(
-                                  title: Align(
-                                      alignment: Alignment.topCenter,
-                                      child: Column(children: [
-                                        Container(
-                                            alignment: Alignment.topCenter,
-                                            width: double.infinity,
-                                            child: Text(
-                                              visit2[index].nama_toko,
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.bold),
-                                            )),
-                                        Divider(),
-
-                                        // SizedBox(
-                                        //     width: double.infinity,
-                                        //     child: Divider())
-                                      ])),
-                                  leading: Container(
-                                      padding: EdgeInsets.only(top: 15),
-                                      child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Text(visit2[index].tanggal,
-                                                style: TextStyle(fontSize: 11),
-                                                textAlign: TextAlign.left),
-                                            Text(
-                                                visit2[index].status == 0
-                                                    ? "Status: Belum Check-Out"
-                                                    : "Status: Sudah Check-Out",
-                                                style: TextStyle(
-                                                    fontSize: 11,
-                                                    color: Colors.grey),
-                                                textAlign: TextAlign.left)
-                                          ])),
-                                  // title: Text(visit2[index].tanggal,
-                                  //     style: TextStyle(fontSize: 11)),
-                                  trailing: Padding(
-                                      padding: EdgeInsets.only(top: 15),
-                                      child: Column(children: [
-                                        Text(
-                                            "Waktu In: ${visit2[index].waktu_in}",
-                                            style: TextStyle(fontSize: 11)),
-                                        Text(
-                                            visit2[index].status == 0
-                                                ? "Waktu Out: -"
-                                                : "Waktu Out: ${visit2[index].waktu_out}",
-                                            style: TextStyle(
-                                                fontSize: 11,
-                                                color: Colors.grey))
-                                      ]))
-                                  // title: Text(
-                                  //   "Nama toko: ${visit2[index].nama_toko}",
-                                  //   style: TextStyle(fontSize: 11),
-                                  // ),
-                                  // subtitle: Row(children: [
-                                  //   Text(
-                                  //       visit2[index].status == 0
-                                  //           ? "Status: Belum Check-Out"
-                                  //           : "Status: Sudah Check-Out",
-                                  //       style: TextStyle(fontSize: 11)),
-
-                                  // ])
-                                  ))))
+                  Card(
+                      elevation: 5,
+                      clipBehavior: Clip.hardEdge,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Container(
+                          color: index % 2 == 0
+                              ? Colors.grey.shade200
+                              : Colors.grey.shade400,
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          padding:
+                              EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                          child: RichText(
+                              text: TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 13.0,
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                TextSpan(
+                                    text: "ID Absen: ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                TextSpan(text: absen2[index].id),
+                                TextSpan(
+                                    text: "\n\nHari, tanggal: ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                TextSpan(text: absen2[index].tanggal),
+                                TextSpan(
+                                    text: ", Waktu: ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                TextSpan(text: absen2[index].waktu),
+                                TextSpan(
+                                    text: "\n\nStatus: ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                TextSpan(
+                                  text: absen2[index].status == 0
+                                      ? "Status: Belum Check-Out"
+                                      : "Status: Sudah Check-Out",
+                                ),
+                                TextSpan(
+                                    text: "\nBukti: ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                WidgetSpan(
+                                    alignment: PlaceholderAlignment.middle,
+                                    child: IconButton(
+                                        onPressed: () => showBukti(
+                                            context, absen2[index].bukti),
+                                        icon: Icon(
+                                          Icons.remove_red_eye,
+                                          size: 25,
+                                        ))),
+                              ]))))
                 ],
               ));
             });
       }
     }
+  }
+
+  showBukti(BuildContext context, foto) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            content: SizedBox(
+                height: 500,
+                width: 500,
+                child: Image.memory(base64Decode(foto)))));
   }
 
   Widget buttonKunjunganSaya(BuildContext context) {
@@ -563,7 +474,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData &&
                           snapshot.connectionState == ConnectionState.done) {
-                        return daftarKunjungan(
+                        return daftarKehadiran(
                             snapshot.data.toString(), context);
                       } else {
                         return Center(child: CircularProgressIndicator());
@@ -573,6 +484,56 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
         ),
       ),
     );
+  }
+
+  showDialogPermission(content) {
+    return showDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(title: Text("Peringatan"), content: Text(content)));
+  }
+
+  void permission() async {
+    LocationPermission permission;
+
+    if (kIsWeb) {
+      showDialogPermission(
+          "Fitur absensi tidak tersedia pada versi website atau desktop. \nSilahkan akses dari aplikasi ponsel anda");
+    } else {
+      if (await Permission.camera.status.isDenied) {
+        Permission.camera.request();
+      } else if (await Permission.camera.status.isPermanentlyDenied) {
+        showDialogPermission("Anda belum mengizinkan penggunaan kamera");
+        openAppSettings();
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        showDialogPermission(
+            "Anda belum aktivasi lokasi pada perangkat mobile");
+      }
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          showDialogPermission(
+              "Harap izinkan aplikasi dalam mengakses aplikasi");
+        }
+      } else if (permission == LocationPermission.deniedForever) {
+        showDialogPermission(
+            "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
+      } else {}
+
+      // else {
+      //   final picker = ImagePicker();
+
+      //   var picked_img =
+      //       await picker.pickImage(source: ImageSource.camera, imageQuality: 20);
+      // }
+
+      // setState(() {
+
+      //});
+    }
   }
 
   @override
@@ -585,10 +546,10 @@ class _DaftarKehadiranState extends State<DaftarKehadiran> {
         // ),
         // drawer: MyDrawer(),
         floatingActionButton: Tooltip(
-            message: "Lakukan Kunjungan",
+            message: "Lakukan Absensi",
             child: FloatingActionButton(
-              onPressed: () =>
-                  Navigator.popAndPushNamed(context, "/kunjunganmasuk"),
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => BuatKehadiran())),
               child: Icon(Icons.add, color: Colors.white),
             )),
         body: buildContainer(context));

@@ -45,8 +45,16 @@ dependencies:
   device_info_plus: ^5.0.0
   measure_size: ^4.0.0
   provider: ^5.0.0
+  geolocator:
+  camera: 
+  permission_handler: 
   dynamic_height_grid_view: 
   flutter_svg: 
+  # tflite_flutter: 
+  # tflite_flutter_helper: 
+  # google_ml_kit: ^0.14.0
+  flutter_face_api: ^4.1.1
+  
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -92,6 +100,9 @@ flutter:
     - assets/coronet_crown.png
     - assets/crn.png
     - assets/herocyn.png
+    - assets/mobilefacenet.tflite
+    - assets/Nigel1.jpg
+    - assets/Nigel2.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
