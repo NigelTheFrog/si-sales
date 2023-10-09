@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -14,8 +13,9 @@ import 'package:pt_coronet_crown/class/admin/absen/absen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_face_api/face_api.dart' as Regula;
 
-import '../../class/admin/absen/visit.dart';
+
 import '../../main.dart';
 
 String username = "", id_jabatan = "", startdate = "", enddate = "";
@@ -521,7 +521,15 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
       } else if (permission == LocationPermission.deniedForever) {
         showDialogPermission(
             "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
-      } else {}
+      } else {
+        // Regula.FaceSDK.presentFaceCaptureActivity().then((result) => setImage(
+        // true,
+        // base64Decode(Regula.FaceCaptureResponse.fromJson(json.decode(result))!
+        //     .image!
+        //     .bitmap!
+        //     .replaceAll("\n", "")),
+        // Regula.ImageType.LIVE));
+      }
 
       // else {
       //   final picker = ImagePicker();
