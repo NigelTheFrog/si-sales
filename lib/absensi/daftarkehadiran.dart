@@ -522,25 +522,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
         showDialogPermission(
             "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
       } else {
-        // Regula.FaceSDK.presentFaceCaptureActivity().then((result) => setImage(
-        // true,
-        // base64Decode(Regula.FaceCaptureResponse.fromJson(json.decode(result))!
-        //     .image!
-        //     .bitmap!
-        //     .replaceAll("\n", "")),
-        // Regula.ImageType.LIVE));
+
       }
-
-      // else {
-      //   final picker = ImagePicker();
-
-      //   var picked_img =
-      //       await picker.pickImage(source: ImageSource.camera, imageQuality: 20);
-      // }
-
-      // setState(() {
-
-      //});
     }
   }
 

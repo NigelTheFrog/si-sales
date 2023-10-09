@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:io' as io;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:flutter_face_api/face_api.dart' as Regula;
-import 'package:image_picker/image_picker.dart';
+import 'package:pt_coronet_crown/main.dart';
 
 class BuatKehadiran extends StatefulWidget {
   @override
@@ -15,94 +13,55 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
   var image1 = Regula.MatchFacesImage();
   var image2 = Regula.MatchFacesImage();
   var img1 = Image.asset('assets/Nigel1.jpg');
-  var img2 = Image.asset('assets/Nigel1.jpg');
-  String _similarity = "nil";
-  String _liveness = "nil";
+  double _similarity = 0;
+  bool processing = false;
+  bool match = false;
+  bool match_process = false;
+  TextEditingController controllerTanggal = TextEditingController(),
+      controllerJam = TextEditingController();
 
   @override
   void initState() {
-    // Regula.FaceSDK.presentFaceCaptureActivity().then((result) => setImage(
-    //     true,
-    //     base64Decode(Regula.FaceCaptureResponse.fromJson(json.decode(result))!
-    //         .image!
-    //         .bitmap!
-    //         .replaceAll("\n", "")),
-    //     Regula.ImageType.LIVE));
-    // setImage(false, imageFile, type)
+    setImage(false, base64Decode(avatar), 1);
+    captureImage();
+
     super.initState();
-    initPlatformState();
   }
-
-  Future<void> initPlatformState() async {}
-
-  showAlertDialog(BuildContext context, bool first) => showDialog(
-      context: context,
-      builder: (BuildContext context) =>
-          AlertDialog(title: Text("Select option"), actions: [
-            // ignore: deprecated_member_use
-            TextButton(
-                child: Text("Use gallery"),
-                onPressed: () {
-                  ImagePicker()
-                      .pickImage(source: ImageSource.gallery)
-                      .then((value) => {
-                            setImage(
-                                first,
-                                io.File(value!.path).readAsBytesSync(),
-                                Regula.ImageType.PRINTED),
-                            print(Regula.ImageType.PRINTED)
-                          });
-                }),
-            // // ignore: deprecated_member_use
-            TextButton(
-                child: Text("Use camera"),
-                onPressed: () {
-                  Regula.FaceSDK.presentFaceCaptureActivity().then((result) =>
-                      setImage(
-                          first,
-                          base64Decode(Regula.FaceCaptureResponse.fromJson(
-                                  json.decode(result))!
-                              .image!
-                              .bitmap!
-                              .replaceAll("\n", "")),
-                          Regula.ImageType.LIVE));
-                  
-                  Navigator.pop(context);
-                })
-          ]));
 
   setImage(bool first, Uint8List? imageFile, int type) {
     if (imageFile == null) return;
-    setState(() => _similarity = "nil");
+    // setState(() => _similarity = "nil");
     if (first) {
-      print("image type: ${Regula.ImageType.LIVE}");
       image1.bitmap = base64Encode(imageFile);
       image1.imageType = type;
       setState(() {
         img1 = Image.memory(imageFile);
-        _liveness = "nil";
       });
     } else {
       image2.bitmap = base64Encode(imageFile);
       image2.imageType = type;
-      setState(() => img2 = Image.memory(imageFile));
     }
   }
 
-  clearResults() {
-    setState(() {
-      img1 = Image.asset('assets/Nigel1.jpg');
-      img2 = Image.asset('assets/Nigel1.jpg');
-      _similarity = "nil";
-      _liveness = "nil";
+  captureImage() {
+    Regula.FaceSDK.presentFaceCaptureActivity().then((result) {
+      setImage(
+          true,
+          base64Decode(Regula.FaceCaptureResponse.fromJson(json.decode(result))!
+              .image!
+              .bitmap!
+              .replaceAll("\n", "")),
+          Regula.ImageType.LIVE);
+      matchFaces();
     });
-    image1 = Regula.MatchFacesImage();
-    image2 = Regula.MatchFacesImage();
   }
 
   matchFaces() {
-    setState(() => _similarity = "Processing...");
-    var request = new Regula.MatchFacesRequest();
+    setState(() {
+      processing = true;
+      match_process = true;
+    });
+    var request = Regula.MatchFacesRequest();
     request.images = [image1, image2];
     Regula.FaceSDK.matchFaces(jsonEncode(request)).then((value) {
       var response = Regula.MatchFacesResponse.fromJson(json.decode(value));
@@ -111,69 +70,114 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
           .then((str) {
         var split = Regula.MatchFacesSimilarityThresholdSplit.fromJson(
             json.decode(str));
-        setState(() => _similarity = split!.matchedFaces.length > 0
-            ? ("${(split.matchedFaces[0]!.similarity! * 100).toStringAsFixed(2)}%")
-            : "error");
+        setState(() {
+          _similarity = split!.matchedFaces.length > 0
+              ? (split.matchedFaces[0]!.similarity! * 100)
+              : 0;
+          if (_similarity >= 90) {
+            match = true;
+            match_process = false;
+          } else {
+            match = false;
+            match_process = false;
+          }
+          print(_similarity);
+        });
       });
     });
   }
 
-  liveness() => Regula.FaceSDK.startLiveness().then((value) {
-        var result = Regula.LivenessResponse.fromJson(json.decode(value));
-        setImage(true, base64Decode(result!.bitmap!.replaceAll("\n", "")),
-            Regula.ImageType.LIVE);
-        setState(() => _liveness = result.liveness == 0 ? "passed" : "unknown");
-      });
-
-  Widget createButton(String text, VoidCallback onPress) => Container(
-        width: 250,
-        child: TextButton(
-            style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.black12),
-            ),
-            onPressed: onPress,
-            child: Text(text)),
-      );
-
-  Widget createImage(image, VoidCallback onPress) => Material(
-          child: InkWell(
-        onTap: onPress,
-        child: Container(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: Image(height: 150, width: 150, image: image),
-          ),
+  Widget createImage(image) => Material(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: Image(height: 150, width: 150, image: image),
         ),
-      ));
+      );
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "Lakukan Kehadiran",
+            style: TextStyle(color: Colors.white),
+          ),
+          leading: BackButton(
+            onPressed: () => Navigator.pop(context, true),
+            color: Colors.white,
+          ),
+        ),
         body: Container(
-            margin: EdgeInsets.fromLTRB(0, 0, 0, 100),
+            alignment: Alignment.topCenter,
+            padding: EdgeInsets.only(top: 20),
+            // margin: EdgeInsets.fromLTRB(0, 0, 0, 100),
             width: double.infinity,
+            height: MediaQuery.of(context).size.height,
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                // mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  createImage(img1.image, () => showAlertDialog(context, true)),
-                  createImage(
-                      img2.image, () => showAlertDialog(context, false)),
-                  Container(margin: EdgeInsets.fromLTRB(0, 0, 0, 15)),
-                  createButton("Match", () => matchFaces()),
-                  createButton("Liveness", () => liveness()),
-                  createButton("Clear", () => clearResults()),
                   Container(
-                      margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                      alignment: Alignment.topCenter,
+                      width: 390,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Similarity: $_similarity",
-                              style: TextStyle(fontSize: 18)),
-                          Container(margin: EdgeInsets.fromLTRB(20, 0, 0, 0)),
-                          Text("Liveness: $_liveness",
-                              style: TextStyle(fontSize: 18))
-                        ],
-                      ))
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            createImage(img1.image),
+                            // Container(
+                            //   // margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                            Text(
+                                processing == false
+                                    ? ""
+                                    : processing == true &&
+                                            match_process == true
+                                        ? "Gambar sedang diproses"
+                                        : processing == true &&
+                                                match_process == false &&
+                                                match == true
+                                            ? "Status kecocokan: \nAnda bisa melakukan absen"
+                                            : "Status kecocokan: \nWajah tidak sama. \nSilahkan lakukan \npemotretan ulang",
+                                style: TextStyle(fontSize: 15),
+                                textAlign: TextAlign.center),
+                            // )
+                          ])),
+                  Container(
+                      width: 390,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(
+                                width: 170,
+                                child: TextField(
+                                    controller: controllerTanggal,
+                                    readOnly: true,
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width >=
+                                                  720
+                                              ? 14
+                                              : 12,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Tanggal',
+                                    ))),
+                            SizedBox(
+                                width: 170,
+                                child: TextField(
+                                    controller: controllerJam,
+                                    readOnly: true,
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width >=
+                                                  720
+                                              ? 14
+                                              : 12,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Jam hadir',
+                                    )))
+                          ]))
+
+                  // Container(margin: EdgeInsets.fromLTRB(0, 0, 0, 15)),
+                  // createButton("Match", () => matchFaces()),
                 ])),
       );
 }
