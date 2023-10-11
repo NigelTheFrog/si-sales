@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:io';
+
 //Kendala di hadir kemarin gaada sinyal. Karena tidak ada sinyal foto tidak bisa masuk
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
@@ -88,6 +90,7 @@ void main() {
       runApp(MyLogin());
     else {
       username = result;
+      HttpOverrides.global = MyHttpOverrides();
       runApp(const MyApp());
     }
   });
@@ -115,6 +118,15 @@ void main() {
   getJabatan().then((String result) {
     jabatan = result;
   });
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 void doLogout() async {

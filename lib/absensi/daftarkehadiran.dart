@@ -1,22 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
 import 'package:pt_coronet_crown/class/admin/absen/absen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:flutter_face_api/face_api.dart' as Regula;
-
-
-import '../../main.dart';
 
 String username = "", id_jabatan = "", startdate = "", enddate = "";
 
@@ -111,7 +104,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                             color: Color.fromARGB(75, 0, 0, 0))),
                     headingRowColor: MaterialStateColor.resolveWith(
                         (states) => Colors.grey.shade600),
-                    dataRowHeight: 75,
+                    dataRowMaxHeight: 75,
                     columnSpacing: 20,
                     columns: [
                       DataColumn(label: tableContent(true, "ID Absen")),
@@ -170,7 +163,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                             color: Color.fromARGB(75, 0, 0, 0))),
                     headingRowColor: MaterialStateColor.resolveWith(
                         (states) => Colors.grey.shade600),
-                    dataRowHeight: 75,
+                    dataRowMaxHeight: 75,
                     columnSpacing: 20,
                     columns: [
                       DataColumn(label: tableContent(true, "ID Absen")),
@@ -231,7 +224,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                           color: index % 2 == 0
                               ? Colors.grey.shade200
                               : Colors.grey.shade400,
-                          width: MediaQuery.of(context).size.width * 0.5,
+                          width: MediaQuery.of(context).size.width,
                           padding:
                               EdgeInsets.only(left: 10, top: 10, bottom: 10),
                           child: RichText(
@@ -257,16 +250,23 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                         fontWeight: FontWeight.bold)),
                                 TextSpan(text: absen2[index].waktu),
                                 TextSpan(
-                                    text: "\n\nStatus: ",
+                                    text: "\nStatus: ",
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold)),
                                 TextSpan(
-                                  text: absen2[index].status == 0
-                                      ? "Status: Belum Check-Out"
-                                      : "Status: Sudah Check-Out",
-                                ),
+                                    text: absen2[index].status == 0
+                                        ? "Belum Check-Out"
+                                        : absen2[index].status == 2
+                                            ? "Belum Acc TL"
+                                            : absen2[index].status == 3
+                                                ? "Belum Acc SPV"
+                                                : absen2[index].status == 4
+                                                    ? "Belum Acc AM"
+                                                    : absen2[index].status == 5
+                                                        ? "Belum Acc Admin"
+                                                        : "Sudah Check-Out"),
                                 TextSpan(
-                                    text: "\nBukti: ",
+                                    text: ", Bukti: ",
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold)),
                                 WidgetSpan(
@@ -278,6 +278,11 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                           Icons.remove_red_eye,
                                           size: 25,
                                         ))),
+                                TextSpan(
+                                    text: "\nKeterangan: ",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                TextSpan(text: absen2[index].keterangan),
                               ]))))
                 ],
               ));
@@ -305,15 +310,15 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                 backgroundColor: Color.fromARGB(255, 248, 172, 49)),
             onPressed: () {
               setState(() {
-                if (type == 1)
-                  type = 0;
+                if (widget.type == 1)
+                  widget.type = 0;
                 else
-                  type = 1;
+                  widget.type = 1;
                 build(context);
               });
             },
             child: Text(
-              type == 0 ? "Keseluruhan \nKunjungan" : "Kunjungan Saya",
+              widget.type == 0 ? "Keseluruhan \nKehadiran" : "Kehadiran Saya",
               style: TextStyle(color: Colors.black, fontSize: 16),
               textAlign: TextAlign.center,
             )));
@@ -424,7 +429,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                 padding: EdgeInsets.all(10),
                 alignment: Alignment.topCenter,
                 width: 400,
-                child: widget.type == 1
+                child: widget.type == 1 || id_jabatan != "3"
                     ? MediaQuery.of(context).size.width > 390
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -452,7 +457,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                   padding: EdgeInsets.all(10),
                   alignment: Alignment.topCenter,
                   width: 700,
-                  child: idjabatan != MediaQuery.of(context).size.width >= 650
+                  child: MediaQuery.of(context).size.width >= 650
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -522,7 +527,21 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
         showDialogPermission(
             "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
       } else {
-
+        Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.best,
+                forceAndroidLocationManager: true)
+            .then((Position position) {
+          setState(() {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BuatKehadiran(
+                        lintang: position.latitude,
+                        bujur: position.longitude)));
+          });
+        });
+        // Navigator.push(
+        //     context, MaterialPageRoute(builder: (context) => BuatKehadiran(lintang: Geolocator.,)));
       }
     }
   }
@@ -539,8 +558,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
         floatingActionButton: Tooltip(
             message: "Lakukan Absensi",
             child: FloatingActionButton(
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => BuatKehadiran())),
+              onPressed: () => permission(),
               child: Icon(Icons.add, color: Colors.white),
             )),
         body: buildContainer(context));

@@ -1,10 +1,11 @@
 class Absen {
-  final String id, tanggal, waktu, bukti;
+  final String id, tanggal, waktu, bukti, keterangan;
   final String? nama_depan, nama_belakang, username, id_lokasi;
   final int status;
 
   Absen({
     required this.id,
+    required this.keterangan,
     required this.tanggal,
     required this.waktu,
     required this.bukti,
@@ -19,6 +20,7 @@ class Absen {
     return Absen(
       id: json['id'] as String,
       tanggal: json['tanggal'] as String,
+      keterangan: json['keterangan'] as String,
       waktu: json['waktu'] as String,
       bukti: json['bukti'] as String,
       id_lokasi: json['id_lokasi'] as String?,

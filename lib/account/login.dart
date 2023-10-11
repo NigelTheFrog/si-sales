@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
+// import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/account/createacount.dart';
+// import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
@@ -152,9 +152,10 @@ class _LoginState extends State<Login> {
                                 height: 50,
                                 width: 300,
                                 decoration: BoxDecoration(
-                                    color: Colors.orange,
                                     borderRadius: BorderRadius.circular(20)),
                                 child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange),
                                   onPressed: () {
                                     setState(() {
                                       isLoading = true;

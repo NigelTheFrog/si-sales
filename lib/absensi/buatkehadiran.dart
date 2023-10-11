@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_face_api/face_api.dart' as Regula;
 import 'package:intl/intl.dart';
@@ -8,6 +6,8 @@ import 'package:pt_coronet_crown/main.dart';
 import 'package:http/http.dart' as http;
 
 class BuatKehadiran extends StatefulWidget {
+  num lintang, bujur;
+  BuatKehadiran({super.key, required this.lintang, required this.bujur});
   @override
   _BuatKehadiranState createState() => _BuatKehadiranState();
 }
@@ -17,21 +17,22 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
   var image2 = Regula.MatchFacesImage();
   var img1;
   double _similarity = 0;
-  int rand = 0;
-  String keterangan = "", tanggal = "";
+  int keterangan = 0;
+  String tanggal = "";
   bool processing = false;
   bool match = false;
   bool match_process = false;
   TextEditingController controllerTanggal = TextEditingController(),
-      controllerJam = TextEditingController();
-  List<String> list = <String>['Kantor', 'Keliling', 'Lain-Lain'];
+      controllerJam = TextEditingController(),
+      controllerKeterangan = TextEditingController();
+  List list = [0, 1, 2];
 
   @override
   void initState() {
+    keterangan = list.first;
     controllerTanggal.text = DateFormat.yMMMMEEEEd('id').format(DateTime.now());
     controllerJam.text = DateFormat.Hm().format(DateTime.now());
     tanggal = DateTime.now().toString().substring(0, 10);
-    rand = Random().nextInt(100);
     setImage(false, base64Decode(avatar), 1);
     captureImage();
     super.initState();
@@ -39,14 +40,21 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
 
   void submit(BuildContext context) async {
     final response = await http.post(
-        Uri.parse("https://otccoronet.com/otc/laporan/event/buatproposal.php"),
+        Uri.parse(
+            "https://otccoronet.com/otc/account/absensi/buatkehadiran.php"),
         body: {
-          'id': "$rand/$tanggal/$username",
+          'id': "$tanggal/$username",
           'nama': nama,
           'tanggal': tanggal,
           'jam': controllerJam.text,
           'bukti': img1,
-          'keterangan': keterangan,
+          'lintang': widget.lintang.toString(),
+          'bujur': widget.bujur.toString(),
+          'keterangan': keterangan == 0
+              ? 'Menetap di kantor'
+              : keterangan == 1
+                  ? 'Keliling'
+                  : controllerKeterangan.text,
           "username": username
         });
     if (response.statusCode == 200) {
@@ -74,7 +82,7 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
     }
   }
 
-  setImage(bool first, Uint8List? imageFile, int type) {
+  setImage(bool first, imageFile, int type) {
     if (imageFile == null) return;
     // setState(() => _similarity = "nil");
     if (first) {
@@ -200,10 +208,7 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
                                   controller: controllerTanggal,
                                   readOnly: true,
                                   style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width >= 720
-                                            ? 14
-                                            : 12,
+                                    fontSize: 12,
                                   ),
                                   decoration: const InputDecoration(
                                     labelText: 'Tanggal',
@@ -214,26 +219,115 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
                                   controller: controllerJam,
                                   readOnly: true,
                                   style: TextStyle(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width >= 720
-                                            ? 14
-                                            : 12,
+                                    fontSize: 12,
                                   ),
                                   decoration: const InputDecoration(
                                     labelText: 'Jam hadir',
                                   ))),
                         ])),
                 Container(
-                  margin: EdgeInsets.only(top: 30),
-                  height: 50,
-                  width: 390,
-                ),
+                    margin: EdgeInsets.only(top: 20),
+                    height: 50,
+                    width: 390,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                              // alignment: Alignment.bo,
+                              width: 170,
+                              height: 50,
+                              child: Stack(children: [
+                                Container(
+                                    height: 15,
+                                    margin: EdgeInsets.only(top: 10),
+                                    child: Text(
+                                      "Keterangan",
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey.shade700),
+                                    )),
+                                Container(
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            bottom: BorderSide(
+                                                width: 1,
+                                                color: Colors.grey.shade600)))),
+                                // padding: EdgeInsets.only(top: 15),
+                                Container(
+                                    margin: EdgeInsets.only(top: 20),
+                                    child: DropdownButtonHideUnderline(
+                                        child: DropdownButton(
+                                            value: keterangan,
+                                            icon: const Icon(
+                                                Icons.arrow_drop_down),
+                                            elevation: 16,
+                                            // style: const TextStyle(color: Colors.deepPurple),
+                                            underline: Container(
+                                                margin:
+                                                    EdgeInsets.only(top: 20),
+                                                height: 1,
+                                                color: Colors.grey
+                                                // color: Colors.deepPurpleAccent,
+                                                ),
+                                            onChanged: (value) {
+                                              // This is called when the user selects an item.
+                                              setState(() {
+                                                keterangan = value!;
+                                              });
+                                            },
+                                            items: list
+                                                .map<DropdownMenuItem>((value) {
+                                              return DropdownMenuItem(
+                                                  value: value,
+                                                  child: Text(
+                                                    value == 0
+                                                        ? 'Menetap di kantor'
+                                                        : value == 1
+                                                            ? 'Keliling'
+                                                            : 'Lain-lain',
+                                                    style:
+                                                        TextStyle(fontSize: 14),
+                                                  ));
+                                            }).toList()))),
+                              ])),
+                          if (keterangan == 2)
+                            SizedBox(
+                                width: 170,
+                                child: TextField(
+                                    controller: controllerKeterangan,
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width >=
+                                                  720
+                                              ? 14
+                                              : 12,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Silahkan diisi',
+                                    ))),
+                        ])),
                 Container(
                     margin: EdgeInsets.only(top: 30),
                     height: 50,
                     width: 390,
                     child: ElevatedButton(
-                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                processing == true && match_process == true
+                                    ? Colors.orange.shade200
+                                    : Colors.orange),
+                        onPressed: () {
+                          if (processing == true && match_process == true) {
+                            null;
+                          } else if (processing == true &&
+                              match_process == false &&
+                              match == true) {
+                            submit(context);
+                          } else {
+                            captureImage();
+                          }
+                        },
                         child: Text(
                             processing == true && match_process == true
                                 ? "Gambar sedang diproses"
