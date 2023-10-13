@@ -28,7 +28,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
   // Timer? timer;
-  int type = 0;
 
   Future<String> fetchData() async {
     final response = await http.post(
@@ -39,7 +38,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
           'startdate': startdate,
           'enddate': enddate,
           'cari': _txtcari,
-          'type': type.toString()
+          'type': widget.type.toString()
         });
     if (response.statusCode == 200) {
       return response.body;
@@ -68,7 +67,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
     enddate = DateTime.now().toString().substring(0, 10);
     _endDateController.text =
         DateFormat.yMMMMEEEEd('id').format(DateTime.now());
-    type = widget.type;
     // initTimer();
   }
 
@@ -79,6 +77,15 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
       return Align(
           alignment: Alignment.center,
           child: Text(content, textAlign: TextAlign.center));
+    }
+  }
+
+  TextSpan cardContent(isHeader, content) {
+    if (content == true) {
+      return TextSpan(
+          text: content, style: const TextStyle(fontWeight: FontWeight.bold));
+    } else {
+      return TextSpan(text: content);
     }
   }
 
@@ -95,7 +102,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
       if (MediaQuery.of(context).size.width >= 740) {
         return Padding(
             padding: EdgeInsets.only(left: 5, right: 5),
-            child: type == 1
+            child: widget.type == 1
                 ? DataTable(
                     border: TableBorder(
                         verticalInside: BorderSide(
@@ -234,27 +241,16 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                     color: Colors.black,
                                   ),
                                   children: [
-                                TextSpan(
-                                    text: "ID Absen: ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(text: absen2[index].id),
-                                TextSpan(
-                                    text: "\n\nHari, tanggal: ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(text: absen2[index].tanggal),
-                                TextSpan(
-                                    text: ", Waktu: ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(text: absen2[index].waktu),
-                                TextSpan(
-                                    text: "\nStatus: ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(
-                                    text: absen2[index].status == 0
+                                cardContent(true, "ID Absen: "),
+                                cardContent(false, absen2[index].id),
+                                cardContent(true, "\n\nHari, tanggal: "),
+                                cardContent(false, absen2[index].tanggal),
+                                cardContent(true, ", Waktu: "),
+                                cardContent(false, absen2[index].waktu),
+                                cardContent(true, ", \nStatus: : "),
+                                cardContent(
+                                    false,
+                                    absen2[index].status == 0
                                         ? "Belum Check-Out"
                                         : absen2[index].status == 2
                                             ? "Belum Acc TL"
@@ -265,10 +261,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                                     : absen2[index].status == 5
                                                         ? "Belum Acc Admin"
                                                         : "Sudah Check-Out"),
-                                TextSpan(
-                                    text: ", Bukti: ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
+                                cardContent(true, ", Bukti: "),
                                 WidgetSpan(
                                     alignment: PlaceholderAlignment.middle,
                                     child: IconButton(
@@ -278,11 +271,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                           Icons.remove_red_eye,
                                           size: 25,
                                         ))),
-                                TextSpan(
-                                    text: "\nKeterangan: ",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(text: absen2[index].keterangan),
+                                cardContent(true, "\nKeterangan: "),
+                                cardContent(false, absen2[index].keterangan),
                               ]))))
                 ],
               ));
@@ -331,7 +321,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
       child: TextFormField(
         decoration: const InputDecoration(
           icon: Icon(Icons.search),
-          labelText: 'Cari Kunjungan',
+          labelText: 'Cari Kehadiran',
         ),
         onChanged: (value) {
           setState(() {
@@ -400,12 +390,10 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2200))
                   .then((value) {
-                setState(() {
-                  startdate = value.toString().substring(0, 10);
-                  String formattedDate =
-                      DateFormat.yMMMMEEEEd('id').format(value!);
-                  _startDateController.text = formattedDate;
-                });
+                startdate = value.toString().substring(0, 10);
+                String formattedDate =
+                    DateFormat.yMMMMEEEEd('id').format(value!);
+                _startDateController.text = formattedDate;
               });
             },
             child: Icon(
@@ -500,7 +488,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
 
   void permission() async {
     LocationPermission permission;
-
     if (kIsWeb) {
       showDialogPermission(
           "Fitur absensi tidak tersedia pada versi website atau desktop. \nSilahkan akses dari aplikasi ponsel anda");

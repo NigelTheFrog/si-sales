@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
 import 'package:pt_coronet_crown/absensi/daftarkehadiran.dart';
+import 'package:pt_coronet_crown/absensi/daftarpersetujuan.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
 import 'package:pt_coronet_crown/admin/attendence/dailyvisit.dart';
@@ -32,12 +33,9 @@ import 'package:pt_coronet_crown/laporan/pembelian/buatlaporanbeli.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
-import 'package:pt_coronet_crown/mainpage/history.dart';
-import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:pt_coronet_crown/mainpage/kunjungan/daftarkunjungan.dart';
 import 'package:pt_coronet_crown/mainpage/kunjungan/buatkunjungan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image/image.dart' as img;
 
 String username = "",
     idjabatan = "",
@@ -199,6 +197,7 @@ class _MyHomePageState extends State<MyHomePage> {
     PersonelData(),
     PersonelGroup(),
     DaftarKehadiran(type: idjabatan == "3" ? 0 : 1),
+    DaftarPersetujuan(),
     DaftarKunjungan(
       type: idjabatan == "3" ? 0 : 1,
     ),
@@ -214,6 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
     'Data Personel',
     'Group Personel',
     'Daftar Kehadiran',
+    'Menunggu Persetujuan',
     'Kunjungan',
     'Daftar Pembelian',
     'Daftar Penjualan',
@@ -241,27 +241,25 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
-  Widget buildTile(index, text, icon) {
-    return Material(
-        type: MaterialType.transparency,
-        child: ListTile(
-          tileColor: indexScreen == index
-              ? Color.fromARGB(255, 193, 144, 0)
-              : Colors.transparent,
-          hoverColor: Colors.amber.shade600,
-          splashColor: Colors.grey.shade600,
-          title: Text(text, style: TextStyle(color: Colors.white)),
-          leading: Icon(icon, color: Colors.white),
-          onTap: () {
-            if (index != 14) {
-              setState(() => indexScreen = index);
-            } else {
-              indexScreen = 0;
-              doLogout();
-            }
-          },
-        ));
-  }
+  Widget buildTile(index, text, icon) => Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        tileColor: indexScreen == index
+            ? Color.fromARGB(255, 193, 144, 0)
+            : Colors.transparent,
+        hoverColor: Colors.amber.shade600,
+        splashColor: Colors.grey.shade600,
+        title: Text(text, style: TextStyle(color: Colors.white)),
+        leading: Icon(icon, color: Colors.white),
+        onTap: () {
+          if (index != 15) {
+            setState(() => indexScreen = index);
+          } else {
+            indexScreen = 0;
+            doLogout();
+          }
+        },
+      ));
 
   Widget buildAvatar() {
     return Container(
@@ -304,8 +302,9 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             buildTile(1, "Personel Data", Icons.account_box),
             buildTile(2, "Personel Group", Icons.group),
-            buildTile(3, "Daftar Kehadiran", Icons.check_rounded),
-            buildTile(4, "Kunjungan", Icons.location_on),
+            buildTile(3, "Kehadiran", Icons.check_rounded),
+            buildTile(4, "Menunggu Persetujuan", Icons.watch_later_outlined),
+            buildTile(5, "Kunjungan", Icons.location_on),
           ],
         ),
         ExpansionTile(
@@ -314,8 +313,8 @@ class _MyHomePageState extends State<MyHomePage> {
           title: const Text("Transaksi", style: TextStyle(color: Colors.white)),
           leading: const Icon(Transaction.attach_money, color: Colors.white),
           children: <Widget>[
-            buildTile(5, "Pembelian", Clippy.clippy),
-            buildTile(6, "Penjualan", ClipBoardCheck.clipboard_check),
+            buildTile(6, "Pembelian", Clippy.clippy),
+            buildTile(7, "Penjualan", ClipBoardCheck.clipboard_check),
           ],
         ),
         ExpansionTile(
@@ -324,24 +323,24 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text("Event", style: TextStyle(color: Colors.white)),
           leading: Icon(EventChart.chart_line, color: Colors.white),
           children: [
-            buildTile(7, "Proposal Event", Proposal.doc_text_inv),
-            buildTile(8, "Riwayat Event", Calendar.event),
+            buildTile(8, "Proposal Event", Proposal.doc_text_inv),
+            buildTile(9, "Riwayat Event", Calendar.event),
           ],
         ),
-        buildTile(9, "Outlet", Outlet.industrial_building),
+        buildTile(10, "Outlet", Outlet.industrial_building),
         ExpansionTile(
           collapsedIconColor: Colors.white,
           iconColor: Colors.amber.shade600,
           title: const Text("Company", style: TextStyle(color: Colors.white)),
           leading: const Icon(Icons.business_center, color: Colors.white),
           children: <Widget>[
-            buildTile(10, "Profile", Icons.business),
-            buildTile(11, "Admin", Icons.admin_panel_settings),
-            buildTile(12, "Produk", Produk.box_open),
-            buildTile(13, "Jabatan", Jabatan.group),
+            buildTile(11, "Profile", Icons.business),
+            buildTile(12, "Admin", Icons.admin_panel_settings),
+            buildTile(13, "Produk", Produk.box_open),
+            buildTile(14, "Jabatan", Jabatan.group),
           ],
         ),
-        buildTile(14, "Logout", Icons.logout)
+        buildTile(15, "Logout", Icons.logout)
       ]));
     } else if (idjabatan == "3") {
       return SingleChildScrollView(
@@ -349,20 +348,20 @@ class _MyHomePageState extends State<MyHomePage> {
         buildAvatar(),
         buildTile(0, "Home", Icons.home),
         buildTile(3, "Kehadiran", Icons.check_rounded),
-        buildTile(4, "Kunjungan", Icons.location_on),
-        buildTile(6, "Penjualan", ClipBoardCheck.clipboard_check),
+        buildTile(5, "Kunjungan", Icons.location_on),
+        buildTile(7, "Penjualan", ClipBoardCheck.clipboard_check),
         ExpansionTile(
           collapsedIconColor: Colors.white,
           iconColor: Colors.amber.shade600,
           title: Text("Event", style: TextStyle(color: Colors.white)),
           leading: Icon(EventChart.chart_line, color: Colors.white),
           children: [
-            buildTile(7, "Proposal Event", Proposal.doc_text_inv),
-            buildTile(8, "Riwayat Event", Calendar.event),
+            buildTile(8, "Proposal Event", Proposal.doc_text_inv),
+            buildTile(9, "Riwayat Event", Calendar.event),
           ],
         ),
         buildTile(1, "Informasi Akun", Icons.account_circle),
-        buildTile(14, "Logout", Icons.logout)
+        buildTile(15, "Logout", Icons.logout)
       ]));
     } else {
       return SingleChildScrollView(
@@ -377,8 +376,9 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             buildTile(1, "Personel Data", Icons.account_box),
             buildTile(2, "Personel Group", Icons.group),
-            buildTile(3, "Daftar Kehadiran", Icons.check_rounded),
-            buildTile(4, "Kunjungan", Icons.location_on),
+            buildTile(3, "Kehadiran", Icons.check_rounded),
+            buildTile(4, "Menunggu Persetujuan", Icons.watch_later_outlined),
+            buildTile(5, "Kunjungan", Icons.location_on),
           ],
         ),
         ExpansionTile(
@@ -387,8 +387,8 @@ class _MyHomePageState extends State<MyHomePage> {
           title: const Text("Transaksi", style: TextStyle(color: Colors.white)),
           leading: const Icon(Transaction.attach_money, color: Colors.white),
           children: <Widget>[
-            buildTile(5, "Pembelian", Clippy.clippy),
-            buildTile(6, "Penjualan", ClipBoardCheck.clipboard_check),
+            buildTile(6, "Pembelian", Clippy.clippy),
+            buildTile(7, "Penjualan", ClipBoardCheck.clipboard_check),
           ],
         ),
         ExpansionTile(
@@ -397,13 +397,13 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text("Event", style: TextStyle(color: Colors.white)),
           leading: Icon(EventChart.chart_line, color: Colors.white),
           children: [
-            buildTile(7, "Proposal Event", Proposal.doc_text_inv),
-            buildTile(8, "Riwayat Event", Calendar.event),
+            buildTile(8, "Proposal Event", Proposal.doc_text_inv),
+            buildTile(9, "Riwayat Event", Calendar.event),
           ],
         ),
-        buildTile(9, "Outlet", Outlet.industrial_building),
-        buildTile(12, "Produk", Produk.box_open),
-        buildTile(14, "Logout", Icons.logout)
+        buildTile(10, "Outlet", Outlet.industrial_building),
+        buildTile(13, "Produk", Produk.box_open),
+        buildTile(15, "Logout", Icons.logout)
       ]));
     }
   }

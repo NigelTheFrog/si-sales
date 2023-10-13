@@ -18,7 +18,7 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
   var img1;
   double _similarity = 0;
   int keterangan = 0;
-  String tanggal = "";
+  String tanggal = "", id_jabatan = "";
   bool processing = false;
   bool match = false;
   bool match_process = false;
@@ -46,10 +46,11 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
           'id': "$tanggal/$username",
           'nama': nama,
           'tanggal': tanggal,
-          'jam': controllerJam.text,
+          'jam': "",
           'bukti': img1,
           'lintang': widget.lintang.toString(),
           'bujur': widget.bujur.toString(),
+          'id_jabatan': idjabatan,
           'keterangan': keterangan == 0
               ? 'Menetap di kantor'
               : keterangan == 1

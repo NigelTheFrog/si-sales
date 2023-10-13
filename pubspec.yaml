@@ -50,9 +50,6 @@ dependencies:
   permission_handler: 
   dynamic_height_grid_view: 
   flutter_svg: 
-  # tflite_flutter: 
-  # tflite_flutter_helper: 
-  # google_ml_kit: ^0.14.0
   flutter_face_api: ^4.1.1
   
 
@@ -149,6 +146,7 @@ flutter:
     - family: AddPenjualan
       fonts:
       - asset: assets/fonts/AddPenjualan.ttf
+
 
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
