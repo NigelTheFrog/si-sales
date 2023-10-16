@@ -33,6 +33,7 @@ import 'package:pt_coronet_crown/laporan/pembelian/buatlaporanbeli.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/daftarpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/buatlaporanjual.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/daftarpenjualan.dart';
+import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:pt_coronet_crown/mainpage/kunjungan/daftarkunjungan.dart';
 import 'package:pt_coronet_crown/mainpage/kunjungan/buatkunjungan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -193,7 +194,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> screens = [
-    Container(),
+    Home(),
     PersonelData(),
     PersonelGroup(),
     DaftarKehadiran(type: idjabatan == "3" ? 0 : 1),
@@ -443,12 +444,12 @@ class _MyHomePageState extends State<MyHomePage> {
             alignment: Alignment.topCenter,
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
+
             // height: MediaQuery.of(context).size.height,
             // width: MediaQuery.of(context).size.width,
             child: Row(children: [
               if (MediaQuery.of(context).size.width >= 1050) NavigationPane(),
               SizedBox(
-                //height: 720,
                 width: MediaQuery.of(context).size.width >= 1050
                     ? MediaQuery.of(context).size.width * 0.82
                     : MediaQuery.of(context).size.width,

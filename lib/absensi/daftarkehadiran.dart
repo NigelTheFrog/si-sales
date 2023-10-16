@@ -234,46 +234,103 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                           width: MediaQuery.of(context).size.width,
                           padding:
                               EdgeInsets.only(left: 10, top: 10, bottom: 10),
-                          child: RichText(
-                              text: TextSpan(
-                                  style: TextStyle(
-                                    fontSize: 13.0,
-                                    color: Colors.black,
-                                  ),
-                                  children: [
-                                cardContent(true, "ID Absen: "),
-                                cardContent(false, absen2[index].id),
-                                cardContent(true, "\n\nHari, tanggal: "),
-                                cardContent(false, absen2[index].tanggal),
-                                cardContent(true, ", Waktu: "),
-                                cardContent(false, absen2[index].waktu),
-                                cardContent(true, ", \nStatus: : "),
-                                cardContent(
-                                    false,
-                                    absen2[index].status == 0
-                                        ? "Belum Check-Out"
-                                        : absen2[index].status == 2
-                                            ? "Belum Acc TL"
-                                            : absen2[index].status == 3
-                                                ? "Belum Acc SPV"
-                                                : absen2[index].status == 4
-                                                    ? "Belum Acc AM"
-                                                    : absen2[index].status == 5
-                                                        ? "Belum Acc Admin"
-                                                        : "Sudah Check-Out"),
-                                cardContent(true, ", Bukti: "),
-                                WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,
-                                    child: IconButton(
-                                        onPressed: () => showBukti(
-                                            context, absen2[index].bukti),
-                                        icon: Icon(
-                                          Icons.remove_red_eye,
-                                          size: 25,
-                                        ))),
-                                cardContent(true, "\nKeterangan: "),
-                                cardContent(false, absen2[index].keterangan),
-                              ]))))
+                          child: widget.type == 1
+                              ? RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: 13.0,
+                                        color: Colors.black,
+                                      ),
+                                      children: [
+                                      cardContent(true, "ID Absen: "),
+                                      cardContent(false, absen2[index].id),
+                                      cardContent(true, "\n\nUsername: "),
+                                      cardContent(
+                                          false, absen2[index].username),
+                                      cardContent(true, ", Nama: "),
+                                      cardContent(false,
+                                          "${absen2[index].nama_depan.toString()} ${absen2[index].nama_belakang.toString()}"),
+                                      cardContent(true, "\n\nHari, tanggal: "),
+                                      cardContent(false, absen2[index].tanggal),
+                                      cardContent(true, ", Waktu: "),
+                                      cardContent(false, absen2[index].waktu),
+                                      cardContent(true, ", \nStatus: : "),
+                                      cardContent(
+                                          false,
+                                          absen2[index].status == 0
+                                              ? "Belum Check-Out"
+                                              : absen2[index].status == 2
+                                                  ? "Belum Acc TL"
+                                                  : absen2[index].status == 3
+                                                      ? "Belum Acc SPV"
+                                                      : absen2[index].status ==
+                                                              4
+                                                          ? "Belum Acc AM"
+                                                          : absen2[index]
+                                                                      .status ==
+                                                                  5
+                                                              ? "Belum Acc Admin"
+                                                              : "Sudah Check-Out"),
+                                      cardContent(true, ", Bukti: "),
+                                      WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: IconButton(
+                                              onPressed: () => showBukti(
+                                                  context, absen2[index].bukti),
+                                              icon: Icon(
+                                                Icons.remove_red_eye,
+                                                size: 25,
+                                              ))),
+                                      cardContent(true, "\nKeterangan: "),
+                                      cardContent(
+                                          false, absen2[index].keterangan),
+                                    ]))
+                              : RichText(
+                                  text: TextSpan(
+                                      style: TextStyle(
+                                        fontSize: 13.0,
+                                        color: Colors.black,
+                                      ),
+                                      children: [
+                                      cardContent(true, "ID Absen: "),
+                                      cardContent(false, absen2[index].id),
+                                      cardContent(true, "\n\nHari, tanggal: "),
+                                      cardContent(false, absen2[index].tanggal),
+                                      cardContent(true, ", Waktu: "),
+                                      cardContent(false, absen2[index].waktu),
+                                      cardContent(true, ", \nStatus: : "),
+                                      cardContent(
+                                          false,
+                                          absen2[index].status == 0
+                                              ? "Belum Check-Out"
+                                              : absen2[index].status == 2
+                                                  ? "Belum Acc TL"
+                                                  : absen2[index].status == 3
+                                                      ? "Belum Acc SPV"
+                                                      : absen2[index].status ==
+                                                              4
+                                                          ? "Belum Acc AM"
+                                                          : absen2[index]
+                                                                      .status ==
+                                                                  5
+                                                              ? "Belum Acc Admin"
+                                                              : "Sudah Check-Out"),
+                                      cardContent(true, ", Bukti: "),
+                                      WidgetSpan(
+                                          alignment:
+                                              PlaceholderAlignment.middle,
+                                          child: IconButton(
+                                              onPressed: () => showBukti(
+                                                  context, absen2[index].bukti),
+                                              icon: Icon(
+                                                Icons.remove_red_eye,
+                                                size: 25,
+                                              ))),
+                                      cardContent(true, "\nKeterangan: "),
+                                      cardContent(
+                                          false, absen2[index].keterangan),
+                                    ]))))
                 ],
               ));
             });
