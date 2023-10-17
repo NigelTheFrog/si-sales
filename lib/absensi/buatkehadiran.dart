@@ -56,7 +56,8 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
               : keterangan == 1
                   ? 'Keliling'
                   : controllerKeterangan.text,
-          "username": username
+          "username": username,
+          "type": "0"
         });
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);

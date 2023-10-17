@@ -5,6 +5,7 @@ import 'dart:io';
 //Kendala di hadir kemarin gaada sinyal. Karena tidak ada sinyal foto tidak bisa masuk
 import 'package:flutter/material.dart';
 import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
+import 'package:flutter/gestures.dart';
 import 'package:pt_coronet_crown/absensi/daftarkehadiran.dart';
 import 'package:pt_coronet_crown/absensi/daftarpersetujuan.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
@@ -134,6 +135,15 @@ void doLogout() async {
   main();
 }
 
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -151,6 +161,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         /* dark theme settings */
       ),
+      scrollBehavior: MyCustomScrollBehavior(),
       themeMode: ThemeMode.light,
       home: const MyHomePage(title: 'Home'),
       debugShowCheckedModeBanner: false,
@@ -200,7 +211,7 @@ class _MyHomePageState extends State<MyHomePage> {
     DaftarKehadiran(type: idjabatan == "3" ? 0 : 1),
     DaftarPersetujuan(),
     DaftarKunjungan(
-      type: idjabatan == "3" ? 0 : 1,
+      type: idjabatan == "3" ? 0 : 2,
     ),
     DaftarPembelian(),
     DaftarPenjualan(),

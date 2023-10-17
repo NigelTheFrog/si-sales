@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pt_coronet_crown/class/admin/absen/kunjungan.dart';
 import 'package:pt_coronet_crown/class/produk.dart';
 import 'package:pt_coronet_crown/customicon/clip_board_check_icons.dart';
 import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
@@ -58,6 +59,99 @@ class _HomeState extends State<Home> {
   //   }
   // }
 
+  Widget buildVisitChart(data) {
+    List<Kunjungan> kunjungan2 = [];
+    Map json = jsonDecode(data);
+    if (json['result'] == "error") {
+      return CircularProgressIndicator();
+    } else {
+      for (var kunj in json['data']) {
+        Kunjungan kunjungan = Kunjungan.fromJson(kunj);
+        kunjungan2.add(kunjungan);
+      }
+    }
+    return SizedBox(
+        width: MediaQuery.of(context).size.width * 0.45,
+        height: 400,
+        child: Card(
+            elevation: 5,
+            child: Container(
+                padding: EdgeInsets.all(15),
+                alignment: Alignment.topLeft,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                          alignment: Alignment.topLeft,
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "Jumlah Kunjungan",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red[300]),
+                          )),
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.45,
+                          height: 375,
+                          // child: syncfu,
+                          // child: ListView.builder(
+                          //     scrollDirection: Axis.horizontal,
+                          //     itemCount: produk2.length,
+                          //     itemBuilder: (BuildContext ctxt, int index) {
+                          //       return Container(
+                          //           padding: EdgeInsets.only(top: 5),
+                          //           child: Column(
+                          //               mainAxisSize: MainAxisSize.min,
+                          //               children: <Widget>[
+                          //                 GestureDetector(
+                          //                     onTap: () {
+                          //                       // Navigator.push(
+                          //                       //     context,
+                          //                       //     MaterialPageRoute(
+                          //                       //         builder: (context) => DetailVisit(
+                          //                       //               type: 0,
+                          //                       //               id_visit: visit2[index].id,
+                          //                       //             )));
+                          //                     },
+                          //                     child: Card(
+                          //                         elevation: 5,
+                          //                         child: Container(
+                          //                             margin:
+                          //                                 EdgeInsets.all(10),
+                          //                             height: 355,
+                          //                             width: 325,
+                          //                             child: Column(children: [
+                          //                               Container(
+                          //                                   color: Colors
+                          //                                       .grey.shade200,
+                          //                                   child: Image.memory(
+                          //                                       fit: BoxFit
+                          //                                           .cover,
+                          //                                       base64Decode(produk2[
+                          //                                               index]
+                          //                                           .gambar
+                          //                                           .toString()))),
+                          //                               Padding(
+                          //                                   padding:
+                          //                                       EdgeInsets.only(
+                          //                                           top: 10),
+                          //                                   child: Text(
+                          //                                       produk2[index]
+                          //                                           .jenis,
+                          //                                       textAlign:
+                          //                                           TextAlign
+                          //                                               .left,
+                          //                                       style: TextStyle(
+                          //                                           fontWeight:
+                          //                                               FontWeight
+                          //                                                   .bold)))
+                          //                             ]))))
+                          //               ]));
+                          //     })
+                              )
+                    ]))));
+  }
+
   Widget buildProductSlider(data) {
     List<Produk> produk2 = [];
     Map json = jsonDecode(data);
@@ -70,73 +164,83 @@ class _HomeState extends State<Home> {
       }
     }
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: 400,
-      child: Card(
-          elevation: 5,
-          child: Container(
-            padding: EdgeInsets.all(15),
-            alignment: Alignment.topLeft,
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Padding(
-                  padding: EdgeInsets.only(bottom: 10),
-                  child: Text(
-                    "Etalase Product",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.red[300]),
-                  )),
-              ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: produk2.length,
-                  itemBuilder: (BuildContext ctxt, int index) {
-                    return Container(
-                        padding: EdgeInsets.only(top: 5),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            GestureDetector(
-                                onTap: () {
-                                  // Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) => DetailVisit(
-                                  //               type: 0,
-                                  //               id_visit: visit2[index].id,
-                                  //             )));
-                                },
-                                child: Card(
-                                  elevation: 2,
-                                  child: Container(
-                                    width: 400,
-                                    child: Image.memory(base64Decode(
-                                        produk2[index].gambar.toString())),
-                                  ),
-                                ))
-                          ],
-                        ));
-                  })
-            ]),
-          )),
-    );
-    // return CarouselSlider(
-
-    //   options: CarouselOptions(height: 400.0),
-    //   items: [1, 2, 3, 4, 5].map((i) {
-    //     return Builder(
-    //       builder: (BuildContext context) {
-    //         return Container(
-    //             width: 300,
-    //             margin: EdgeInsets.symmetric(horizontal: 5.0),
-    //             decoration: BoxDecoration(color: Colors.amber),
-    //             child: Text(
-    //               'text $i',
-    //               style: TextStyle(fontSize: 16.0),
-    //             ));
-    //       },
-    //     );
-    //   }).toList(),
-    // );
+        width: MediaQuery.of(context).size.width,
+        height: 470,
+        child: Card(
+            elevation: 5,
+            child: Container(
+                padding: EdgeInsets.all(15),
+                alignment: Alignment.topLeft,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                          alignment: Alignment.topLeft,
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            "Etalase Product",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red[300]),
+                          )),
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: 400,
+                          child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: produk2.length,
+                              itemBuilder: (BuildContext ctxt, int index) {
+                                return Container(
+                                    padding: EdgeInsets.only(top: 5),
+                                    child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          GestureDetector(
+                                              onTap: () {
+                                                // Navigator.push(
+                                                //     context,
+                                                //     MaterialPageRoute(
+                                                //         builder: (context) => DetailVisit(
+                                                //               type: 0,
+                                                //               id_visit: visit2[index].id,
+                                                //             )));
+                                              },
+                                              child: Card(
+                                                  elevation: 5,
+                                                  child: Container(
+                                                      margin:
+                                                          EdgeInsets.all(10),
+                                                      height: 355,
+                                                      width: 325,
+                                                      child: Column(children: [
+                                                        Container(
+                                                            color: Colors
+                                                                .grey.shade200,
+                                                            child: Image.memory(
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                base64Decode(produk2[
+                                                                        index]
+                                                                    .gambar
+                                                                    .toString()))),
+                                                        Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 10),
+                                                            child: Text(
+                                                                produk2[index]
+                                                                    .jenis,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .left,
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold)))
+                                                      ]))))
+                                        ]));
+                              }))
+                    ]))));
   }
 
   @override

@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import '../../class/admin/absen/visit.dart';
+import '../../class/admin/absen/kunjungan.dart';
 import '../../main.dart';
 import 'detailvisit.dart';
 

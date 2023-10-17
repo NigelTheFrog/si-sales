@@ -24,7 +24,7 @@ class DaftarKehadiran extends StatefulWidget {
 
 class _DaftarKehadiranState extends State<DaftarKehadiran>
     with WidgetsBindingObserver {
-  String _txtcari = "";
+  String _txtcari = "", id_grup = "";
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
   // Timer? timer;
@@ -34,9 +34,10 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
         Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
         body: {
           'username': username,
-          'idjabatan': id_jabatan,
+          'id_jabatan': id_jabatan,
           'startdate': startdate,
           'enddate': enddate,
+          'id_grup': id_grup,
           'cari': _txtcari,
           'type': widget.type.toString()
         });
@@ -52,6 +53,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
     setState(() {
       username = prefs.getString("username") ?? '';
       id_jabatan = prefs.getString("idJabatan") ?? '';
+      id_grup = prefs.getString("idGrup") ?? '';
     });
   }
 
@@ -120,7 +122,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                       DataColumn(label: tableContent(true, "Tanggal")),
                       DataColumn(label: tableContent(true, "Waktu")),
                       DataColumn(label: tableContent(true, "Status")),
-                      DataColumn(label: tableContent(true, "ID Lokasi")),
+                      // DataColumn(label: tableContent(true, "ID Lokasi")),
                       DataColumn(label: tableContent(true, "Bukti")),
                     ],
                     rows: List<DataRow>.generate(
@@ -153,8 +155,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                         ? "Status: Absen"
                                         : "Status: Sudah Check-Out",
                                   )),
-                                  DataCell(tableContent(
-                                      false, absen2[index].id_lokasi)),
+                                  // DataCell(tableContent(
+                                  //     false, absen2[index].id_lokasi)),
                                   DataCell(Align(
                                       alignment: Alignment.center,
                                       child: IconButton(

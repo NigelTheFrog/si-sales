@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:pt_coronet_crown/class/admin/absen/visit.dart';
+import 'package:pt_coronet_crown/class/admin/absen/kunjungan.dart';
 import 'package:pt_coronet_crown/customicon/add_image_icons.dart';
 import 'package:pt_coronet_crown/customicon/add_penjualan_icons.dart';
 import 'package:http/http.dart' as http;

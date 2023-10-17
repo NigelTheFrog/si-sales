@@ -25,8 +25,6 @@ class _DaftarPersetujuanState extends State<DaftarPersetujuan> {
   TextEditingController dateController = TextEditingController();
 
   Future<String> fetchData() async {
-    print(id_grup);
-    print(id_jabatan);
     final response = await http.post(
         Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
         body: {
