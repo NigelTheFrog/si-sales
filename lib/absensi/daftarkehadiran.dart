@@ -11,8 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-String username = "", id_jabatan = "", startdate = "", enddate = "";
-
 class DaftarKehadiran extends StatefulWidget {
   int type;
   DaftarKehadiran({super.key, required this.type});
@@ -24,7 +22,12 @@ class DaftarKehadiran extends StatefulWidget {
 
 class _DaftarKehadiranState extends State<DaftarKehadiran>
     with WidgetsBindingObserver {
-  String _txtcari = "", id_grup = "";
+  String _txtcari = "",
+      id_grup = "",
+      username = "",
+      id_jabatan = "",
+      startdate = "",
+      enddate = "";
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
   // Timer? timer;
