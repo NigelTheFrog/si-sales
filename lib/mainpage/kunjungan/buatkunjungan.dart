@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:pt_coronet_crown/customicon/add_image_icons.dart';
 import 'package:pt_coronet_crown/customicon/add_penjualan_icons.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +25,7 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
       username = "",
       date = "",
       deskripsi = "";
+  double lintang = 0, bujur = 0;
   int id = Random().nextInt(10);
 
   @override
@@ -32,6 +34,15 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
     super.initState();
     _loadData();
     date = DateTime.now().toString().substring(0, 10);
+    Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best,
+            forceAndroidLocationManager: true)
+        .then((Position position) {
+      setState(() {
+        lintang = position.latitude;
+        bujur = position.longitude;
+      });
+    });
   }
 
   _loadData() async {
@@ -151,8 +162,12 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                         Map json;
                         var response = await http.post(
                             Uri.parse(
-                                "http://192.168.137.1/magang/outlet/daftaroutlet.php"),
-                            body: {'cari': text});
+                                "https://otccoronet.com/otc/outlet/daftaroutlet.php"),
+                            body: {
+                              'cari': text,
+                              'lintang': lintang.toString(),
+                              'bujur': bujur.toString()
+                            });
 
                         if (response.statusCode == 200) {
                           json = jsonDecode(response.body);
@@ -177,7 +192,6 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                       keyboardType: TextInputType.multiline,
                       minLines: 1,
                       maxLines: 5,
-                      
                       style: TextStyle(
                         fontSize:
                             MediaQuery.of(context).size.width >= 720 ? 14 : 12,

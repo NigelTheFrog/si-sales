@@ -39,16 +39,17 @@ class _HomeState extends State<Home> {
   Future<String> fetchData(type) async {
     final response = await http.post(
         Uri.parse(
-            "https://otccoronet.com/otc/account/kunjungan/daftarkunjungan.php"),
+            "https://otccoronet.com/otc/account/kunjungan/jumlahkunjungan.php"),
         body: {
           'username': username,
           'id_jabatan': id_jabatan,
           'id_grup': id_grup,
           'id_provinsi': id_provinsi,
           'id_area': id_area,
-          'type': type
+          'type': type.toString()
         });
     if (response.statusCode == 200) {
+      print(response.body);
       return response.body;
     } else {
       throw Exception('Failed to read API');
@@ -77,75 +78,6 @@ class _HomeState extends State<Home> {
   //   }
   // }
 
-  // Widget logChart(data) {
-  //   List<Kunjungan> visit2 = [];
-  //   Map json = jsonDecode(data);
-  //   if (json['result'] == "error") {
-  //     return Align(
-  //       alignment: Alignment.center,
-  //       child: Text("Tidak ada data tersedia"),
-  //     );
-  //   } else {
-  //     for (var vis in json['data']) {
-  //       Kunjungan visit = Kunjungan.fromJson(vis);
-  //       visit2.add(visit);
-  //     }
-  //     return SingleChildScrollView(
-  //       child: SfCartesianChart(
-  //         primaryXAxis: CategoryAxis(),
-  //         series: <CartesianSeries>[
-  //           ColumnSeries<Kunjungan, String>(
-  //               dataSource: visit2,
-  //               xValueMapper: (Kunjungan data, _) => data.tanggal,
-  //               yValueMapper: (Kunjungan data, _) => data.jumlah,
-  //               dataLabelSettings: DataLabelSettings(isVisible: true),
-  //               // Map color for each data points from the data source
-  //               pointColorMapper: (Kunjungan data, _) {
-  //                 // if (widget.nama_sensor == "Sensor Cahaya") {
-  //                 //   if (data.average! > 900 || data.average! < 100) {
-  //                 //     return Colors.red;
-  //                 //   } else if (data.average! <= 900 && data.average! >= 400 ||
-  //                 //       data.average! >= 100 && data.average! <= 200) {
-  //                 //     return Colors.yellow;
-  //                 //   } else {
-  //                 //     return Colors.lightGreen;
-  //                 //   }
-  //                 // } else if (widget.nama_sensor == "Sensor Suhu") {
-  //                 //   if (data.average! > 27 || data.average! < 18) {
-  //                 //     return Colors.red;
-  //                 //   } else if (data.average! >= 18 && data.average! <= 20 ||
-  //                 //       data.average! >= 25 && data.average! <= 27) {
-  //                 //     return Colors.yellow;
-  //                 //   } else {
-  //                 //     return Colors.lightGreen;
-  //                 //   }
-  //                 // } else if ((widget.nama_sensor ==
-  //                 //     "Sensor Kelembaban Tanah")) {
-  //                 //   if (data.average! > 750 || data.average! < 250) {
-  //                 //     return Colors.red;
-  //                 //   } else if (data.average! >= 250 && data.average! <= 400 ||
-  //                 //       data.average! >= 600 && data.average! <= 750) {
-  //                 //     return Colors.yellow;
-  //                 //   } else {
-  //                 //     return Colors.lightGreen;
-  //                 //   }
-  //                 // } else {
-  //                 //   if (data.average! < 5.5 || data.average! > 8) {
-  //                 //     return Colors.red;
-  //                 //   } else if (data.average! >= 5.5 && data.average! <= 6.5 ||
-  //                 //       data.average! >= 7 && data.average! <= 8) {
-  //                 //     return Colors.yellow;
-  //                 //   } else {
-  //                 //     return Colors.lightGreen;
-  //                 //   }
-  //                 // }
-  //               })
-  //         ],
-  //       ),
-  //     );
-  //   }
-  // }
-
   Widget buildVisitChart(data) {
     List<HomePage> homepage2 = [];
     Map json = jsonDecode(data);
@@ -157,76 +89,20 @@ class _HomeState extends State<Home> {
         homepage2.add(homepage);
       }
 
-      return SizedBox(
-          // width: MediaQuery.of(context).size.width * 0.45,
-          height: 375,
-          child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: homepage2.length,
-              itemBuilder: (BuildContext ctxt, int index) {
-                return Container(
-                    padding: EdgeInsets.only(top: 5),
-                    child: SfCartesianChart(
-                        primaryXAxis: CategoryAxis(),
-                        series: <CartesianSeries>[
-                          ColumnSeries<HomePage, String>(
-                            dataSource: homepage2,
-                            xValueMapper: (HomePage data, _) =>
-                                data.tanggalKunjungan,
-                            yValueMapper: (HomePage data, _) =>
-                                data.jumlahKehadiran,
-                            dataLabelSettings:
-                                DataLabelSettings(isVisible: true),
-                            // Map color for each data points from the data source
-                            // pointColorMapper: (Log data, _) {
-                            //   if (widget.nama_sensor == "Sensor Cahaya") {
-                            //     if (data.average! > 900 || data.average! < 100) {
-                            //       return Colors.red;
-                            //     } else if (data.average! <= 900 &&
-                            //             data.average! >= 400 ||
-                            //         data.average! >= 100 &&
-                            //             data.average! <= 200) {
-                            //       return Colors.yellow;
-                            //     } else {
-                            //       return Colors.lightGreen;
-                            //     }
-                            //   } else if (widget.nama_sensor == "Sensor Suhu") {
-                            //     if (data.average! > 27 || data.average! < 18) {
-                            //       return Colors.red;
-                            //     } else if (data.average! >= 18 &&
-                            //             data.average! <= 20 ||
-                            //         data.average! >= 25 && data.average! <= 27) {
-                            //       return Colors.yellow;
-                            //     } else {
-                            //       return Colors.lightGreen;
-                            //     }
-                            //   } else if ((widget.nama_sensor ==
-                            //       "Sensor Kelembaban Tanah")) {
-                            //     if (data.average! > 750 || data.average! < 250) {
-                            //       return Colors.red;
-                            //     } else if (data.average! >= 250 &&
-                            //             data.average! <= 400 ||
-                            //         data.average! >= 600 &&
-                            //             data.average! <= 750) {
-                            //       return Colors.yellow;
-                            //     } else {
-                            //       return Colors.lightGreen;
-                            //     }
-                            //   } else {
-                            //     if (data.average! < 5.5 || data.average! > 8) {
-                            //       return Colors.red;
-                            //     } else if (data.average! >= 5.5 &&
-                            //             data.average! <= 6.5 ||
-                            //         data.average! >= 7 && data.average! <= 8) {
-                            //       return Colors.yellow;
-                            //     } else {
-                            //       return Colors.lightGreen;
-                            //     }
-                            //   }
-                            // }
-                          )
-                        ]));
-              }));
+      // return SizedBox(
+      //     // width: MediaQuery.of(context).size.width * 0.45,
+      //     // height: 500,
+      //     child:
+      return SfCartesianChart(
+          primaryXAxis: CategoryAxis(),
+          series: <CartesianSeries>[
+            ColumnSeries<HomePage, String>(
+                dataSource: homepage2,
+                xValueMapper: (HomePage data, _) => data.tanggalKunjungan,
+                yValueMapper: (HomePage data, _) => data.jumlahKunjungan,
+                dataLabelSettings: DataLabelSettings(isVisible: true),
+                pointColorMapper: (HomePage data, _) => Colors.green)
+          ]);
     }
   }
 
@@ -295,6 +171,53 @@ class _HomeState extends State<Home> {
     // getDeviceInfor();
   }
 
+  Widget buildCardChart(type, cardType, title) {
+    return Container(
+        padding: MediaQuery.of(context).size.width >= 720
+            ? cardType == 0
+                ? EdgeInsets.only(left: 10)
+                : EdgeInsets.only(right: 10)
+            : EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        width: MediaQuery.of(context).size.width >= 1050
+            ? MediaQuery.of(context).size.width * 0.405
+            : MediaQuery.of(context).size.width >= 720 &&
+                    MediaQuery.of(context).size.width < 1050
+                ? MediaQuery.of(context).size.width * 0.495
+                : MediaQuery.of(context).size.width,
+        height: 400,
+        child: Card(
+          elevation: 5,
+          child: Container(
+              padding: EdgeInsets.all(15),
+              alignment: Alignment.topLeft,
+              child:
+                  Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Container(
+                    alignment: Alignment.topLeft,
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.red[300]),
+                    )),
+                FutureBuilder(
+                    future: fetchData(type),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return buildVisitChart(snapshot.data.toString());
+                        // if (cardType == 0) {
+                        //   return buildVisitChart(snapshot.data.toString());
+                        // } else {
+                        //   return buildVisitChart(snapshot.data.toString());
+                        // }
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    })
+              ])),
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -304,66 +227,17 @@ class _HomeState extends State<Home> {
                 child: Column(children: [
               Padding(
                   padding: EdgeInsets.only(top: 10, bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                          padding: EdgeInsets.only(left: 10),
-                          width: MediaQuery.of(context).size.width * 0.405,
-                          height: 400,
-                          child: Card(
-                            elevation: 5,
-                            child: Container(
-                                padding: EdgeInsets.all(15),
-                                alignment: Alignment.topLeft,
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                          alignment: Alignment.topLeft,
-                                          padding: EdgeInsets.only(bottom: 10),
-                                          child: Text(
-                                            "Jumlah Kunjungan",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red[300]),
-                                          ))
-                                    ])),
-                          )),
-                      Container(
-                          padding: EdgeInsets.only(right: 10),
-                          width: MediaQuery.of(context).size.width * 0.405,
-                          height: 400,
-                          child: Card(
-                              elevation: 5,
-                              child: Container(
-                                  padding: EdgeInsets.all(15),
-                                  alignment: Alignment.topLeft,
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                            alignment: Alignment.topLeft,
-                                            padding:
-                                                EdgeInsets.only(bottom: 10),
-                                            child: Text(
-                                              "Jumlah Transaksi",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.red[300]),
-                                            ))
-                                      ]))))
-                    ],
-                  )),
-              // Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              //   Card(
-              //     elevation: 5,
-              //     child: Container(
-              //         width: MediaQuery.of(context).size.width * 0.45),
-              //   ),
-
-              // ]),
+                  child: MediaQuery.of(context).size.width >= 720
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                              buildCardChart(1, 0, "Jumlah Kunjungan"),
+                              buildCardChart(1, 1, "Jumlah Transaksi")
+                            ])
+                      : Column(children: [
+                          buildCardChart(1, 0, "Jumlah Kunjungan"),
+                          buildCardChart(1, 1, "Jumlah Transaksi")
+                        ])),
               Container(
                   padding: EdgeInsets.only(right: 10, left: 10),
                   width: MediaQuery.of(context).size.width,

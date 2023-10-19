@@ -4,7 +4,10 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:pt_coronet_crown/mainpage/kunjungan/buatkunjungan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -382,6 +385,46 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
     }
   }
 
+  showDialogPermission(content) {
+    return showDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(title: Text("Peringatan"), content: Text(content)));
+  }
+
+  void permission() async {
+    LocationPermission permission;
+    if (kIsWeb) {
+      showDialogPermission(
+          "Fitur absensi tidak tersedia pada versi website atau desktop. \nSilahkan akses dari aplikasi ponsel anda");
+    } else {
+      if (await Permission.camera.status.isDenied) {
+        Permission.camera.request();
+      } else if (await Permission.camera.status.isPermanentlyDenied) {
+        showDialogPermission("Anda belum mengizinkan penggunaan kamera");
+        openAppSettings();
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        showDialogPermission(
+            "Anda belum aktivasi lokasi pada perangkat mobile");
+      }
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          showDialogPermission(
+              "Harap izinkan aplikasi dalam mengakses aplikasi");
+        }
+      } else if (permission == LocationPermission.deniedForever) {
+        showDialogPermission(
+            "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
+      } else {
+        Navigator.popAndPushNamed(context, "/kunjunganmasuk");
+      }
+    }
+  }
+
   Widget buttonKunjunganSaya(BuildContext context) {
     return SizedBox(
         height: 50,
@@ -584,8 +627,7 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
         floatingActionButton: Tooltip(
             message: "Lakukan Kunjungan",
             child: FloatingActionButton(
-              onPressed: () =>
-                  Navigator.popAndPushNamed(context, "/kunjunganmasuk"),
+              onPressed: () => permission(),
               child: Icon(Icons.add, color: Colors.white),
             )),
         body: buildContainer(context));
