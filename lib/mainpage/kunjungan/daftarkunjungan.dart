@@ -14,7 +14,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import '../../class/admin/absen/kunjungan.dart';
 import '../../main.dart';
-import 'detailvisit.dart';
+import 'detailkunjungan.dart';
 
 String username = "", id_jabatan = "", startdate = "", enddate = "";
 
@@ -176,6 +176,13 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                                                                   visit2[index]
                                                                       .id,
                                                               type: 0,
+                                                              username: visit2[
+                                                                      index]
+                                                                  .username
+                                                                  .toString(),
+                                                              status:
+                                                                  visit2[index]
+                                                                      .status,
                                                             )))))),
                                   )),
                                   DataCell(tableContent(
@@ -266,6 +273,13 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                                                                   visit2[index]
                                                                       .id,
                                                               type: 0,
+                                                              status:
+                                                                  visit2[index]
+                                                                      .status,
+                                                              username: visit2[
+                                                                      index]
+                                                                  .username
+                                                                  .toString(),
                                                             )))))),
                                   )),
                                   DataCell(tableContent(
@@ -304,6 +318,9 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                                 builder: (context) => DetailVisit(
                                       type: 0,
                                       id_visit: visit2[index].id,
+                                      username:
+                                          visit2[index].username.toString(),
+                                      status: visit2[index].status,
                                     )));
                       },
                       child: Card(

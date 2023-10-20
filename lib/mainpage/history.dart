@@ -10,7 +10,7 @@ import 'package:pt_coronet_crown/customicon/clippy_icons.dart';
 import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
 import 'package:pt_coronet_crown/laporan/pembelian/detailpembelian.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/detailpenjualan.dart';
-import 'package:pt_coronet_crown/mainpage/kunjungan/detailvisit.dart';
+import 'package:pt_coronet_crown/mainpage/kunjungan/detailkunjungan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
@@ -88,13 +88,13 @@ class _HistoryState extends State<History> {
                       children: <Widget>[
                         GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => DetailVisit(
-                                            type: 0,
-                                            id_visit: visit2[index].id,
-                                          )));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => DetailVisit(
+                              //               type: 0,
+                              //               id_visit: visit2[index].id,
+                              //             )));
                             },
                             child: Card(
                                 elevation: 2,
@@ -188,8 +188,6 @@ class _HistoryState extends State<History> {
           });
     }
   }
-
-  
 
   Widget buildHistoryPembelian() {
     return Container(

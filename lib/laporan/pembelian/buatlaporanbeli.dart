@@ -122,7 +122,7 @@ class _BuatPembelianState extends State<BuatPembelian> {
       _ppn = "",
       _diskon = "",
       id_cabang = "";
-  var _foto = null, _foto_proses = null;
+  var _foto, _foto_proses;
   List _supplier = [];
 
   List<dynamicWidgetBeli> dynamicList = [];

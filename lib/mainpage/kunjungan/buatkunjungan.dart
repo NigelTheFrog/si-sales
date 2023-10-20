@@ -7,7 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:pt_coronet_crown/customicon/add_image_icons.dart';
 import 'package:pt_coronet_crown/customicon/add_penjualan_icons.dart';
 import 'package:http/http.dart' as http;
-import 'package:pt_coronet_crown/mainpage/kunjungan/detailvisit.dart';
+import 'package:pt_coronet_crown/mainpage/kunjungan/detailkunjungan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BuatKunjungan extends StatefulWidget {
@@ -26,7 +26,6 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
       date = "",
       deskripsi = "";
   double lintang = 0, bujur = 0;
-  int id = Random().nextInt(10);
 
   @override
   void initState() {
@@ -54,9 +53,10 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
 
   void submit(BuildContext context) async {
     final response = await http.post(
-        Uri.parse("http://192.168.137.1/magang/absensi/visit/visit_in.php"),
+        Uri.parse(
+            "https://otccoronet.com/otc/account/kunjungan/buatkunjungan.php"),
         body: {
-          'id': "$id/$_id_outlet/$username/$date",
+          'id': "$_id_outlet/$username/$date",
           'tanggal': date,
           'deskripsi': deskripsi,
           'id_outlet': _id_outlet,
@@ -73,7 +73,9 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
             MaterialPageRoute(
                 builder: (context) => DetailVisit(
                       type: 1,
-                      id_visit: "$id-$_id_outlet-$username-$date",
+                      id_visit: "$_id_outlet/$username/$date",
+                      username: username,
+                      status: 0,
                     )));
       }
     } else {
@@ -139,53 +141,96 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                             "https://otccoronet.com/otc/asset/maps.jpeg")),
                   ),
                   Container(
-                    padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-                    alignment: Alignment.center,
-                    child: DropdownSearch<dynamic>(
-                      dropdownSearchDecoration: InputDecoration(
-                        hintText: "Daftar Outlet",
-                        hintStyle: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width >= 720
-                              ? 14
-                              : 12,
-                        ),
-                        labelText: "Nama Outlet",
-                        labelStyle: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width >= 720
-                              ? 14
-                              : 12,
-                        ),
-                      ),
-                      mode: Mode.MENU,
-                      showSearchBox: true,
-                      onFind: (text) async {
-                        Map json;
-                        var response = await http.post(
-                            Uri.parse(
-                                "https://otccoronet.com/otc/outlet/daftaroutlet.php"),
-                            body: {
-                              'cari': text,
-                              'lintang': lintang.toString(),
-                              'bujur': bujur.toString()
-                            });
+                      padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+                      alignment: Alignment.center,
+                      child: DropdownSearch<dynamic>(
+                          dropdownSearchDecoration: InputDecoration(
+                            hintText: "Daftar Outlet",
+                            hintStyle: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width >= 720
+                                  ? 14
+                                  : 12,
+                            ),
+                            labelText: "Nama Outlet",
+                            labelStyle: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width >= 720
+                                  ? 14
+                                  : 12,
+                            ),
+                          ),
+                          mode: Mode.MENU,
+                          showSearchBox: false,
+                          emptyBuilder: (context, searchEntry) => Center(
+                                child: Text("Tidak ada data ditemukan"),
+                              ),
+                          onFind: (text) async {
+                            Map json;
+                            var response = await http.post(
+                                Uri.parse(
+                                    "https://otccoronet.com/otc/outlet/daftaroutlet.php"),
+                                body: {
+                                  'lintang': lintang.toString(),
+                                  'bujur': bujur.toString()
+                                });
 
-                        if (response.statusCode == 200) {
-                          json = jsonDecode(response.body);
-                          setState(() {
-                            _outlet = json['data'];
-                          });
-                        }
-                        return _outlet as List<dynamic>;
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                          controllerOutlet = value['nama_toko'];
-                          _id_outlet = value['id'];
-                        });
-                      },
-                      itemAsString: (item) => item['nama_toko'],
-                    ),
-                  ),
+                            if (response.statusCode == 200) {
+                              json = jsonDecode(response.body);
+                              _outlet = json['data'];
+                            }
+                            return _outlet as List<dynamic>;
+                          },
+                          onChanged: (value) {
+                            setState(() {
+                              controllerOutlet = value['nama_toko'];
+                              _id_outlet = value['id'];
+                            });
+                          },
+                          itemAsString: (item) => item['nama_toko'])
+                      //  DropdownSearch<dynamic>(
+                      //   dropdownSearchDecoration: InputDecoration(
+                      //     hintText: "Daftar Outlet",
+                      //     hintStyle: TextStyle(
+                      //       fontSize: MediaQuery.of(context).size.width >= 720
+                      //           ? 14
+                      //           : 12,
+                      //     ),
+                      //     labelText: "Nama Outlet",
+                      //     labelStyle: TextStyle(
+                      //       fontSize: MediaQuery.of(context).size.width >= 720
+                      //           ? 14
+                      //           : 12,
+                      //     ),
+                      //   ),
+                      //   mode: Mode.MENU,
+                      //   showSearchBox: false,
+                      //   emptyBuilder: (context, searchEntry) => Center(
+                      //     child: Text("Tidak ada data ditemukan"),
+                      //   ),
+                      //   onFind: (text) async {
+                      //     Map json;
+                      //     var response = await http.post(
+                      //         Uri.parse(
+                      //             "https://otccoronet.com/otc/outlet/daftaroutlet.php"),
+                      //         body: {
+                      //           'lintang': lintang.toString(),
+                      //           'bujur': bujur.toString()
+                      //         });
+
+                      //     if (response.statusCode == 200) {
+                      //       json = jsonDecode(response.body);
+                      //       _outlet = json['data'];
+                      //     }
+                      //     return _outlet;
+                      //   },
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       controllerOutlet = value['nama_toko'];
+                      //       _id_outlet = value['id'];
+                      //     });
+                      //   },
+                      //   itemAsString: (item) => item['nama_toko'],
+                      // ),
+                      ),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: TextField(

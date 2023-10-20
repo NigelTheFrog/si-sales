@@ -8,7 +8,7 @@ import 'package:pt_coronet_crown/class/admin/absen/kunjungan.dart';
 import 'package:pt_coronet_crown/class/transaksi/penjualan.dart';
 import 'package:pt_coronet_crown/drawer.dart';
 import 'package:pt_coronet_crown/laporan/penjualan/detailpenjualan.dart';
-import 'package:pt_coronet_crown/mainpage/kunjungan/detailvisit.dart';
+import 'package:pt_coronet_crown/mainpage/kunjungan/detailkunjungan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';

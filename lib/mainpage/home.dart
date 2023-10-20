@@ -49,7 +49,6 @@ class _HomeState extends State<Home> {
           'type': type.toString()
         });
     if (response.statusCode == 200) {
-      print(response.body);
       return response.body;
     } else {
       throw Exception('Failed to read API');
