@@ -1,5 +1,5 @@
 class Absen {
-  final String id, tanggal, waktu, bukti, keterangan;
+  final String id, tanggal, waktu, keterangan;
   final String? nama_depan, nama_belakang, username, id_lokasi;
   final int status;
 
@@ -8,7 +8,6 @@ class Absen {
     required this.keterangan,
     required this.tanggal,
     required this.waktu,
-    required this.bukti,
     required this.status,
     this.id_lokasi,
     this.username,
@@ -22,7 +21,6 @@ class Absen {
       tanggal: json['tanggal'] as String,
       keterangan: json['keterangan'] as String,
       waktu: json['waktu'] as String,
-      bukti: json['bukti'] as String,
       id_lokasi: json['id_lokasi'] as String?,
       username: json['username'] as String?,
       nama_depan: json['nama_depan'] as String?,

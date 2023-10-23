@@ -4,13 +4,12 @@ import 'dart:io';
 
 //Kendala di hadir kemarin gaada sinyal. Karena tidak ada sinyal foto tidak bisa masuk
 import 'package:flutter/material.dart';
-import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
 import 'package:flutter/gestures.dart';
+import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
 import 'package:pt_coronet_crown/absensi/daftarkehadiran.dart';
 import 'package:pt_coronet_crown/absensi/daftarpersetujuan.dart';
 import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
-import 'package:pt_coronet_crown/admin/attendence/dailyvisit.dart';
 // import 'package:pt_coronet_crown/admin/company/daftarkota.dart';
 import 'package:pt_coronet_crown/admin/company/daftarprovinsi.dart';
 import 'package:pt_coronet_crown/admin/jabatan/daftarjabatan.dart';
@@ -174,12 +173,12 @@ class MyApp extends StatelessWidget {
 
         "/daftarproposal": (context) => DaftarProposal(),
         "/daftarevent": (context) => DaftarEvent(),
+        "/buatkehadiran": (context) => BuatKehadiran(),
         // "/daftarevent": (context) => DaftarEvent(),
 
         //harus dilakukan pengecekan id jabatan
         "/daftarpembelian": (context) => DaftarPembelian(),
         "/daftarpenjualan": (context) => DaftarPenjualan(),
-        "/daftarkunjungan": (context) => DailyVisit(),
         "/daftarpersonel": (context) => PersonelData(),
         "/daftargrup": (context) => PersonelGroup(),
         "tambahstaff": (context) => CreateAccount(),

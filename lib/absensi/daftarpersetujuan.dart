@@ -65,6 +65,38 @@ class _DaftarPersetujuanState extends State<DaftarPersetujuan> {
     }
   }
 
+  Future<String> fetchDataGambar(id_absen) async {
+    final response = await http.post(
+        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
+        body: {'id_absen': id_absen, "type": "4"});
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  showBukti(id_absen) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            content: SizedBox(
+                height: 500,
+                width: 500,
+                child: FutureBuilder(
+                    future: fetchDataGambar(id_absen),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData &&
+                          snapshot.connectionState == ConnectionState.done) {
+                        Map json = jsonDecode(snapshot.data.toString());
+                        return Image.memory(
+                            base64Decode(json['data'][0]['bukti']));
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    }))));
+  }
+
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -161,8 +193,8 @@ class _DaftarPersetujuanState extends State<DaftarPersetujuan> {
                                   alignment: Alignment.center,
                                   child: IconButton(
                                       icon: Icon(Icons.remove_red_eye),
-                                      onPressed: () => showBukti(
-                                          context, absen2[index].bukti)))),
+                                      onPressed: () =>
+                                          showBukti(absen2[index].id)))),
                               DataCell(Align(
                                   alignment: Alignment.center,
                                   child: id_jabatan == "1" || id_jabatan == "2"
@@ -270,8 +302,8 @@ class _DaftarPersetujuanState extends State<DaftarPersetujuan> {
                                 WidgetSpan(
                                     alignment: PlaceholderAlignment.middle,
                                     child: IconButton(
-                                        onPressed: () => showBukti(
-                                            context, absen2[index].bukti),
+                                        onPressed: () =>
+                                            showBukti(absen2[index].id),
                                         icon: Icon(
                                           Icons.remove_red_eye,
                                           size: 25,
@@ -287,16 +319,6 @@ class _DaftarPersetujuanState extends State<DaftarPersetujuan> {
             });
       }
     }
-  }
-
-  showBukti(BuildContext context, foto) {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-            content: SizedBox(
-                height: 500,
-                width: 500,
-                child: Image.memory(base64Decode(foto)))));
   }
 
   Widget kolomCari() {

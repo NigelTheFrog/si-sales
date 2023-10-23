@@ -60,6 +60,7 @@ class _DetailVisitState extends State<DetailVisit> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Sukses menyimpan data kunjungan')));
+        Navigator.popAndPushNamed(context, "/home");
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

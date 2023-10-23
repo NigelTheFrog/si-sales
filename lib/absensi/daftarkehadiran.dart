@@ -27,7 +27,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
       username = "",
       id_jabatan = "",
       startdate = "",
-      enddate = "";
+      enddate = "",
+      test = "";
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
   // Timer? timer;
@@ -51,6 +52,33 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
     }
   }
 
+  Future<String> fetchDataGambar(id_absen) async {
+    final response = await http.post(
+        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
+        body: {'id_absen': id_absen, "type": "4"});
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  void checkAbsen() async {
+    final response = await http.post(
+        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
+        body: {'username': username, "type": "3"});
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      if (json['result'] == 'success') {
+        Navigator.popAndPushNamed(context, "/buatkehadiran");
+      } else if (json['result'] == 'error') {
+        warningDialog(json['message']);
+      }
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -58,6 +86,21 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
       id_jabatan = prefs.getString("idJabatan") ?? '';
       id_grup = prefs.getString("idGrup") ?? '';
     });
+  }
+
+  warningDialog(message) {
+    return showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: const Text('Peringatan'),
+              content: Text(message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            ));
   }
 
   @override
@@ -92,6 +135,27 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
     } else {
       return TextSpan(text: content);
     }
+  }
+
+  showBukti(id_absen) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+            content: SizedBox(
+                height: 500,
+                width: 500,
+                child: FutureBuilder(
+                    future: fetchDataGambar(id_absen),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData &&
+                          snapshot.connectionState == ConnectionState.done) {
+                        Map json = jsonDecode(snapshot.data.toString());
+                        return Image.memory(
+                            base64Decode(json['data'][0]['bukti']));
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    }))));
   }
 
   Widget daftarKehadiran(data, context) {
@@ -164,8 +228,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                       alignment: Alignment.center,
                                       child: IconButton(
                                           icon: Icon(Icons.remove_red_eye),
-                                          onPressed: () => showBukti(
-                                              context, absen2[index].bukti)))),
+                                          onPressed: () =>
+                                              showBukti(absen2[index].id)))),
                                 ])))
                 : DataTable(
                     border: TableBorder(
@@ -214,8 +278,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                       alignment: Alignment.center,
                                       child: IconButton(
                                           icon: Icon(Icons.remove_red_eye),
-                                          onPressed: () => showBukti(
-                                              context, absen2[index].bukti)))),
+                                          onPressed: () =>
+                                              showBukti(absen2[index].id)))),
                                 ]))));
       } else {
         return ListView.builder(
@@ -281,8 +345,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                           alignment:
                                               PlaceholderAlignment.middle,
                                           child: IconButton(
-                                              onPressed: () => showBukti(
-                                                  context, absen2[index].bukti),
+                                              onPressed: () =>
+                                                  showBukti(absen2[index].id),
                                               icon: Icon(
                                                 Icons.remove_red_eye,
                                                 size: 25,
@@ -326,8 +390,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                           alignment:
                                               PlaceholderAlignment.middle,
                                           child: IconButton(
-                                              onPressed: () => showBukti(
-                                                  context, absen2[index].bukti),
+                                              onPressed: () =>
+                                                  showBukti(absen2[index].id),
                                               icon: Icon(
                                                 Icons.remove_red_eye,
                                                 size: 25,
@@ -341,16 +405,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
             });
       }
     }
-  }
-
-  showBukti(BuildContext context, foto) {
-    return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-            content: SizedBox(
-                height: 500,
-                width: 500,
-                child: Image.memory(base64Decode(foto)))));
   }
 
   Widget buttonKunjunganSaya(BuildContext context) {
@@ -576,19 +630,8 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
         showDialogPermission(
             "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
       } else {
-        Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.best,
-                forceAndroidLocationManager: true)
-            .then((Position position) {
-          setState(() {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => BuatKehadiran(
-                        lintang: position.latitude,
-                        bujur: position.longitude)));
-          });
-        });
+        checkAbsen();
+
         // Navigator.push(
         //     context, MaterialPageRoute(builder: (context) => BuatKehadiran(lintang: Geolocator.,)));
       }

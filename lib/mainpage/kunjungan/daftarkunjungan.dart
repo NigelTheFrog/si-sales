@@ -53,6 +53,37 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
     }
   }
 
+  void checkKunjungan() async {
+    final response = await http.post(
+        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
+        body: {'username': username, "type": "3"});
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      if (json['result'] == 'success') {
+        Navigator.popAndPushNamed(context, "/buatkehadiran");
+      } else if (json['result'] == 'error') {
+        warningDialog(json['message']);
+      }
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  warningDialog(message) {
+    return showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: const Text('Peringatan'),
+              content: Text(message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'),
+                ),
+              ],
+            ));
+  }
+
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {

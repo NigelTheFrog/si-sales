@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_face_api/face_api.dart' as Regula;
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:pt_coronet_crown/main.dart';
 import 'package:http/http.dart' as http;
 
 class BuatKehadiran extends StatefulWidget {
-  num lintang, bujur;
-  BuatKehadiran({super.key, required this.lintang, required this.bujur});
+  BuatKehadiran({super.key});
   @override
   _BuatKehadiranState createState() => _BuatKehadiranState();
 }
@@ -22,6 +22,7 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
   bool processing = false;
   bool match = false;
   bool match_process = false;
+
   TextEditingController controllerTanggal = TextEditingController(),
       controllerJam = TextEditingController(),
       controllerKeterangan = TextEditingController();
@@ -39,17 +40,23 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
   }
 
   void submit(BuildContext context) async {
+    double lintang = 0, bujur = 0;
+    Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best,
+            forceAndroidLocationManager: true)
+        .then((Position position) {
+      setState(() {
+        lintang = position.latitude;
+        bujur = position.longitude;
+      });
+    });
     final response = await http.post(
         Uri.parse(
             "https://otccoronet.com/otc/account/absensi/buatkehadiran.php"),
         body: {
-          'id': "$tanggal/$username",
-          'nama': nama,
-          'tanggal': tanggal,
-          'jam': "",
           'bukti': img1,
-          'lintang': widget.lintang.toString(),
-          'bujur': widget.bujur.toString(),
+          'lintang': lintang.toString(),
+          'bujur': bujur.toString(),
           'id_jabatan': idjabatan,
           'keterangan': keterangan == 0
               ? 'Menetap di kantor'
@@ -64,21 +71,10 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
       if (json['result'] == 'success') {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Laporan telah diajukan')));
-        Navigator.popAndPushNamed(context, "/daftarproposal");
-      }
-      // else if (json['Error'] ==
-      //     "Got a packet bigger than 'max_allowed_packet' bytes") {
-      //   setState(() {
-      //     warningDialog(context, "Ukuran gambar terlalu besar");
-      //   });
-      // } else {
-      //   setState(() {
-      //     warningDialog(context,
-      //         "${json['Error']}\nSilahkan contact leader anda untuk menambahkan jumlah stock pada sistem");
-      //   });
-
-      // }
+            .showSnackBar(SnackBar(content: Text('Kehadiran telah diajukan')));
+        Navigator.popAndPushNamed(context, "/home");
+      } 
+      
     } else {
       throw Exception('Failed to read API');
     }
