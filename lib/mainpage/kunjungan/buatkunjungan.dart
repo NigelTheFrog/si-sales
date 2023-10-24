@@ -159,7 +159,7 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                             ),
                           ),
                           mode: Mode.MENU,
-                          showSearchBox: false,
+                          showSearchBox: true,
                           emptyBuilder: (context, searchEntry) => Center(
                                 child: Text("Tidak ada data ditemukan"),
                               ),
@@ -176,6 +176,10 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                             if (response.statusCode == 200) {
                               json = jsonDecode(response.body);
                               _outlet = json['data'];
+                              // if(json["result"] == "error")
+                              // _outlet = json['message'];
+                              // else
+                              // _outlet = json['data'];
                             }
                             return _outlet as List<dynamic>;
                           },
@@ -185,52 +189,7 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
                               _id_outlet = value['id'];
                             });
                           },
-                          itemAsString: (item) => item['nama_toko'])
-                      //  DropdownSearch<dynamic>(
-                      //   dropdownSearchDecoration: InputDecoration(
-                      //     hintText: "Daftar Outlet",
-                      //     hintStyle: TextStyle(
-                      //       fontSize: MediaQuery.of(context).size.width >= 720
-                      //           ? 14
-                      //           : 12,
-                      //     ),
-                      //     labelText: "Nama Outlet",
-                      //     labelStyle: TextStyle(
-                      //       fontSize: MediaQuery.of(context).size.width >= 720
-                      //           ? 14
-                      //           : 12,
-                      //     ),
-                      //   ),
-                      //   mode: Mode.MENU,
-                      //   showSearchBox: false,
-                      //   emptyBuilder: (context, searchEntry) => Center(
-                      //     child: Text("Tidak ada data ditemukan"),
-                      //   ),
-                      //   onFind: (text) async {
-                      //     Map json;
-                      //     var response = await http.post(
-                      //         Uri.parse(
-                      //             "https://otccoronet.com/otc/outlet/daftaroutlet.php"),
-                      //         body: {
-                      //           'lintang': lintang.toString(),
-                      //           'bujur': bujur.toString()
-                      //         });
-
-                      //     if (response.statusCode == 200) {
-                      //       json = jsonDecode(response.body);
-                      //       _outlet = json['data'];
-                      //     }
-                      //     return _outlet;
-                      //   },
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       controllerOutlet = value['nama_toko'];
-                      //       _id_outlet = value['id'];
-                      //     });
-                      //   },
-                      //   itemAsString: (item) => item['nama_toko'],
-                      // ),
-                      ),
+                          itemAsString: (item) => item['nama_toko'])),
                   Container(
                     padding: EdgeInsets.all(10),
                     child: TextField(

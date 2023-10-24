@@ -63,7 +63,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
     }
   }
 
-  void checkAbsen() async {
+  Future<void> checkAbsen() async {
     final response = await http.post(
         Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
         body: {'username': username, "type": "3"});

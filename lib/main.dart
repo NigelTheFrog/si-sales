@@ -171,7 +171,6 @@ class MyApp extends StatelessWidget {
         "/homepage": (context) => MyApp(),
         "/kunjunganmasuk": (contex) => BuatKunjungan(),
 
-        "/daftarproposal": (context) => DaftarProposal(),
         "/daftarevent": (context) => DaftarEvent(),
         "/buatkehadiran": (context) => BuatKehadiran(),
         // "/daftarevent": (context) => DaftarEvent(),
@@ -214,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
     DaftarPembelian(),
     DaftarPenjualan(),
-    DaftarProposal(),
+    DaftarProposal(type: idjabatan == "3" ? 0 : 1),
     DaftarEvent(),
     DaftarProvinsi()
   ];

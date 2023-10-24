@@ -31,27 +31,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  percent_indicator: ^4.2.2
-  shared_preferences: ^2.0.15
-  http: 0.13.5
-  numberpicker: ^2.1.1
-  image_picker: ^0.8.6
-  image: ^3.2.2
-  path_provider: ^2.0.11
-  file_picker: ^5.2.5
-  dropdown_search: ^3.0.0
-  syncfusion_flutter_pdf: ^20.3.49
-  universal_html: ^2.2.1
-  device_info_plus: ^5.0.0
-  measure_size: ^4.0.0
-  provider: ^5.0.0
+  percent_indicator: 
+  shared_preferences: 
+  http: 
+  numberpicker: 
+  image_picker: 
+  image: 
+  path_provider: 
+  file_picker:
+  dropdown_search:
+  syncfusion_flutter_pdf: 
+  universal_html: 
+  device_info_plus: 
+  measure_size: 
+  provider: 
   syncfusion_flutter_charts: 
   geolocator:
   camera: 
   permission_handler: 
   dynamic_height_grid_view: 
   flutter_svg: 
-  flutter_face_api: ^4.1.1
+  flutter_face_api: 
   
 
   # The following adds the Cupertino Icons font to your application.

@@ -32,7 +32,6 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
   TextEditingController _startDateController = TextEditingController();
   TextEditingController _endDateController = TextEditingController();
   // Timer? timer;
-  int type = 0;
 
   Future<String> fetchData() async {
     final response = await http.post(
@@ -44,7 +43,7 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
           'startdate': startdate,
           'enddate': enddate,
           'cari': _txtcari,
-          'type': type.toString()
+          'type': widget.type.toString()
         });
     if (response.statusCode == 200) {
       return response.body;
@@ -55,12 +54,13 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
 
   void checkKunjungan() async {
     final response = await http.post(
-        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
+        Uri.parse(
+            "https://otccoronet.com/otc/account/kunjungan/daftarkunjungan.php"),
         body: {'username': username, "type": "3"});
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
-        Navigator.popAndPushNamed(context, "/buatkehadiran");
+        Navigator.popAndPushNamed(context, "/kunjunganmasuk");
       } else if (json['result'] == 'error') {
         warningDialog(json['message']);
       }
@@ -104,7 +104,6 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
     enddate = DateTime.now().toString().substring(0, 10);
     _endDateController.text =
         DateFormat.yMMMMEEEEd('id').format(DateTime.now());
-    type = widget.type;
     // initTimer();
   }
 
@@ -139,7 +138,7 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
       if (MediaQuery.of(context).size.width >= 740) {
         return Padding(
             padding: EdgeInsets.only(left: 5, right: 5),
-            child: type == 1
+            child: widget.type == 1
                 ? DataTable(
                     border: TableBorder(
                         verticalInside: BorderSide(
@@ -189,8 +188,7 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                                                   if (states.contains(
                                                       MaterialState.hovered))
                                                     return Colors.blue.shade400;
-                                                  return Colors.blue
-                                                      .shade600; // null throus error in flutter 2.2+.
+                                                  return Colors.blue.shade600;
                                                 })),
                                                 child: Text(visit2[index].id,
                                                     textAlign: TextAlign.center,
@@ -412,20 +410,7 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                                             style: TextStyle(
                                                 fontSize: 11,
                                                 color: Colors.grey))
-                                      ]))
-                                  // title: Text(
-                                  //   "Nama toko: ${visit2[index].nama_toko}",
-                                  //   style: TextStyle(fontSize: 11),
-                                  // ),
-                                  // subtitle: Row(children: [
-                                  //   Text(
-                                  //       visit2[index].status == 0
-                                  //           ? "Status: Belum Check-Out"
-                                  //           : "Status: Sudah Check-Out",
-                                  //       style: TextStyle(fontSize: 11)),
-
-                                  // ])
-                                  ))))
+                                      ]))))))
                 ],
               ));
             });
@@ -468,7 +453,7 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
         showDialogPermission(
             "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
       } else {
-        Navigator.popAndPushNamed(context, "/kunjunganmasuk");
+        checkKunjungan();
       }
     }
   }
@@ -482,15 +467,15 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                 backgroundColor: Color.fromARGB(255, 248, 172, 49)),
             onPressed: () {
               setState(() {
-                if (type == 1)
-                  type = 0;
+                if (widget.type == 1)
+                  widget.type = 0;
                 else
-                  type = 1;
+                  widget.type = 1;
                 build(context);
               });
             },
             child: Text(
-              type == 0 ? "Keseluruhan \nKunjungan" : "Kunjungan Saya",
+              widget.type == 0 ? "Keseluruhan \nKunjungan" : "Kunjungan Saya",
               style: TextStyle(color: Colors.black, fontSize: 16),
               textAlign: TextAlign.center,
             )));
@@ -629,7 +614,7 @@ class _DaftarKunjunganState extends State<DaftarKunjungan> {
                   padding: EdgeInsets.all(10),
                   alignment: Alignment.topCenter,
                   width: 700,
-                  child: idjabatan != MediaQuery.of(context).size.width >= 650
+                  child: MediaQuery.of(context).size.width >= 650
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

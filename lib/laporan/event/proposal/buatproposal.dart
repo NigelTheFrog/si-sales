@@ -1176,7 +1176,7 @@ class _BuatProposalState extends State<BuatProposal> {
           title: Text("Buat Proposal Event"),
           leading: BackButton(
             onPressed: () {
-              Navigator.popAndPushNamed(context, "/daftarproposal");
+              Navigator.popAndPushNamed(context, "/homepage");
             },
           ),
         ),

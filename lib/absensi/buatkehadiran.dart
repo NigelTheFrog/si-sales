@@ -39,6 +39,13 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    Navigator.popAndPushNamed(context, "/homepage");
+  }
+
   void submit(BuildContext context) async {
     double lintang = 0, bujur = 0;
     Geolocator.getCurrentPosition(
@@ -72,9 +79,8 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Kehadiran telah diajukan')));
-        Navigator.popAndPushNamed(context, "/home");
-      } 
-      
+        dispose();
+      }
     } else {
       throw Exception('Failed to read API');
     }
@@ -158,7 +164,7 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
           style: TextStyle(color: Colors.white),
         ),
         leading: BackButton(
-          onPressed: () => Navigator.pop(context, true),
+          onPressed: () => dispose(),
           color: Colors.white,
         ),
       ),
