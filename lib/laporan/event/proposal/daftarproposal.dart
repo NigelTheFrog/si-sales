@@ -308,7 +308,7 @@ class _DaftarProposalState extends State<DaftarProposal> {
     );
   }
 
-  Widget buttonKunjunganSaya(BuildContext context) {
+  Widget buttonProposalSaya(BuildContext context) {
     return SizedBox(
         height: 50,
         width: 130,
@@ -326,7 +326,7 @@ class _DaftarProposalState extends State<DaftarProposal> {
               });
             },
             child: Text(
-              widget.type == 0 ? "Keseluruhan \nKunjungan" : "Kunjungan Saya",
+              widget.type == 0 ? "Keseluruhan \nProposal" : "Proposal Saya",
               style: const TextStyle(color: Colors.black, fontSize: 16),
               textAlign: TextAlign.center,
             )));
@@ -423,13 +423,13 @@ class _DaftarProposalState extends State<DaftarProposal> {
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                                buttonKunjunganSaya(context),
+                                buttonProposalSaya(context),
                                 kolomCari()
                               ])
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              buttonKunjunganSaya(context),
+                              buttonProposalSaya(context),
                               kolomCari()
                             ],
                           )

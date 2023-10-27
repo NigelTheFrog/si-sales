@@ -9,6 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:pt_coronet_crown/class/transaksi/eventherocyn.dart';
 import 'package:measure_size/measure_size.dart';
+import 'package:pt_coronet_crown/customicon/event_chart_icons.dart';
+import 'package:pt_coronet_crown/customicon/produk_icons.dart';
 
 List existedPersonil = [],
     existedGimmick = [],
@@ -21,9 +23,11 @@ class dynamicWidgetPersonil extends StatelessWidget {
 
   String username = "";
   List pengguna = [];
-  Widget comboPersonil() {
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
-      width: 480,
+      width: 380,
       child: DropdownSearch<dynamic>(
         dropdownSearchDecoration: InputDecoration(
           labelText: "Daftar Personil",
@@ -65,14 +69,9 @@ class dynamicWidgetPersonil extends StatelessWidget {
           username = value['username'];
         },
         itemAsString: (item) =>
-            "${item['username']} - ${item['nama_depan']} ${item['nama_belakang']} - ${item['jabatan']}",
+            "${item['username']} - ${item['nama_depan']} ${item['nama_belakang']}",
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return comboPersonil();
   }
 }
 
@@ -83,55 +82,55 @@ class dynamicWidgetGimmick extends StatelessWidget {
   List gimmick = [];
   Widget comboGimmick() {
     return SizedBox(
-        width: 480,
+        width: 380,
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           SizedBox(
-            width: 400,
-            child: DropdownSearch<dynamic>(
-                dropdownSearchDecoration: InputDecoration(
-                  labelText: "Daftar Gimmick",
-                ),
-                mode: Mode.MENU,
-                showSearchBox: true,
-                emptyBuilder: (context, searchEntry) => Center(
-                      child: Text("Tidak ada data ditemukan"),
-                    ),
-                onFind: (text) async {
-                  Map json;
-                  var response = await http.post(
-                      Uri.parse(
-                          "https://otccoronet.com/otc/admin/gimmick/daftargimmickcabang.php"),
-                      body: {
-                        'cari': text,
-                        'id': id_cabang,
-                        'existedGimmick': existedGimmick
-                      });
-
-                  if (response.statusCode == 200) {
-                    json = jsonDecode(response.body);
-                    gimmick = json['data'];
-                  }
-                  return gimmick as List<dynamic>;
-                },
-                onChanged: (value) {
-                  if (existedGimmick.isEmpty) {
-                    existedGimmick.add(id);
-                  } else {
-                    if (id != 0) {
-                      int index = existedGimmick
-                          .indexWhere((parameter) => parameter.startsWith(id));
-                      existedGimmick[index] = id;
-                    } else {
-                      existedGimmick.add(id);
+              height: 55,
+              width: 300,
+              child: DropdownSearch<dynamic>(
+                  dropdownSearchDecoration: InputDecoration(
+                    labelText: "Daftar Gimmick",
+                  ),
+                  mode: Mode.MENU,
+                  showSearchBox: true,
+                  emptyBuilder: (context, searchEntry) => Center(
+                        child: Text("Tidak ada data ditemukan"),
+                      ),
+                  onFind: (text) async {
+                    Map json;
+                    var response = await http.post(
+                        Uri.parse(
+                            "https://otccoronet.com/otc/admin/gimmick/daftargimmickcabang.php"),
+                        body: {
+                          'cari': text,
+                          'id': id_cabang,
+                          //'existedGimmick': existedGimmick
+                        });
+                    if (response.statusCode == 200) {
+                      json = jsonDecode(response.body);
+                      gimmick = json['data'];
                     }
-                  }
-                  id = value['id'];
-                  harga = value['harga'];
-                },
-                itemAsString: (item) =>
-                    "${item['barang']} - Rp. ${NumberFormat('###,000').format(item['harga'])}/pcs"),
-          ),
+                    return gimmick as List<dynamic>;
+                  },
+                  onChanged: (value) {
+                    // if (existedGimmick.isEmpty) {
+                    //   existedGimmick.add(id);
+                    // } else {
+                    //   if (id != 0) {
+                    //     int index = existedGimmick.indexWhere(
+                    //         (parameter) => parameter.startsWith(id));
+                    //     existedGimmick[index] = id;
+                    //   } else {
+                    //     existedGimmick.add(id);
+                    //   }
+                    // }
+                    id = value['id'];
+                    harga = value['harga'];
+                  },
+                  itemAsString: (item) => item['barang'])
+              // "${item['barang']} - Rp. ${NumberFormat('###,000').format(item['harga'])}/pcs"),
+              ),
           SizedBox(
               width: 75,
               height: 55,
@@ -157,69 +156,66 @@ class dynamicWidgetProduct extends StatelessWidget {
   dynamicWidgetProduct({super.key, required this.id_cabang});
   int harga = 0, id = 0;
   List produk = [];
-  Widget comboGimmick() {
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
-        width: 480,
+        width: 380,
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           SizedBox(
-            width: 330,
-            child: DropdownSearch<dynamic>(
-                dropdownSearchDecoration: InputDecoration(
-                  labelText: "Daftar Produk",
-                ),
-                mode: Mode.MENU,
-                showSearchBox: false,
-                onFind: (text) async {
-                  Map json;
-                  var response = await http.post(
-                      Uri.parse(
-                          "https://otccoronet.com/otc/admin/product/daftarproductcabang.php"),
-                      body: {
-                        'idCabang': id_cabang,
-                        'existedProduct': existedProduct
-                      });
+              width: 250,
+              height: 55,
+              child: DropdownSearch<dynamic>(
+                  dropdownSearchDecoration: InputDecoration(
+                    labelText: "Daftar Produk",
+                  ),
+                  mode: Mode.MENU,
+                  showSearchBox: false,
+                  onFind: (text) async {
+                    Map json;
+                    var response = await http.post(
+                        Uri.parse(
+                            "https://otccoronet.com/otc/admin/product/daftarproductcabang.php"),
+                        body: {
+                          'idCabang': id_cabang,
+                          // 'existedProduct': existedProduct
+                        });
 
-                  if (response.statusCode == 200) {
-                    json = jsonDecode(response.body);
-                    produk = json['data'];
-                  }
-                  return produk as List<dynamic>;
-                },
-                onChanged: (value) {
-                  if (existedProduct.isEmpty) {
-                    existedProduct.add(id);
-                  } else {
-                    if (id != 0) {
-                      int index = existedProduct
-                          .indexWhere((parameter) => parameter.startsWith(id));
-                      existedProduct[index] = id;
-                    } else {
-                      existedProduct.add(id);
+                    if (response.statusCode == 200) {
+                      json = jsonDecode(response.body);
+                      produk = json['data'];
                     }
-                  }
-                  id = value['id'];
-                  harga = value['harga'];
-                },
-                itemAsString: (item) => item['barang']),
-          ),
+                    return produk as List<dynamic>;
+                  },
+                  onChanged: (value) {
+                    // if (existedProduct.isEmpty) {
+                    //   existedProduct.add(id);
+                    // } else {
+                    //   if (id != 0) {
+                    //     int index = existedProduct
+                    //         .indexWhere((parameter) => parameter.startsWith(id));
+                    //     existedProduct[index] = id;
+                    //   } else {
+                    //     existedProduct.add(id);
+                    //   }
+                    // }
+                    id = value['id'];
+                    harga = value['harga'];
+                  },
+                  itemAsString: (item) => item['jenis'])),
           SizedBox(
-              width: 110,
+              width: 120,
               height: 55,
               child: TextField(
                 decoration: const InputDecoration(
-                  labelText: 'Harga satuan (dalam Rp)',
+                  labelText: 'Harga satuan',
                 ),
                 onChanged: (value) {
                   harga = int.parse(value);
                 },
               ))
         ]));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return comboGimmick();
   }
 }
 
@@ -276,7 +272,7 @@ class dynamicWidgetTarget extends StatefulWidget {
 
 class _dynamicWidgetTargetState extends State<dynamicWidgetTarget> {
   List parameter = [];
-  double targetWidth = 480, textfieldWidth = 0;
+  double targetWidth = 380, textfieldWidth = 0;
   bool isNeedTextField = false;
 
   Widget comboTarget() {
@@ -287,39 +283,40 @@ class _dynamicWidgetTargetState extends State<dynamicWidgetTarget> {
         onFind: (text) async {
           Map json;
           var response = await http.post(
-              Uri.parse(
-                  "https://otccoronet.com/otc/laporan/event/properties/eventtarget.php"),
-              body: {'existedTarget': existedTarget});
+            Uri.parse(
+                "https://otccoronet.com/otc/laporan/event/properties/eventtarget.php"),
+            //body: {'existedTarget': existedTarget}
+          );
           if (response.statusCode == 200) {
             json = jsonDecode(response.body);
             setState(() {
               parameter = json['data'];
             });
           }
-          return parameter as List<dynamic>;
+          return parameter;
         },
         onChanged: (value) {
           setState(() {
-            if (existedTarget.isEmpty) {
-              existedTarget.add(widget.id);
-            } else {
-              if (widget.id != 0) {
-                int index = existedTarget
-                    .indexWhere((parameter) => parameter.startsWith(widget.id));
-                existedTarget[index] = widget.id;
-              } else {
-                existedTarget.add(widget.id);
-              }
-            }
+            // if (existedTarget.isEmpty) {
+            //   existedTarget.add(widget.id);
+            // } else {
+            //   if (widget.id != 0) {
+            //     int index = existedTarget
+            //         .indexWhere((parameter) => parameter.startsWith(widget.id));
+            //     existedTarget[index] = widget.id;
+            //   } else {
+            //     existedTarget.add(widget.id);
+            //   }
+            // }
             widget.id = value['id'];
 
             if (value['parameter'].contains("Estimasi") ||
                 value['parameter'].contains("Penjualan")) {
-              targetWidth = 370;
+              targetWidth = 280;
               textfieldWidth = 90;
               isNeedTextField = true;
             } else {
-              targetWidth = 480;
+              targetWidth = 380;
               textfieldWidth = 0;
               isNeedTextField = false;
             }
@@ -337,7 +334,7 @@ class _dynamicWidgetTargetState extends State<dynamicWidgetTarget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 480,
+      width: 380,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -373,9 +370,14 @@ class BuatProposal extends StatefulWidget {
 }
 
 class _BuatProposalState extends State<BuatProposal> {
+  int index = 0;
   TextEditingController startTimeController = TextEditingController(),
       endTimeController = TextEditingController(),
-      dateController = TextEditingController();
+      dateController = TextEditingController(),
+      controllerTujuan = TextEditingController(),
+      controllerStrategi = TextEditingController(),
+      controllerLatarBelakang = TextEditingController(),
+      controllerAlamat = TextEditingController();
   String id_kota = "",
       id_event = "",
       alamat = "",
@@ -393,15 +395,18 @@ class _BuatProposalState extends State<BuatProposal> {
       gimmick = [],
       kebutuhanTambahan = [],
       kecamatan = [],
-      kelurahan = [];
+      kelurahan = [],
+      product = [];
   List<dynamicWidgetPersonil> dynamicPersonel = [];
   List<dynamicWidgetTarget> dynamicTarget = [];
   List<dynamicWidgetGimmick> dynamicGimmick = [];
   List<dynamicWidgetKebutuhanTambahan> dynamicKebutuhanTambahan = [];
+  List<dynamicWidgetProduct> dynamicproduct = [];
   double heightAddPersonel = 0,
       heightAddTarget = 0,
       heightAddGimmick = 0,
-      heightAddKebutuhanTambahan = 0;
+      heightAddKebutuhanTambahan = 0,
+      heightAddproduct = 0;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   addDynamicPersonel() {
@@ -411,6 +416,16 @@ class _BuatProposalState extends State<BuatProposal> {
       }
       dynamicPersonel.add(dynamicWidgetPersonil(id_cabang: widget.id_cabang));
       heightAddPersonel += 55;
+    });
+  }
+
+  addDynamicProduct() {
+    setState(() {
+      if (product.isNotEmpty) {
+        product = [];
+      }
+      dynamicproduct.add(dynamicWidgetProduct(id_cabang: widget.id_cabang));
+      heightAddproduct += 55;
     });
   }
 
@@ -519,13 +534,12 @@ class _BuatProposalState extends State<BuatProposal> {
         .format(DateTime.now().copyWith(hour: 8, minute: 0, second: 0));
     endTimeController.text = DateFormat.Hm()
         .format(DateTime.now().copyWith(hour: 16, minute: 0, second: 0));
-    int rand = Random().nextInt(100);
     setState(() {
-      id_event = "${rand.toString()}/${widget.username}/${widget.id_cabang}";
+      id_event = "${widget.username}/${widget.id_cabang}";
     });
   }
 
-  Widget datePicker() {
+  Widget startDatePicker() {
     return SizedBox(
       height: 55,
       width: 260,
@@ -533,7 +547,44 @@ class _BuatProposalState extends State<BuatProposal> {
         Expanded(
             child: TextFormField(
           decoration: InputDecoration(
-            labelText: "Tanggal Event",
+            labelText: "Tanggal Event Mulai",
+          ),
+          controller: dateController,
+        )),
+        ElevatedButton(
+            onPressed: () {
+              showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2200))
+                  .then((value) {
+                setState(() {
+                  date = value.toString().substring(0, 10);
+                  String formattedDate =
+                      DateFormat.yMMMMEEEEd('id').format(value!);
+                  dateController.text = formattedDate;
+                });
+              });
+            },
+            child: Icon(
+              Icons.calendar_today_sharp,
+              color: Colors.white,
+              size: 24.0,
+            ))
+      ]),
+    );
+  }
+
+  Widget endDatePicker() {
+    return SizedBox(
+      height: 55,
+      width: 260,
+      child: Row(children: [
+        Expanded(
+            child: TextFormField(
+          decoration: InputDecoration(
+            labelText: "Tanggal Event Selesai",
           ),
           controller: dateController,
         )),
@@ -563,8 +614,8 @@ class _BuatProposalState extends State<BuatProposal> {
   }
 
   Widget startTimePicker() {
-    return SizedBox(
-      height: 55,
+    return Container(
+      padding: EdgeInsets.only(left: 10),
       width: 125,
       child: Row(children: [
         Expanded(
@@ -598,8 +649,8 @@ class _BuatProposalState extends State<BuatProposal> {
   }
 
   Widget endTimePicker() {
-    return SizedBox(
-      height: 55,
+    return Container(
+      padding: EdgeInsets.only(left: 10),
       width: 125,
       child: Row(children: [
         Expanded(
@@ -634,10 +685,6 @@ class _BuatProposalState extends State<BuatProposal> {
 
   Widget addPersonel() {
     return Column(children: [
-      Text(
-        "PERSONIL",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
       SizedBox(
           height: heightAddPersonel,
           child: ListView.builder(
@@ -667,18 +714,13 @@ class _BuatProposalState extends State<BuatProposal> {
       Container(
         margin: EdgeInsets.only(top: 10),
         height: 50,
-        width: 50,
         child: ElevatedButton(
           onPressed: () {
             setState(() {
               addDynamicPersonel();
             });
           },
-          child: Text(
-            '+',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          child: Icon(Icons.add, color: Colors.white),
         ),
       ),
     ]);
@@ -686,10 +728,6 @@ class _BuatProposalState extends State<BuatProposal> {
 
   Widget addKebutuhanTambahan() {
     return Column(children: [
-      Text(
-        "KEBUTUHAN TAMBAHAN",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
       SizedBox(
           height: heightAddKebutuhanTambahan,
           child: ListView.builder(
@@ -718,18 +756,13 @@ class _BuatProposalState extends State<BuatProposal> {
       Container(
         margin: EdgeInsets.only(top: 10),
         height: 50,
-        width: 50,
         child: ElevatedButton(
           onPressed: () {
             setState(() {
               addDynamicKebutuhanTambahan();
             });
           },
-          child: Text(
-            '+',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          child: Icon(Icons.add, color: Colors.white),
         ),
       ),
     ]);
@@ -737,10 +770,6 @@ class _BuatProposalState extends State<BuatProposal> {
 
   Widget addGimmick() {
     return Column(children: [
-      Text(
-        "GIMMICK",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
       SizedBox(
           height: heightAddGimmick,
           child: ListView.builder(
@@ -770,18 +799,13 @@ class _BuatProposalState extends State<BuatProposal> {
       Container(
         margin: EdgeInsets.only(top: 10),
         height: 50,
-        width: 50,
         child: ElevatedButton(
           onPressed: () {
             setState(() {
               addDynamicGimmick();
             });
           },
-          child: Text(
-            '+',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          child: Icon(Icons.add, color: Colors.white),
         ),
       ),
     ]);
@@ -789,10 +813,6 @@ class _BuatProposalState extends State<BuatProposal> {
 
   Widget addTarget() {
     return Column(children: [
-      Text(
-        "TARGET",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
       SizedBox(
           height: heightAddTarget,
           child: ListView.builder(
@@ -820,22 +840,101 @@ class _BuatProposalState extends State<BuatProposal> {
             },
           )),
       Container(
-        margin: EdgeInsets.only(top: 10),
-        height: 50,
-        width: 50,
-        child: ElevatedButton(
-          onPressed: () {
-            setState(() {
-              addDynamicTarget();
-            });
-          },
-          child: Text(
-            '+',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
+          margin: EdgeInsets.only(top: 10),
+          height: 50,
+          child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  addDynamicTarget();
+                });
+              },
+              child: Icon(Icons.add, color: Colors.white)))
     ]);
+  }
+
+  Widget addProduct() {
+    return Column(children: [
+      SizedBox(
+          height: heightAddproduct,
+          child: ListView.builder(
+            itemCount: dynamicproduct.length,
+            itemBuilder: (_, index) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  dynamicproduct[index],
+                  Tooltip(
+                    message: "Delete parameter",
+                    child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          dynamicproduct.removeAt(index);
+                          heightAddproduct -= 55;
+                        });
+                      },
+                      icon: Icon(Icons.delete),
+                    ),
+                  )
+                ],
+              );
+            },
+          )),
+      Container(
+          margin: EdgeInsets.only(top: 10),
+          height: 50,
+          width: 50,
+          child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  addDynamicProduct();
+                });
+              },
+              child: Icon(Icons.add, color: Colors.white)))
+    ]);
+  }
+
+  Widget multiTabNavigator(indexNow, icon, text) {
+    return GestureDetector(
+        onTap: () {
+          setState(() {
+            index = indexNow;
+          });
+        },
+        child: Container(
+          width: 180,
+          height: 55,
+          decoration: BoxDecoration(
+            color: index == indexNow ? Colors.orange : Colors.grey,
+            borderRadius: BorderRadius.all(Radius.circular(30)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                  )),
+              Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Text(
+                    text,
+                    style: TextStyle(color: Colors.white),
+                  ))
+            ],
+          ),
+        ));
+  }
+
+  Widget multiTabIndicator() {
+    return Container(
+        alignment: Alignment.topCenter,
+        width: 400,
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          multiTabNavigator(0, Icons.info_outline, "General Information"),
+          multiTabNavigator(1, EventChart.chart_line, "Target"),
+        ]));
   }
 
   Widget buildLokasi() {
@@ -862,11 +961,11 @@ class _BuatProposalState extends State<BuatProposal> {
           ],
         ),
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-              width: 240,
+              width: 300,
               child: DropdownSearch<dynamic>(
                 dropdownSearchDecoration: InputDecoration(
                   labelText: "Kecamatan",
@@ -899,7 +998,7 @@ class _BuatProposalState extends State<BuatProposal> {
                 itemAsString: (item) => item['kecamatan'],
               )),
           SizedBox(
-              width: 240,
+              width: 300,
               child: DropdownSearch<dynamic>(
                 dropdownSearchDecoration: InputDecoration(
                   labelText: "Kelurahan",
@@ -928,243 +1027,357 @@ class _BuatProposalState extends State<BuatProposal> {
                 },
                 itemAsString: (item) => item['kelurahan'],
               )),
+          SizedBox(
+              width: 300,
+              child: TextField(
+                  controller: controllerAlamat,
+                  decoration: const InputDecoration(
+                    labelText: 'Alamat',
+                  ),
+                  onChanged: (value) {
+                    alamat = value;
+                  }))
         ],
       ),
-      TextField(
-        // controller: controllerLatarBelakang,
-        // minLines: 1,
-        // maxLines: 50,
-        decoration: const InputDecoration(
-          labelText: 'Alamat',
-        ),
-        onChanged: (value) {
-          alamat = value;
-        },
-      )
     ]);
   }
 
-  Widget buildLatarBelakang() {
-    return Column(children: [
-      Text(
-        "LATAR BELAKANG",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      TextField(
-        minLines: 1,
-        maxLines: 50,
-        decoration: const InputDecoration(
-          labelText: 'Latar Belakang',
-        ),
-        onChanged: (value) {
-          latarBelakang = value;
-        },
-      )
-    ]);
+  Widget buildGeneralInformation() {
+    Widget personilWidget = Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              "PERSONIL",
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: addPersonel())
+            ]));
+    Widget lokasiWidget = Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              "LOKASI",
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: buildLokasi())
+            ]));
+    Widget latarBelakangWidget = Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              "LATAR BELAKANG",
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: TextField(
+                      controller: controllerLatarBelakang,
+                      minLines: 1,
+                      maxLines: 50,
+                      decoration: const InputDecoration(
+                        labelText: 'Latar Belakang',
+                      ),
+                      onChanged: (value) {
+                        latarBelakang = value;
+                      }))
+            ]));
+    Widget tujuanWidget = Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              "TUJUAN",
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: TextField(
+                      controller: controllerTujuan,
+                      minLines: 1,
+                      maxLines: 50,
+                      decoration: const InputDecoration(
+                        labelText: 'Tujuan',
+                      ),
+                      onChanged: (value) {
+                        tujuan = value;
+                      }))
+            ]));
+    Widget strategiWidget = Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              "STRATEGI ",
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: TextField(
+                      controller: controllerStrategi,
+                      minLines: 1,
+                      maxLines: 50,
+                      decoration: const InputDecoration(
+                        labelText: 'Strategi',
+                      ),
+                      onChanged: (value) {
+                        strategi = value;
+                      }))
+            ]));
+    Widget tanggalWidget = Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              "TANGGAL EVENT",
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: Column(
+                    children: [
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [startDatePicker(), startTimePicker()]),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [endDatePicker(), endTimePicker()])
+                    ],
+                  ))
+            ]));
+    if (MediaQuery.of(context).size.width >= 720) {
+      return Table(children: [
+        TableRow(children: [
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(right: 5, bottom: 20),
+              child: lokasiWidget),
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(left: 5, bottom: 20),
+              child: tanggalWidget)
+        ]),
+        TableRow(children: [
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(right: 5, bottom: 20),
+              child: latarBelakangWidget),
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(left: 5, bottom: 20),
+              child: personilWidget)
+        ]),
+        TableRow(children: [
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(right: 5, bottom: 20),
+              child: lokasiWidget),
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(left: 5, bottom: 20),
+              child: tanggalWidget)
+        ])
+      ]);
+    } else {
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Padding(padding: EdgeInsets.only(bottom: 20), child: lokasiWidget),
+        Padding(
+            padding: EdgeInsets.only(bottom: 20), child: latarBelakangWidget),
+        Padding(padding: EdgeInsets.only(bottom: 20), child: tujuanWidget),
+        strategiWidget
+      ]);
+    }
   }
 
-  Widget buildStrategi() {
-    return Column(children: [
-      Text("STRATEGI", style: TextStyle(fontWeight: FontWeight.bold)),
-      TextField(
-        minLines: 1,
-        maxLines: 50,
-        decoration: const InputDecoration(
-          labelText: 'Strategi',
-        ),
-        onChanged: (value) {
-          strategi = value;
-        },
-      )
-    ]);
+  Widget buildTargetComponen(text, componen) {
+    return Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: componen)
+            ]));
   }
 
-  Widget buildTujuan() {
-    return Column(children: [
-      Text("TUJUAN", style: TextStyle(fontWeight: FontWeight.bold)),
-      TextField(
-        minLines: 1,
-        maxLines: 50,
-        decoration: const InputDecoration(
-          labelText: 'Tujuan',
+  Widget buildTarget() {
+    if (MediaQuery.of(context).size.width >= 720) {
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Table(
+          children: [
+            TableRow(children: [
+              Container(
+                  width: 500,
+                  padding: EdgeInsets.only(right: 5, bottom: 20),
+                  child: buildTargetComponen(
+                      "KEBUTUHAN TAMBAHAN", addKebutuhanTambahan())),
+              Container(
+                  width: 500,
+                  padding: EdgeInsets.only(left: 5, bottom: 20),
+                  child: buildTargetComponen("GIMMICK", addGimmick()))
+            ]),
+            TableRow(children: [
+              Container(
+                  width: 500,
+                  padding: EdgeInsets.only(right: 5, bottom: 20),
+                  child: buildTargetComponen("TARGET", addTarget())),
+              Container(
+                  width: 500,
+                  padding: EdgeInsets.only(right: 5, bottom: 20),
+                  child: buildTargetComponen("PRODUK", addProduct()))
+            ]),
+          ],
         ),
-        onChanged: (value) {
-          tujuan = value;
-        },
-      )
-    ]);
+      ]);
+    } else {
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: buildTargetComponen(
+                "KEBUTUHAN TAMBAHAN", addKebutuhanTambahan())),
+        Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: buildTargetComponen("GIMMICK", addGimmick())),
+        Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: buildTargetComponen("TARGET", addTarget())),
+        Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: buildTargetComponen("PRODUK", addProduct())),
+        // targetWidget
+      ]);
+    }
   }
 
-  Widget buildNamaId() {
-    return Column(children: [
-      Text("ID EVENT: ${id_event}/${date}",
-          style: TextStyle(fontWeight: FontWeight.bold)),
-      TextField(
-        decoration: const InputDecoration(
-          labelText: 'Nama Event',
-        ),
-        onChanged: (value) {
-          nama = value;
-        },
-      )
-    ]);
+  countIndex(type) {
+    setState(() {
+      if (type == 1)
+        index++;
+      else
+        index--;
+    });
+  }
+
+  Widget arrowNavigator(type) {
+    return Container(
+      margin: EdgeInsets.only(top: 50),
+      height: 50,
+      width: 100,
+      child: ElevatedButton(
+          onPressed: () {
+            countIndex(type);
+          },
+          child: Icon(
+              type == 1
+                  ? Icons.keyboard_double_arrow_right
+                  : Icons.keyboard_double_arrow_left,
+              color: Colors.white)),
+    );
   }
 
   Widget tampilData(BuildContext context) {
     return Container(
       width: 1050,
       alignment: Alignment.topCenter,
-      padding: EdgeInsets.only(top: 20, bottom: 20),
-      child: Column(children: [
+      padding: EdgeInsets.only(top: 20, bottom: 20, left: 10, right: 10),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Text("ID EVENT: ${id_event}/${date}\n",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: buildNamaId()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: Column(
-                      children: [
-                        Text("TANGGAL DAN WAKTU EVENT",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              datePicker(),
-                              startTimePicker(),
-                              endTimePicker()
-                            ])
-                      ],
-                    )),
-              ])
-            ],
-          ),
-        ),
+            alignment: Alignment.topCenter,
+            padding: EdgeInsets.only(top: 20),
+            child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal, child: multiTabIndicator())),
         Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: buildLokasi()),
-                //     child: lokasi()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: addPersonel()),
-              ])
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: buildLatarBelakang()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: buildTujuan()),
-              ])
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: buildStrategi()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: addTarget()),
-              ])
-            ],
-          ),
-        ),
-        Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child: Table(
-            children: [
-              TableRow(children: [
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(right: 5),
-                    child: addKebutuhanTambahan()),
-                Container(
-                    width: 500,
-                    padding: EdgeInsets.only(left: 5),
-                    child: addGimmick()),
-              ])
-            ],
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 50),
-          height: 50,
-          width: 1050,
-          child: ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState != null &&
-                  !_formKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Harap data yang kosong diisi kembali')));
-              } else {
-                dynamicPersonel
-                    .forEach((widget) => personel.add(widget.username));
-                dynamicKebutuhanTambahan.forEach((widget) =>
-                    kebutuhanTambahan.add([widget.komponen, widget.estimasi]));
-                dynamicGimmick.forEach((widget) =>
-                    gimmick.add([widget.id, widget.harga, widget.quantity]));
-                dynamicTarget.forEach(
-                    (widget) => target.add([widget.id, widget.isiTarget]));
-                showDialog<String>(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Peringatan'),
-                          content: Text(
-                              "Apakah anda yakin hendak mem-finalisasi proposal? \nData pada proposal tidak dapat diubah, kecuali proposal tidak disetujui"),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () {
-                                submit(context);
-                              },
-                              child: const Text('Iya'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, 'Tidak'),
-                              child: const Text('Tidak'),
-                            ),
-                          ],
-                        ));
-              }
-            },
-            child: Text(
-              'Submit',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            alignment: Alignment.topLeft,
+            padding: EdgeInsets.only(top: 20),
+            child: index == 0 ? buildGeneralInformation() : buildTarget()),
+        Align(
+            alignment:
+                index == 0 ? Alignment.bottomRight : Alignment.bottomLeft,
+            child: index == 0 ? arrowNavigator(1) : arrowNavigator(0)),
+        if (index == 1)
+          Container(
+            margin: EdgeInsets.only(top: 50),
+            height: 50,
+            width: 1050,
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState != null &&
+                    !_formKey.currentState!.validate()) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Harap data yang kosong diisi kembali')));
+                } else {
+                  dynamicPersonel
+                      .forEach((widget) => personel.add(widget.username));
+                  dynamicKebutuhanTambahan.forEach((widget) => kebutuhanTambahan
+                      .add([widget.komponen, widget.estimasi]));
+                  dynamicGimmick.forEach((widget) =>
+                      gimmick.add([widget.id, widget.harga, widget.quantity]));
+                  dynamicTarget.forEach(
+                      (widget) => target.add([widget.id, widget.isiTarget]));
+                  showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                            title: const Text('Peringatan'),
+                            content: Text(
+                                "Apakah anda yakin hendak mem-finalisasi proposal? \nData pada proposal tidak dapat diubah, kecuali proposal tidak disetujui"),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  submit(context);
+                                },
+                                child: const Text('Iya'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, 'Tidak'),
+                                child: const Text('Tidak'),
+                              ),
+                            ],
+                          ));
+                }
+              },
+              child: Text(
+                'Submit',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
           ),
-        ),
       ]),
     );
   }
@@ -1173,8 +1386,10 @@ class _BuatProposalState extends State<BuatProposal> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Buat Proposal Event"),
+          title: Text("Buat Proposal Event",
+              style: TextStyle(color: Colors.white)),
           leading: BackButton(
+            color: Colors.white,
             onPressed: () {
               Navigator.popAndPushNamed(context, "/homepage");
             },

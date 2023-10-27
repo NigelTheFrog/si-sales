@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:pt_coronet_crown/main.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BuatKehadiran extends StatefulWidget {
   BuatKehadiran({super.key});
@@ -43,6 +44,7 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
+    main();
     Navigator.popAndPushNamed(context, "/homepage");
   }
 
@@ -76,9 +78,11 @@ class _BuatKehadiranState extends State<BuatKehadiran> {
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
+        final prefs = await SharedPreferences.getInstance();
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Kehadiran telah diajukan')));
+        prefs.setString("tanggalAbsen", json["tanggal"]);
         dispose();
       }
     } else {

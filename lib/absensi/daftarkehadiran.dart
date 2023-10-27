@@ -63,22 +63,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
     }
   }
 
-  Future<void> checkAbsen() async {
-    final response = await http.post(
-        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
-        body: {'username': username, "type": "3"});
-    if (response.statusCode == 200) {
-      Map json = jsonDecode(response.body);
-      if (json['result'] == 'success') {
-        Navigator.popAndPushNamed(context, "/buatkehadiran");
-      } else if (json['result'] == 'error') {
-        warningDialog(json['message']);
-      }
-    } else {
-      throw Exception('Failed to read API');
-    }
-  }
-
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -86,21 +70,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
       id_jabatan = prefs.getString("idJabatan") ?? '';
       id_grup = prefs.getString("idGrup") ?? '';
     });
-  }
-
-  warningDialog(message) {
-    return showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-              title: const Text('Peringatan'),
-              content: Text(message),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context, 'OK'),
-                  child: const Text('OK'),
-                ),
-              ],
-            ));
   }
 
   @override
@@ -157,6 +126,39 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                       }
                     }))));
   }
+
+  // void submit(BuildContext context, id) async {
+  //   double lintang = 0, bujur = 0;
+  //   Geolocator.getCurrentPosition(
+  //           desiredAccuracy: LocationAccuracy.best,
+  //           forceAndroidLocationManager: true)
+  //       .then((Position position) {
+  //     setState(() {
+  //       lintang = position.latitude;
+  //       bujur = position.longitude;
+  //     });
+  //   });
+  //   final response = await http.post(
+  //       Uri.parse(
+  //           "https://otccoronet.com/otc/account/absensi/buatkehadiran.php"),
+  //       body: {
+  //         'id': id,
+  //         'lintang': lintang,
+  //         'bujur': bujur,
+  //         "username": username,
+  //         "type": "0"
+  //       });
+  //   if (response.statusCode == 200) {
+  //     Map json = jsonDecode(response.body);
+  //     if (json['result'] == 'success') {
+  //       if (!mounted) return;
+  //       ScaffoldMessenger.of(context)
+  //           .showSnackBar(SnackBar(content: Text('Anda berhasil melakukan checkout')));
+  //     }
+  //   } else {
+  //     throw Exception('Failed to read API');
+  //   }
+  // }
 
   Widget daftarKehadiran(data, context) {
     List<Absen> absen2 = [];
@@ -219,8 +221,16 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                   DataCell(tableContent(
                                     false,
                                     absen2[index].status == 0
-                                        ? "Status: Absen"
-                                        : "Status: Sudah Check-Out",
+                                        ? "Belum Check-Out"
+                                        : absen2[index].status == 2
+                                            ? "Belum Acc TL"
+                                            : absen2[index].status == 3
+                                                ? "Belum Acc SPV"
+                                                : absen2[index].status == 4
+                                                    ? "Belum Acc AM"
+                                                    : absen2[index].status == 5
+                                                        ? "Belum Acc Admin"
+                                                        : "Sudah Check-Out",
                                   )),
                                   // DataCell(tableContent(
                                   //     false, absen2[index].id_lokasi)),
@@ -247,6 +257,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                       DataColumn(label: tableContent(true, "Waktu")),
                       DataColumn(label: tableContent(true, "Status")),
                       DataColumn(label: tableContent(true, "Bukti")),
+                      DataColumn(label: tableContent(true, "Checkout")),
                     ],
                     rows: List<DataRow>.generate(
                         absen2.length,
@@ -271,8 +282,16 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                   DataCell(tableContent(
                                     false,
                                     absen2[index].status == 0
-                                        ? "Status: Belum Check-Out"
-                                        : "Status: Sudah Check-Out",
+                                        ? "Belum Check-Out"
+                                        : absen2[index].status == 2
+                                            ? "Belum Acc TL"
+                                            : absen2[index].status == 3
+                                                ? "Belum Acc SPV"
+                                                : absen2[index].status == 4
+                                                    ? "Belum Acc AM"
+                                                    : absen2[index].status == 5
+                                                        ? "Belum Acc Admin"
+                                                        : "Sudah Check-Out",
                                   )),
                                   DataCell(Align(
                                       alignment: Alignment.center,
@@ -280,6 +299,15 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
                                           icon: Icon(Icons.remove_red_eye),
                                           onPressed: () =>
                                               showBukti(absen2[index].id)))),
+                                  DataCell(absen2[index].checkout == null
+                                      ? Align(
+                                          alignment: Alignment.center,
+                                          child: IconButton(
+                                              icon: Icon(Icons.remove_red_eye),
+                                              onPressed: () =>
+                                                  showBukti(absen2[index].id)))
+                                      : tableContent(
+                                          false, absen2[index].checkout)),
                                 ]))));
       } else {
         return ListView.builder(
@@ -595,49 +623,6 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
     );
   }
 
-  showDialogPermission(content) {
-    return showDialog(
-        context: context,
-        builder: (context) =>
-            AlertDialog(title: Text("Peringatan"), content: Text(content)));
-  }
-
-  void permission() async {
-    LocationPermission permission;
-    if (kIsWeb) {
-      showDialogPermission(
-          "Fitur absensi tidak tersedia pada versi website atau desktop. \nSilahkan akses dari aplikasi ponsel anda");
-    } else {
-      if (await Permission.camera.status.isDenied) {
-        Permission.camera.request();
-      } else if (await Permission.camera.status.isPermanentlyDenied) {
-        showDialogPermission("Anda belum mengizinkan penggunaan kamera");
-        openAppSettings();
-      }
-
-      permission = await Geolocator.checkPermission();
-      if (!await Geolocator.isLocationServiceEnabled()) {
-        showDialogPermission(
-            "Anda belum aktivasi lokasi pada perangkat mobile");
-      }
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          showDialogPermission(
-              "Harap izinkan aplikasi dalam mengakses aplikasi");
-        }
-      } else if (permission == LocationPermission.deniedForever) {
-        showDialogPermission(
-            "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
-      } else {
-        checkAbsen();
-
-        // Navigator.push(
-        //     context, MaterialPageRoute(builder: (context) => BuatKehadiran(lintang: Geolocator.,)));
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // if (idjabatan != "3") {
@@ -647,12 +632,7 @@ class _DaftarKehadiranState extends State<DaftarKehadiran>
         //   title: Text("Daftar Pembelian"),
         // ),
         // drawer: MyDrawer(),
-        floatingActionButton: Tooltip(
-            message: "Lakukan Absensi",
-            child: FloatingActionButton(
-              onPressed: () => permission(),
-              child: Icon(Icons.add, color: Colors.white),
-            )),
+
         body: buildContainer(context));
     // } else {
     //   return Scaffold(

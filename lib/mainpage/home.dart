@@ -65,6 +65,7 @@ class _HomeState extends State<Home> {
       id_area = prefs.getString("username") ?? '';
     });
   }
+  
 
   // getDeviceInfor() async {
   //   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();

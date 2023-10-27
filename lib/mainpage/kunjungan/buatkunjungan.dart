@@ -23,7 +23,6 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
   String _id_outlet = "",
       controllerOutlet = "",
       username = "",
-      date = "",
       deskripsi = "";
   double lintang = 0, bujur = 0;
 
@@ -32,7 +31,6 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
     // TODO: implement initState
     super.initState();
     _loadData();
-    date = DateTime.now().toString().substring(0, 10);
     Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best,
             forceAndroidLocationManager: true)
@@ -56,8 +54,7 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
         Uri.parse(
             "https://otccoronet.com/otc/account/kunjungan/buatkunjungan.php"),
         body: {
-          'id': "$_id_outlet/$username/$date",
-          'tanggal': date,
+          'id': "$_id_outlet/$username",
           'deskripsi': deskripsi,
           'id_outlet': _id_outlet,
           'username': username
@@ -73,7 +70,7 @@ class _BuatKunjunganState extends State<BuatKunjungan> {
             MaterialPageRoute(
                 builder: (context) => DetailVisit(
                       type: 1,
-                      id_visit: "$_id_outlet/$username/$date",
+                      id_visit: "$_id_outlet/$username",
                       username: username,
                       status: 0,
                     )));

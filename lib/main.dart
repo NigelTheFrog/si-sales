@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:io';
 
 //Kendala di hadir kemarin gaada sinyal. Karena tidak ada sinyal foto tidak bisa masuk
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:pt_coronet_crown/absensi/buatkehadiran.dart';
@@ -12,6 +13,7 @@ import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:pt_coronet_crown/account/login.dart';
 // import 'package:pt_coronet_crown/admin/company/daftarkota.dart';
 import 'package:pt_coronet_crown/admin/company/daftarprovinsi.dart';
+import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/admin/jabatan/daftarjabatan.dart';
 import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
@@ -37,13 +39,17 @@ import 'package:pt_coronet_crown/mainpage/home.dart';
 import 'package:pt_coronet_crown/mainpage/kunjungan/daftarkunjungan.dart';
 import 'package:pt_coronet_crown/mainpage/kunjungan/buatkunjungan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 String username = "",
     idjabatan = "",
     idcabang = "",
     nama = "",
     email = "",
-    jabatan = "";
+    jabatan = "",
+    tanggalAbsen = "";
 var avatar = "";
 int indexScreen = 0;
 
@@ -82,6 +88,11 @@ Future<String> getJabatan() async {
   return prefs.getString("jabatan") ?? '';
 }
 
+Future<String> getTanggalAbsen() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("tanggalAbsen") ?? '';
+}
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   checkUser().then((String result) {
@@ -116,6 +127,10 @@ void main() {
 
   getJabatan().then((String result) {
     jabatan = result;
+  });
+
+  getTanggalAbsen().then((String result) {
+    tanggalAbsen = result;
   });
 }
 
@@ -171,7 +186,7 @@ class MyApp extends StatelessWidget {
         "/homepage": (context) => MyApp(),
         "/kunjunganmasuk": (contex) => BuatKunjungan(),
 
-        "/daftarevent": (context) => DaftarEvent(),
+        // "/daftarevent": (context) => DaftarEvent(),
         "/buatkehadiran": (context) => BuatKehadiran(),
         // "/daftarevent": (context) => DaftarEvent(),
 
@@ -202,6 +217,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String dateNow = "";
   final List<Widget> screens = [
     Home(),
     PersonelData(),
@@ -214,7 +230,7 @@ class _MyHomePageState extends State<MyHomePage> {
     DaftarPembelian(),
     DaftarPenjualan(),
     DaftarProposal(type: idjabatan == "3" ? 0 : 1),
-    DaftarEvent(),
+    DaftarEvent(type: idjabatan == "3" ? 0 : 1),
     DaftarProvinsi()
   ];
 
@@ -234,8 +250,39 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void doLogout() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.remove("username");
+    prefs.clear();
     main();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    initializeDateFormatting();
+    dateNow = DateTime.now().toString().substring(0, 10);
+    super.initState();
+  }
+
+  Future<void> checkAbsen() async {
+    final response = await http.post(
+        Uri.parse("https://otccoronet.com/otc/account/absensi/daftarabsen.php"),
+        body: {'username': username, "type": "3"});
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      if (json['result'] == 'success') {
+        Navigator.popAndPushNamed(context, "/buatkehadiran");
+      } else if (json['result'] == 'error') {
+        warningDialog(json['message']);
+      }
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  warningDialog(content) {
+    return showDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(title: Text("Peringatan"), content: Text(content)));
   }
 
   Widget NavigationDrawer() {
@@ -251,6 +298,37 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
+  void permission() async {
+    LocationPermission permission;
+    if (kIsWeb) {
+      warningDialog(
+          "Fitur absensi tidak tersedia pada versi website atau desktop. \nSilahkan akses dari aplikasi ponsel anda");
+    } else {
+      if (await Permission.camera.status.isDenied) {
+        Permission.camera.request();
+      } else if (await Permission.camera.status.isPermanentlyDenied) {
+        warningDialog("Anda belum mengizinkan penggunaan kamera");
+        openAppSettings();
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        warningDialog("Anda belum aktivasi lokasi pada perangkat mobile");
+      }
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          warningDialog("Harap izinkan aplikasi dalam mengakses aplikasi");
+        }
+      } else if (permission == LocationPermission.deniedForever) {
+        warningDialog(
+            "Aplikasi anda melarang akses lokasi, silahkan lakukan perubahan hak akses di setting");
+      } else {
+        checkAbsen();
+      }
+    }
+  }
+
   Widget buildTile(index, text, icon) => Material(
       type: MaterialType.transparency,
       child: ListTile(
@@ -263,7 +341,15 @@ class _MyHomePageState extends State<MyHomePage> {
         leading: Icon(icon, color: Colors.white),
         onTap: () {
           if (index != 15) {
-            setState(() => indexScreen = index);
+            if (dateNow != tanggalAbsen || tanggalAbsen == "") {
+              if (index == 3) {
+                permission();
+              } else {
+                warningDialog("Harap lakukan absensi terlebih dahulu");
+              }
+            } else {
+              setState(() => indexScreen = index);
+            }
           } else {
             indexScreen = 0;
             doLogout();

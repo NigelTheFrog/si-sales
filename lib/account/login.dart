@@ -72,6 +72,7 @@ class _LoginState extends State<Login> {
         prefs.setString("cabang", json["cabang"]);
         prefs.setString("idGrup", json["id_grup"]);
         prefs.setString("grup", json["grup"]);
+        prefs.setString("tanggalAbsen", json["tanggal_absen"]);
         main();
       } else {
         if (json['message'] == "1") {

@@ -19,7 +19,8 @@ String nama_depan = "",
     enddate = "";
 
 class DaftarEvent extends StatefulWidget {
-  DaftarEvent({Key? key}) : super(key: key);
+  int type;
+  DaftarEvent({super.key, required this.type});
   @override
   _DaftarEventState createState() {
     return _DaftarEventState();
@@ -476,6 +477,30 @@ class _DaftarEventState extends State<DaftarEvent> {
     );
   }
 
+  Widget buttonProposalSaya(BuildContext context) {
+    return SizedBox(
+        height: 50,
+        width: 130,
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 248, 172, 49)),
+            onPressed: () {
+              setState(() {
+                if (widget.type == 1) {
+                  widget.type = 0;
+                } else {
+                  widget.type = 1;
+                }
+                build(context);
+              });
+            },
+            child: Text(
+              widget.type == 0 ? "Keseluruhan \nProposal" : "Proposal Saya",
+              style: const TextStyle(color: Colors.black, fontSize: 16),
+              textAlign: TextAlign.center,
+            )));
+  }
+
   Widget buildContainer(BuildContext context) {
     return Container(
       alignment: Alignment.topCenter,
@@ -485,62 +510,25 @@ class _DaftarEventState extends State<DaftarEvent> {
           children: <Widget>[
             Container(
                 margin: const EdgeInsets.all(10),
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 alignment: Alignment.topCenter,
                 width: 400,
-                child: MediaQuery.of(context).size.width > 390
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                            // ElevatedButton(
-                            //     style: ElevatedButton.styleFrom(
-                            //         backgroundColor:
-                            //             Color.fromARGB(255, 248, 172, 49)),
-                            //     onPressed: () {
-                            //       Navigator.popAndPushNamed(
-                            //           context, "/ajukanproposal");
-                            //     },
-                            //     child: Text(
-                            //       "Ajukan Proposal",
-                            //       style: TextStyle(
-                            //           color: Colors.black, fontSize: 16),
-                            //     )),
-                            Container(
-                              height: 50,
-                              width: 175,
-                              child: TextFormField(
-                                decoration: const InputDecoration(
-                                  icon: Icon(Icons.search),
-                                  labelText: 'Cari Event',
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    _txtcari = value;
-                                  });
-                                  // bacaData();
-                                },
-                              ),
-                            )
-                          ])
-                    : Column(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 50,
-                            width: 175,
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                icon: Icon(Icons.search),
-                                labelText: 'Cari Laporan',
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _txtcari = value;
-                                });
-                              },
-                            ),
+                child: widget.type == 1
+                    ? MediaQuery.of(context).size.width > 390
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                                buttonProposalSaya(context),
+                                kolomCari()
+                              ])
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              buttonProposalSaya(context),
+                              kolomCari()
+                            ],
                           )
-                        ],
-                      )),
+                    : kolomCari()),
             Text(
               "Pilih rentang tanggal event untuk melakukan filtering data",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

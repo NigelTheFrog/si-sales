@@ -1150,10 +1150,9 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                           addPengungjung(true);
                         });
                       },
-                      child: Text(
-                        'Tambah Pengujunjung Lama',
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Text('Tambah Pengujunjung Lama',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ),
                   Container(
@@ -1166,10 +1165,8 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                           addPengungjung(false);
                         });
                       },
-                      child: Text(
-                        'Tambah Pengujunjung Baru',
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Text('Tambah Pengujunjung Baru',
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],
@@ -1231,166 +1228,50 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
     ]);
   }
 
+  Widget multiTabNavigator(indexNow, icon, text) {
+    return GestureDetector(
+        onTap: () {
+          setState(() {
+            index = indexNow;
+          });
+        },
+        child: Container(
+          width: 180,
+          height: 55,
+          decoration: BoxDecoration(
+            color: index == indexNow ? Colors.orange : Colors.grey,
+            borderRadius: BorderRadius.all(Radius.circular(30)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Icon(
+                    icon,
+                    color: Colors.white,
+                  )),
+              Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: Text(
+                    text,
+                    style: TextStyle(color: Colors.white),
+                  ))
+            ],
+          ),
+        ));
+  }
+
   Widget multiTabIndicator() {
     return Container(
         alignment: Alignment.topCenter,
         width: 1050,
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          GestureDetector(
-              onTap: () {
-                setState(() {
-                  index = 0;
-                });
-              },
-              child: Container(
-                width: 180,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: index == 0 ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Icon(
-                          Icons.info_outline,
-                          color: Colors.white,
-                        )),
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          "General Information",
-                          style: TextStyle(color: Colors.white),
-                        ))
-                  ],
-                ),
-              )),
-          GestureDetector(
-              onTap: () {
-                setState(() {
-                  index = 1;
-                });
-              },
-              child: Container(
-                width: 180,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: index == 1 ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.white,
-                        )),
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          "Personil",
-                          style: TextStyle(color: Colors.white),
-                        ))
-                  ],
-                ),
-              )),
-          GestureDetector(
-              onTap: () {
-                setState(() {
-                  index = 2;
-                });
-              },
-              child: Container(
-                width: 180,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: index == 2 ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Icon(
-                          EventChart.chart_line,
-                          color: Colors.white,
-                        )),
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          "Realisasi",
-                          style: TextStyle(color: Colors.white),
-                        ))
-                  ],
-                ),
-              )),
-          GestureDetector(
-              onTap: () {
-                setState(() {
-                  index = 3;
-                });
-              },
-              child: Container(
-                width: 180,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: index == 3 ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Icon(
-                          Transaction.attach_money,
-                          color: Colors.white,
-                        )),
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          "Penjualan",
-                          style: TextStyle(color: Colors.white),
-                        ))
-                  ],
-                ),
-              )),
-          GestureDetector(
-              onTap: () {
-                setState(() {
-                  index = 4;
-                });
-              },
-              child: Container(
-                width: 180,
-                height: 55,
-                decoration: BoxDecoration(
-                  color: index == 4 ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Icon(
-                          Icons.note_alt_outlined,
-                          color: Colors.white,
-                        )),
-                    Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          "Evaluasi",
-                          style: TextStyle(color: Colors.white),
-                        ))
-                  ],
-                ),
-              ))
+          multiTabNavigator(0, Icons.info_outline, "General Information"),
+          multiTabNavigator(1, Icons.person, "Personil"),
+          multiTabNavigator(2, EventChart.chart_line, "Realisasi"),
+          multiTabNavigator(3, Transaction.attach_money, "Penjualan"),
+          multiTabNavigator(4, Icons.note_alt_outlined, "Evaluasi")
         ]));
   }
 
@@ -1535,78 +1416,70 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
     );
   }
 
+  Widget generalInformationComponent(title, text) {
+    return Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 5,
+        child: ExpansionTile(
+            title: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: (TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            children: [
+              Container(
+                  margin:
+                      EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+                  child: Text(text,
+                      style: TextStyle(
+                        height: 1.5,
+                      )))
+            ]));
+  }
+
   Widget buildGeneralInformation() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
+    if (MediaQuery.of(context).size.width >= 720) {
+      return Table(children: [
+        TableRow(children: [
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(right: 5, bottom: 20),
+              child: generalInformationComponent(
+                  "LATAR BELAKANG", _event!.latar_belakang!.toString())),
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(left: 5, bottom: 20),
+              child: generalInformationComponent(
+                  "TUJUAN", _event!.tujuan!.toString()))
+        ]),
+        TableRow(children: [
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(right: 5, bottom: 20),
+              child: generalInformationComponent(
+                  "STRATEGI", _event!.strategi!.toString())),
+          Container(
+              width: 500,
+              padding: EdgeInsets.only(left: 5, bottom: 20),
+              child: Container())
+        ]),
+      ]);
+    } else {
+      return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Padding(
-            padding: EdgeInsets.only(bottom: 10),
-            child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                elevation: 5,
-                child: ExpansionTile(
-                  title: Text(
-                    "LATAR BELAKANG",
-                    textAlign: TextAlign.center,
-                    style: (TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  children: [
-                    Container(
-                        margin: EdgeInsets.only(
-                            left: 40, right: 40, top: 10, bottom: 10),
-                        child: Text(_event!.latar_belakang!.toString(),
-                            style: TextStyle(
-                              height: 1.5,
-                            )))
-                  ],
-                ))),
+            padding: EdgeInsets.only(bottom: 20),
+            child: generalInformationComponent(
+                "LATAR BELAKANG", _event!.latar_belakang!.toString())),
         Padding(
-            padding: EdgeInsets.only(bottom: 10, top: 10),
-            child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                elevation: 5,
-                child: ExpansionTile(
-                  title: Text(
-                    "TUJUAN",
-                    textAlign: TextAlign.center,
-                    style: (TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  children: [
-                    Container(
-                        margin: EdgeInsets.only(
-                            left: 40, right: 40, top: 10, bottom: 10),
-                        child: Text(_event!.tujuan!.toString(),
-                            style: TextStyle(
-                              height: 1.5,
-                            )))
-                  ],
-                ))),
+            padding: EdgeInsets.only(bottom: 20),
+            child: generalInformationComponent(
+                "TUJUAN", _event!.tujuan!.toString())),
         Padding(
-            padding: EdgeInsets.only(top: 10),
-            child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                elevation: 5,
-                child: ExpansionTile(
-                  title: Text(
-                    "STRATEGI ",
-                    textAlign: TextAlign.center,
-                    style: (TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  children: [
-                    Container(
-                        margin: EdgeInsets.only(
-                            left: 40, right: 40, top: 10, bottom: 10),
-                        child: Text(_event!.strategi!.toString(),
-                            style: TextStyle(
-                              height: 1.5,
-                            )))
-                  ],
-                )))
-      ],
-    );
+            padding: EdgeInsets.only(bottom: 20),
+            child: generalInformationComponent(
+                "STRATEGI", _event!.strategi!.toString())),
+      ]);
+    }
   }
 
   warningDialog(message) {
@@ -1641,6 +1514,23 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
       else
         index--;
     });
+  }
+
+  Widget arrowNavigator(type) {
+    return Container(
+      margin: EdgeInsets.only(top: 50),
+      height: 50,
+      width: 100,
+      child: ElevatedButton(
+          onPressed: () {
+            countIndex(type);
+          },
+          child: Icon(
+              type == 1
+                  ? Icons.keyboard_double_arrow_right
+                  : Icons.keyboard_double_arrow_left,
+              color: Colors.white)),
+    );
   }
 
   Widget tampilData(BuildContext context) {
@@ -1681,7 +1571,8 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
         Container(
             alignment: Alignment.topLeft,
             padding: EdgeInsets.only(top: 20),
-            child: multiTabIndicator()),
+            child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal, child: multiTabIndicator())),
         Container(
             alignment: Alignment.topLeft,
             padding: EdgeInsets.only(top: 20),
@@ -1701,53 +1592,12 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                     ? Alignment.bottomLeft
                     : Alignment.bottomCenter,
             child: index == 0
-                ? Container(
-                    margin: EdgeInsets.only(top: 50),
-                    height: 50,
-                    width: 100,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          countIndex(1);
-                        },
-                        child: Icon(Icons.keyboard_double_arrow_right)),
-                  )
+                ? arrowNavigator(1)
                 : index == 4
-                    ? Container(
-                        margin: EdgeInsets.only(top: 50),
-                        height: 50,
-                        width: 100,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              countIndex(0);
-                            },
-                            child: Icon(Icons.keyboard_double_arrow_left)),
-                      )
+                    ? arrowNavigator(0)
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                            Container(
-                              margin: EdgeInsets.only(top: 50),
-                              height: 50,
-                              width: 100,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    countIndex(0);
-                                  },
-                                  child:
-                                      Icon(Icons.keyboard_double_arrow_left)),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 50),
-                              height: 50,
-                              width: 100,
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    countIndex(1);
-                                  },
-                                  child:
-                                      Icon(Icons.keyboard_double_arrow_right)),
-                            )
-                          ])),
+                        children: [arrowNavigator(0), arrowNavigator(1)])),
         if (index == 4)
           Container(
             margin: EdgeInsets.only(top: 50),
@@ -1985,7 +1835,10 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
               },
               child: Text(
                 'Submit',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
             ),
           ),
@@ -1997,8 +1850,10 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Buat Laporan Event"),
+          title:
+              Text("Buat Laporan Event", style: TextStyle(color: Colors.white)),
           leading: BackButton(
+            color: Colors.white,
             onPressed: () {
               Navigator.popAndPushNamed(context, "/homepage");
             },

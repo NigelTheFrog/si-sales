@@ -39,7 +39,7 @@ dependencies:
   image: 
   path_provider: 
   file_picker:
-  dropdown_search:
+  dropdown_search: ^3.0.0
   syncfusion_flutter_pdf: 
   universal_html: 
   device_info_plus: 
