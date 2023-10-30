@@ -1275,50 +1275,6 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
         ]));
   }
 
-  Widget lokasi() {
-    return Column(children: [
-      Text(
-        "LOKASI",
-        style: TextStyle(fontWeight: FontWeight.bold),
-      ),
-      ListView.builder(
-          shrinkWrap: true,
-          itemCount: _event?.lokasi?.length,
-          itemBuilder: (BuildContext ctxt, int index) {
-            return RichText(
-              text: TextSpan(
-                style: const TextStyle(
-                  fontSize: 13.0,
-                  color: Colors.black,
-                ),
-                children: <TextSpan>[
-                  TextSpan(text: '\nKelurahan: '),
-                  TextSpan(
-                      text: _event!.lokasi![index]['kelurahan'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: ', Kecamatan: '),
-                  TextSpan(
-                      text: _event!.lokasi![index]['kecamatan'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: ', Kota: '),
-                  TextSpan(
-                      text: _event!.lokasi![index]['kota'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: ', Provinsi: '),
-                  TextSpan(
-                      text: _event!.lokasi![index]['provinsi'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: '\nAlamat: '),
-                  TextSpan(
-                      text: _event!.lokasi![index]['alamat'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
-            );
-          }),
-    ]);
-  }
-
   Widget buildFinalisasi() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -1416,7 +1372,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
     );
   }
 
-  Widget generalInformationComponent(title, text) {
+  Widget generalInformationComponent(type, title, text) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 5,
@@ -1430,10 +1386,66 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
               Container(
                   margin:
                       EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
-                  child: Text(text,
-                      style: TextStyle(
-                        height: 1.5,
-                      )))
+                  child: type == 0
+                      ? Text(text,
+                          style: TextStyle(
+                            height: 1.5,
+                          ))
+                      : RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                                fontSize: 13.0, color: Colors.black, height: 2),
+                            children: [
+                              TextSpan(text: 'ID Event: '),
+                              TextSpan(
+                                  text: widget.event_id,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: '\nNama Event: '),
+                              TextSpan(
+                                  text: _event!.nama,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: '\nPenanggung Jawab: '),
+                              TextSpan(
+                                  text: widget.penanggung_jawab,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: Divider()),
+                              TextSpan(
+                                  text: "LOKASI:",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: '\nKelurahan: '),
+                              TextSpan(
+                                  text: _event!.lokasi![0]['kelurahan'],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: ', Kecamatan: '),
+                              TextSpan(
+                                  text: _event!.lokasi![0]['kecamatan'],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: ', Kota: '),
+                              TextSpan(
+                                  text: _event!.lokasi![0]['kota'],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: ', Provinsi: '),
+                              TextSpan(
+                                  text: _event!.lokasi![0]['provinsi'],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              TextSpan(text: '\nAlamat: '),
+                              TextSpan(
+                                  text: _event!.lokasi![0]['alamat'],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ))
             ]));
   }
 
@@ -1443,25 +1455,25 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
         TableRow(children: [
           Container(
               width: 500,
-              padding: EdgeInsets.only(right: 5, bottom: 20),
-              child: generalInformationComponent(
-                  "LATAR BELAKANG", _event!.latar_belakang!.toString())),
+              padding: EdgeInsets.only(left: 5, bottom: 20),
+              child: generalInformationComponent(1, "TENTANG EVENT", "")),
           Container(
               width: 500,
-              padding: EdgeInsets.only(left: 5, bottom: 20),
+              padding: EdgeInsets.only(right: 5, bottom: 20),
               child: generalInformationComponent(
-                  "TUJUAN", _event!.tujuan!.toString()))
+                  0, "LATAR BELAKANG", _event!.latar_belakang!.toString())),
         ]),
         TableRow(children: [
           Container(
               width: 500,
-              padding: EdgeInsets.only(right: 5, bottom: 20),
+              padding: EdgeInsets.only(left: 5, bottom: 20),
               child: generalInformationComponent(
-                  "STRATEGI", _event!.strategi!.toString())),
+                  0, "TUJUAN", _event!.tujuan!.toString())),
           Container(
               width: 500,
-              padding: EdgeInsets.only(left: 5, bottom: 20),
-              child: Container())
+              padding: EdgeInsets.only(right: 5, bottom: 20),
+              child: generalInformationComponent(
+                  0, "STRATEGI", _event!.strategi!.toString())),
         ]),
       ]);
     } else {
@@ -1469,15 +1481,19 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
         Padding(
             padding: EdgeInsets.only(bottom: 20),
             child: generalInformationComponent(
-                "LATAR BELAKANG", _event!.latar_belakang!.toString())),
+                1, "TENTANG EVENT", _event!.latar_belakang!.toString())),
         Padding(
             padding: EdgeInsets.only(bottom: 20),
             child: generalInformationComponent(
-                "TUJUAN", _event!.tujuan!.toString())),
+                0, "LATAR BELAKANG", _event!.latar_belakang!.toString())),
         Padding(
             padding: EdgeInsets.only(bottom: 20),
             child: generalInformationComponent(
-                "STRATEGI", _event!.strategi!.toString())),
+                0, "TUJUAN", _event!.tujuan!.toString())),
+        Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: generalInformationComponent(
+                0, "STRATEGI", _event!.strategi!.toString())),
       ]);
     }
   }
@@ -1540,34 +1556,6 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
       alignment: Alignment.topCenter,
       padding: EdgeInsets.only(top: 20, bottom: 20),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Align(
-            alignment: Alignment.topLeft,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("ID Event: ${widget.event_id}",
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text("Nama Event: ${_event!.nama}",
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
-                ])),
-        Container(
-          alignment: Alignment.topLeft,
-          padding: EdgeInsets.only(top: 20),
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Container(
-                width: 500,
-                padding: EdgeInsets.only(right: 5),
-                child: lokasi()),
-            Text("Penanggung Jawab: ${widget.penanggung_jawab}",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          ]),
-        ),
         Container(
             alignment: Alignment.topLeft,
             padding: EdgeInsets.only(top: 20),
@@ -1575,7 +1563,7 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                 scrollDirection: Axis.horizontal, child: multiTabIndicator())),
         Container(
             alignment: Alignment.topLeft,
-            padding: EdgeInsets.only(top: 20),
+            padding: EdgeInsets.only(top: 20, left: 10, right: 10),
             child: index == 0
                 ? buildGeneralInformation()
                 : index == 1
@@ -1585,7 +1573,8 @@ class _BuatLaporanEventState extends State<BuatLaporanEvent> {
                         : index == 3
                             ? buildPengunjung()
                             : buildFinalisasi()),
-        Align(
+        Container(
+            padding: EdgeInsets.only(left: 10, right: 10),
             alignment: index == 0
                 ? Alignment.bottomRight
                 : index == 4

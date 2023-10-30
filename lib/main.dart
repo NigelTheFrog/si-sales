@@ -28,6 +28,7 @@ import 'package:pt_coronet_crown/customicon/outlet_icons.dart';
 import 'package:pt_coronet_crown/customicon/produk_icons.dart';
 import 'package:pt_coronet_crown/customicon/proposal_icons.dart';
 import 'package:pt_coronet_crown/customicon/transaction_icons.dart';
+import 'package:pt_coronet_crown/laporan/event/laporan/buatlaporan.dart';
 import 'package:pt_coronet_crown/laporan/event/laporan/daftarevent.dart';
 import 'package:pt_coronet_crown/laporan/event/proposal/buatproposal.dart';
 import 'package:pt_coronet_crown/laporan/event/proposal/daftarproposal.dart';
@@ -193,9 +194,8 @@ class MyApp extends StatelessWidget {
         //harus dilakukan pengecekan id jabatan
         "/daftarpembelian": (context) => DaftarPembelian(),
         "/daftarpenjualan": (context) => DaftarPenjualan(),
-        "/daftarpersonel": (context) => PersonelData(),
         "/daftargrup": (context) => PersonelGroup(),
-        "tambahstaff": (context) => CreateAccount(),
+        "/tambahstaff": (context) => CreateAccount(),
         "tambahgrup": (context) => CreateGroup(),
         "/daftarproduk": (context) => DaftarProduk(),
         "/daftarjabatan": (context) => DaftarJabatan(),
@@ -220,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String dateNow = "";
   final List<Widget> screens = [
     Home(),
-    PersonelData(),
+    PersonelData(type: idjabatan == "3" ? 0 : 1),
     PersonelGroup(),
     DaftarKehadiran(type: idjabatan == "3" ? 0 : 1),
     DaftarPersetujuan(),
@@ -340,6 +340,15 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(text, style: TextStyle(color: Colors.white)),
         leading: Icon(icon, color: Colors.white),
         onTap: () {
+          if (index == 9) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BuatLaporanEvent(
+                          event_id: "6/admin/JTM-SDJ-TAMAN/2023-07-27",
+                          penanggung_jawab: "Nigel Kislew William",
+                        )));
+          }
           if (index != 15) {
             if (dateNow != tanggalAbsen || tanggalAbsen == "") {
               if (index == 3) {

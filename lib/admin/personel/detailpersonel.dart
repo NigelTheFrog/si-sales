@@ -12,35 +12,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:pt_coronet_crown/class/personel/personel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailPersonel extends StatefulWidget {
-  String username,
-      avatar,
-      namaDepan,
-      namaBelakang,
-      email,
-      nomorTelepon,
-      namaCabang,
-      namaJabatan,
-      namaGrup,
-      idcabang,
-      idjabatan,
-      idgrup;
+  String username;
+
   DetailPersonel({
     super.key,
     required this.username,
-    required this.avatar,
-    required this.namaDepan,
-    required this.namaBelakang,
-    required this.email,
-    required this.nomorTelepon,
-    required this.namaCabang,
-    required this.namaJabatan,
-    required this.namaGrup,
-    required this.idcabang,
-    required this.idjabatan,
-    required this.idgrup,
   });
   @override
   _DetailPersonelState createState() {
@@ -57,12 +37,13 @@ class _DetailPersonelState extends State<DetailPersonel> {
   TextEditingController namaBelakangController = TextEditingController();
   TextEditingController namaGrupController = TextEditingController();
 
-  late Timer timer;
+  Person? personalia;
   String cabang = "",
       usernameController = "",
-      _idjabatan = "",
+      id_jabatan = "",
       _idcabang = "",
-      _idgrup = "";
+      _idgrup = "",
+      jabatanPersonalia = "";
   var _avatar = null;
   var _avatar_proses = null;
 
@@ -126,7 +107,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
               "http://192.168.137.1/magang/admin/personel/personeldata/ubahpersonel.php"),
           body: {
             'username': widget.username,
-            'id_jabatan': _idjabatan,
+            'id_jabatan': id_jabatan,
           });
     }
 
@@ -146,9 +127,39 @@ class _DetailPersonelState extends State<DetailPersonel> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       id_jabatan = prefs.getString("idJabatan") ?? '';
-      if (id_jabatan != "1" || id_jabatan != "2") {
-        widget.namaDepan = namaDepanController.text = prefs.getString("idJabatan") ?? '';
-      }
+    });
+  }
+
+  Future<String> fetchData() async {
+    final response = await http.post(
+        Uri.parse(
+            "https://otccoronet.com/otc/account/kunjungan/detailkunjungan.php"),
+        body: {'id': widget.username});
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to read API');
+    }
+  }
+
+  bacadata() {
+    fetchData().then((value) {
+      Map json = jsonDecode(value);
+      personalia = Person.fromJson(json['data']);
+      setState(() {
+        usernameController = widget.username;
+        namaDepanController.text = personalia!.nama_depan;
+        namaBelakangController.text = personalia!.nama_belakang;
+        emailController.text = personalia!.email;
+        nomorTeleponController.text = personalia!.no_telp;
+        namaCabangController.text = personalia!.nama_cabang;
+        namaJabatanController.text = personalia!.jabatan;
+        namaGrupController.text = personalia!.nama_grup;
+        _idcabang = personalia!.id_cabang;
+        jabatanPersonalia = personalia!.id_jabatan.toString();
+        _idgrup = personalia!.id_grup;
+        _avatar = personalia!.avatar;
+      });
     });
   }
 
@@ -157,25 +168,12 @@ class _DetailPersonelState extends State<DetailPersonel> {
     // TODO: implement initState
     super.initState();
     _loadData();
-    if (id_jabatan == "1" || id_jabatan == "2") {
-      usernameController = widget.username;
-      namaDepanController.text = widget.namaDepan;
-      namaBelakangController.text = widget.namaBelakang;
-      emailController.text = widget.email;
-      nomorTeleponController.text = widget.nomorTelepon;
-      namaCabangController.text = widget.namaCabang;
-      namaJabatanController.text = widget.namaJabatan;
-      namaGrupController.text = widget.namaGrup;
-      _idcabang = widget.idcabang;
-      _idjabatan = widget.idjabatan;
-      _idgrup = widget.idgrup;
-    }
+    bacadata();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    timer.cancel();
     super.dispose();
   }
 
@@ -240,7 +238,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
           _idcabang = value['id'];
           namaCabangController.text = value['nama_cabang'];
         } else if (change == 5) {
-          _idjabatan = value['id'];
+          id_jabatan = value['id'];
           namaJabatanController.text = value['jabatan'];
         } else {
           _idgrup = value['id'];
@@ -357,7 +355,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
                 print(emailController.text);
                 print(nomorTeleponController.text);
                 print(_idcabang);
-                print(_idjabatan);
+                print(id_jabatan);
 
                 Navigator.pop(context);
               },
@@ -385,7 +383,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
                 child: Container(
                   height: 200,
                   width: 150,
-                  child: Image.memory(base64Decode(widget.avatar)),
+                  child: Image.memory(base64Decode(_avatar)),
                   // : Image.file(_avatar_proses!),
                 ))),
         Text(

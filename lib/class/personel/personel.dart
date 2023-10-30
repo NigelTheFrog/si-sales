@@ -1,11 +1,9 @@
-
 class Person {
   final String username,
       nama_depan,
       nama_belakang,
       email,
       avatar,
-      gender,
       no_telp,
       tanggal_gabung,
       jabatan,
@@ -13,7 +11,7 @@ class Person {
       nama_grup,
       id_cabang,
       nama_cabang;
-  int id_jabatan;
+  int id_jabatan, gender;
 
   Person({
     required this.username,
@@ -39,7 +37,7 @@ class Person {
       nama_belakang: json['nama_belakang'] as String,
       email: json['email'] as String,
       avatar: json['avatar'] as String,
-      gender: json['gender'] as String,
+      gender: json['gender'] as int,
       no_telp: json['no_telp'] as String,
       tanggal_gabung: json['tanggal_gabung'] as String,
       id_jabatan: json['id_jabatan'] as int,

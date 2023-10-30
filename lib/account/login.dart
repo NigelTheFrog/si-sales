@@ -1,11 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 // import 'dart:developer';
 
 import 'package:flutter/material.dart';
 // import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 // import 'package:pt_coronet_crown/account/createacount.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
 
 import '../main.dart';
 
@@ -36,6 +41,8 @@ class _LoginState extends State<Login> {
   String error_login = "";
   String picture = "null";
   bool isLoading = false;
+  var _avatar, _avatar_proses;
+  final picker = ImagePicker();
 
 //   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 //if (Platform.isAndroid) {
@@ -51,29 +58,85 @@ class _LoginState extends State<Login> {
     _username = "";
   }
 
+  void prosesFoto() {
+    Future<Directory?> extDir = getTemporaryDirectory();
+    extDir.then((value) {
+      String _timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final String filePath = '${value?.path}/$_timestamp.jpg';
+      _avatar_proses = File(filePath);
+      img.Image? temp = img.readJpg(_avatar!.readAsBytesSync());
+      img.Image temp2 = img.copyResize(temp!, width: 480, height: 640);
+      setState(() {
+        _avatar_proses = Uint8List.fromList(img.encodeJpg(temp2));
+        updateAccount();
+      });
+    });
+  }
+
+  Future captureImg() async {
+    var picked_img =
+        await picker.pickImage(source: ImageSource.camera, imageQuality: 20);
+    _avatar = File(picked_img!.path);
+    prosesFoto();
+  }
+
+  void updateAccount() async {
+    final response = await http
+        .post(Uri.parse("https://otccoronet.com/otc/account/login.php"), body: {
+      'username': _username,
+      'avatar': base64Encode(_avatar_proses),
+      'type': "1"
+    });
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      final prefs = await SharedPreferences.getInstance();
+      if (json['result'] == 'success') {
+        prefs.setString("avatar", base64Encode(_avatar_proses));
+        main();
+      } else {
+        prefs.clear();
+      }
+    }
+  }
+
   void doLogin() async {
     final response = await http.post(
         Uri.parse("https://otccoronet.com/otc/account/login.php"),
-        body: {'username': _username, 'password': _password});
+        body: {'username': _username, 'password': _password, 'type': "0"});
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
+      final prefs = await SharedPreferences.getInstance();
       if (json['result'] == 'success') {
-        if (json["avatar"] == null || json["avatar"] == "") {}
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setString("username", json['username']);
-        prefs.setString("nama_depan", json["nama_depan"]);
-        prefs.setString("nama_belakang", json["nama_belakang"]);
-        prefs.setString("email", json["email"]);
-        prefs.setString("tanggal_gabung", json["tanggal_gabung"]);
-        prefs.setString("avatar", json["avatar"]);
-        prefs.setString("idJabatan", json["id_jabatan"].toString());
-        prefs.setString("jabatan", json["jabatan"]);
-        prefs.setString("idCabang", json["id_cabang"]);
-        prefs.setString("cabang", json["cabang"]);
-        prefs.setString("idGrup", json["id_grup"]);
-        prefs.setString("grup", json["grup"]);
-        prefs.setString("tanggalAbsen", json["tanggal_absen"]);
-        main();
+        if (json["avatar"] == null || json["avatar"] == "") {
+          prefs.setString("username", json['username']);
+          prefs.setString("nama_depan", json["nama_depan"]);
+          prefs.setString("nama_belakang", json["nama_belakang"]);
+          prefs.setString("email", json["email"]);
+          prefs.setString("tanggal_gabung", json["tanggal_gabung"]);
+          prefs.setString("idJabatan", json["id_jabatan"].toString());
+          prefs.setString("jabatan", json["jabatan"]);
+          prefs.setString("idCabang", json["id_cabang"]);
+          prefs.setString("cabang", json["cabang"]);
+          prefs.setString("idGrup", json["id_grup"]);
+          prefs.setString("grup", json["grup"]);
+          prefs.setString("tanggalAbsen", json["tanggal_absen"]);
+          updateAccount();
+        } else {
+          prefs.setString("username", json['username']);
+          prefs.setString("nama_depan", json["nama_depan"]);
+          prefs.setString("nama_belakang", json["nama_belakang"]);
+          prefs.setString("email", json["email"]);
+          prefs.setString("tanggal_gabung", json["tanggal_gabung"]);
+          prefs.setString("idJabatan", json["id_jabatan"].toString());
+          prefs.setString("jabatan", json["jabatan"]);
+          prefs.setString("idCabang", json["id_cabang"]);
+          prefs.setString("cabang", json["cabang"]);
+          prefs.setString("idGrup", json["id_grup"]);
+          prefs.setString("grup", json["grup"]);
+          prefs.setString("tanggalAbsen", json["tanggal_absen"]);
+          prefs.setString("avatar", json["avatar"]);
+          main();
+        }
       } else {
         if (json['message'] == "1") {
           setState(() {

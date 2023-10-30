@@ -356,14 +356,35 @@ class _DaftarEventState extends State<DaftarEvent> {
                                     color: Colors.blue,
                                     decoration: TextDecoration.underline),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {}
-                                // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (context) => DetailPembelian(
-                                //               laporan_id:
-                                //                   pembelian2[index].id,
-                                //             )))
+                                  ..onTap = () {
+                                    if (event2[index].status == 0 ||
+                                        event2[index].status == 1) {
+                                    } else if (event2[index].status == 2) {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BuatLaporanEvent(
+                                                    event_id: event2[index].id,
+                                                    penanggung_jawab:
+                                                        event2[index]
+                                                            .penanggung_jawab
+                                                            .toString(),
+                                                  )));
+                                    } else {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => DetailEvent(
+                                                    event_id: event2[index].id,
+                                                    penanggung_jawab:
+                                                        event2[index]
+                                                            .penanggung_jawab
+                                                            .toString(),
+                                                  )));
+                                    }
+                                  }
+
                                 )
                           ]))));
             });
