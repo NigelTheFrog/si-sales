@@ -69,6 +69,119 @@ class _PersonelDataState extends State<PersonelData> {
     _loadData();
   }
 
+  Widget buildPersonelComponent(data) {
+    return Card(
+        elevation: 5,
+        child: Stack(children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: Column(
+              children: [
+                Tooltip(
+                  message: 'Aktivitas Harian',
+                  child: IconButton(
+                    icon: Icon(Icons.zoom_in),
+                    onPressed: () {},
+                  ),
+                ),
+                Tooltip(
+                  message: 'Edit data personnel',
+                  child: IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {},
+                  ),
+                ),
+                Tooltip(
+                  message: 'Hapus Personnel',
+                  child: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      setState(() {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Warning!"),
+                              content: Text(
+                                  "Dengan menekan tombol iya, \nAnda akan menghapus data user: ${data.username}"),
+                              actions: [
+                                TextButton(
+                                  child: Text("Cancel"),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                  child: Text("Iya"),
+                                  onPressed: () =>
+                                      deletePersonel(data.username),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                        //deletePersonel(person2[idx].username);
+                      });
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+          Row(children: [
+            Container(
+                alignment: Alignment.topLeft,
+                margin: EdgeInsets.only(top: 5, left: 5, bottom: 5, right: 10),
+                // child: ClipRRect(borderRadius: BorderRadius.circular(8), child: ,),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 2, color: Colors.orange),
+                ),
+                width: 100,
+                height: 130,
+                child: Image(
+                  image: MemoryImage(base64Decode(data.avatar)),
+                  alignment: Alignment.center,
+                  height: double.infinity,
+                  width: double.infinity,
+                  fit: BoxFit.fill,
+                )
+                // child:  Image.memory(
+                //   base64Decode(person2[index].avatar),
+                //   // fit: BoxFit.fill,
+                // )
+                ),
+            Container(
+                padding: EdgeInsets.all(5),
+                width: 220,
+                child: Column(children: [
+                  Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "${data.nama_depan} ${data.nama_belakang} - ${data.jabatan} \n${data.nama_cabang}",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                  Align(
+                      alignment: Alignment.topLeft, child: Text(data.username)),
+                  Row(children: [
+                    Icon(Icons.mail, size: 20),
+                    Text(" ${data.email}",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 12))
+                  ]),
+                  Row(children: [
+                    Icon(Icons.phone, size: 16),
+                    Text(" ${data.no_telp}",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 12))
+                  ]),
+                  Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text("Group : ${data.nama_grup}",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 12))),
+                ]))
+          ])
+        ]));
+  }
+
   Widget listPersonel(data) {
     List<Person> person2 = [];
     Map json = jsonDecode(data);
@@ -79,149 +192,26 @@ class _PersonelDataState extends State<PersonelData> {
         Person person = Person.fromJson(pers);
         person2.add(person);
       }
-      return
-          // child: SizedBox(
-          // height: MediaQuery.of(context).size.width,
-          // width: MediaQuery.of(context).size.width,
-          dynamicGridView.DynamicHeightGridView(
-              crossAxisCount: MediaQuery.of(context).size.width >= 800 ? 2 : 1,
-              crossAxisSpacing: 4,
-              itemCount: person2.length,
-              builder: (context, index) {
-                return Card(
-                    elevation: 5,
-                    child: Stack(children: [
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Column(
-                          children: [
-                            Tooltip(
-                              message: 'Personnel attendance',
-                              child: IconButton(
-                                icon: Icon(Icons.zoom_in),
-                                onPressed: () {},
-                              ),
-                            ),
-                            Tooltip(
-                              message: 'Edit data personnel',
-                              child: IconButton(
-                                icon: Icon(Icons.edit),
-                                onPressed: () {
-                                  // Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //         builder: (context) => DetailPersonel(
-                                  //               username: person2[i].username,
-                                  //               avatar: person2[i].avatar,
-                                  //               namaDepan: person2[i].nama_depan,
-                                  //               namaBelakang: person2[i].nama_belakang,
-                                  //               nomorTelepon: person2[i].no_telp,
-                                  //               namaJabatan: person2[i].jabatan,
-                                  //               namaCabang: person2[i].nama_cabang,
-                                  //               email: person2[i].email,
-                                  //               idcabang: person2[i].id_cabang,
-                                  //               idjabatan:
-                                  //                   person2[i].id_jabatan.toString(),
-                                  //               idgrup: person2[i].id_grup,
-                                  //               namaGrup: person2[i].nama_grup,
-                                  //             )));
-                                },
-                              ),
-                            ),
-                            Tooltip(
-                              message: 'Delete Personnel',
-                              child: IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () {
-                                  setState(() {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text("Warning!"),
-                                          content: Text(
-                                              "Dengan menekan tombol iya, \nAnda akan menghapus data user: ${person2[index].username}"),
-                                          actions: [
-                                            TextButton(
-                                              child: Text("Cancel"),
-                                              onPressed: () {},
-                                            ),
-                                            TextButton(
-                                              child: Text("Iya"),
-                                              onPressed: () {
-                                                //deletePersonel(person2[i].username);
-                                              },
-                                            )
-                                          ],
-                                        );
-                                      },
-                                    );
-                                    //deletePersonel(person2[idx].username);
-                                  });
-                                },
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Row(children: [
-                        Container(
-                            alignment: Alignment.topLeft,
-                            margin: EdgeInsets.only(
-                                top: 5, left: 5, bottom: 5, right: 10),
-                            // child: ClipRRect(borderRadius: BorderRadius.circular(8), child: ,),
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(width: 2, color: Colors.orange),
-                            ),
-                            width: 100,
-                            height: 130,
-                            child: Image(
-                              image: MemoryImage(
-                                  base64Decode(person2[index].avatar)),
-                              alignment: Alignment.center,
-                              height: double.infinity,
-                              width: double.infinity,
-                              fit: BoxFit.fill,
-                            )
-                            // child:  Image.memory(
-                            //   base64Decode(person2[index].avatar),
-                            //   // fit: BoxFit.fill,
-                            // )
-                            ),
-                        Container(
-                            padding: EdgeInsets.all(5),
-                            width: 220,
-                            child: Column(children: [
-                              Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(
-                                    "${person2[index].nama_depan} ${person2[index].nama_belakang} - ${person2[index].jabatan} \n${person2[index].nama_cabang}",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  )),
-                              Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text(person2[index].username)),
-                              Row(children: [
-                                Icon(Icons.mail),
-                                Text(person2[index].email,
-                                    textAlign: TextAlign.left)
-                              ]),
-                              Row(children: [
-                                Icon(Icons.phone),
-                                Text(person2[index].no_telp,
-                                    textAlign: TextAlign.left)
-                              ]),
-                              Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Text(
-                                      "Group : " + person2[index].nama_grup,
-                                      textAlign: TextAlign.left)),
-                            ]))
-                      ])
-                    ]));
-              });
+      if (MediaQuery.of(context).size.width >= 800) {
+        return dynamicGridView.DynamicHeightGridView(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: ClampingScrollPhysics(),
+            crossAxisSpacing: 4,
+            itemCount: person2.length,
+            builder: (context, index) {
+              return buildPersonelComponent(person2[index]);
+            });
+      } else {
+        return ListView.builder(
+            itemCount: person2.length,
+            shrinkWrap: true,
+            physics: ClampingScrollPhysics(),
+            padding: EdgeInsets.only(left: 5, right: 5),
+            itemBuilder: (BuildContext ctxt, int index) {
+              return buildPersonelComponent(person2[index]);
+            });
+      }
     }
   }
 
@@ -248,23 +238,27 @@ class _PersonelDataState extends State<PersonelData> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
-                  alignment: Alignment.topCenter,
-                  width: 300,
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      icon: Icon(Icons.search),
-                      labelText: 'Search Personnel',
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _txtcari = value;
-                      });
-                      // bacaData();
-                    },
-                  ),
-                ),
+                    margin: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    alignment: Alignment.topCenter,
+                    width: 300,
+                    child: Row(
+                      children: [
+                        Container(
+                            child: TextFormField(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.search),
+                            labelText: 'Search Personnel',
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              _txtcari = value;
+                            });
+                            // bacaData();
+                          },
+                        ))
+                      ],
+                    )),
                 Container(
                     alignment: Alignment.topCenter,
                     padding: EdgeInsets.only(left: 5, right: 5),

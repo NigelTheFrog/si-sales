@@ -16,6 +16,7 @@ import 'package:pt_coronet_crown/admin/company/daftarprovinsi.dart';
 import 'package:http/http.dart' as http;
 import 'package:pt_coronet_crown/admin/jabatan/daftarjabatan.dart';
 import 'package:pt_coronet_crown/admin/personel/addpersonelgroup.dart';
+import 'package:pt_coronet_crown/admin/personel/detailpersonel.dart';
 import 'package:pt_coronet_crown/admin/personel/personeldata.dart';
 import 'package:pt_coronet_crown/admin/personel/personelgroup.dart';
 import 'package:pt_coronet_crown/admin/company/daftarproduk.dart';
@@ -96,6 +97,8 @@ Future<String> getTanggalAbsen() async {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // ErrorWidget.builder = (FlutterErrorDetails details) =>
+  //     Center(child: CircularProgressIndicator());
   checkUser().then((String result) {
     if (result == '')
       runApp(MyLogin());
@@ -231,7 +234,8 @@ class _MyHomePageState extends State<MyHomePage> {
     DaftarPenjualan(),
     DaftarProposal(type: idjabatan == "3" ? 0 : 1),
     DaftarEvent(type: idjabatan == "3" ? 0 : 1),
-    DaftarProvinsi()
+    DaftarProvinsi(),
+    DetailPersonel(type: 0)
   ];
 
   final List<String> _title = [
@@ -245,7 +249,8 @@ class _MyHomePageState extends State<MyHomePage> {
     'Daftar Penjualan',
     'Daftar Proposal',
     'Daftar Event',
-    'Daftar Provinsi'
+    'Daftar Provinsi',
+    'Informasi Akun'
   ];
 
   void doLogout() async {
@@ -340,15 +345,6 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(text, style: TextStyle(color: Colors.white)),
         leading: Icon(icon, color: Colors.white),
         onTap: () {
-          if (index == 9) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => BuatLaporanEvent(
-                          event_id: "6/admin/JTM-SDJ-TAMAN/2023-07-27",
-                          penanggung_jawab: "Nigel Kislew William",
-                        )));
-          }
           if (index != 15) {
             if (dateNow != tanggalAbsen || tanggalAbsen == "") {
               if (index == 3) {
@@ -378,7 +374,6 @@ class _MyHomePageState extends State<MyHomePage> {
             base64Decode(avatar),
             width: 150,
             height: 150,
-            alignment: Alignment.topCenter,
             fit: BoxFit.cover,
           )),
           Padding(
@@ -465,7 +460,7 @@ class _MyHomePageState extends State<MyHomePage> {
             buildTile(9, "Riwayat Event", Calendar.event),
           ],
         ),
-        buildTile(1, "Informasi Akun", Icons.account_circle),
+        buildTile(11, "Informasi Akun", Icons.account_circle),
         buildTile(15, "Logout", Icons.logout)
       ]));
     } else {
@@ -553,10 +548,11 @@ class _MyHomePageState extends State<MyHomePage> {
             // width: MediaQuery.of(context).size.width,
             child: Row(children: [
               if (MediaQuery.of(context).size.width >= 1050) NavigationPane(),
-              SizedBox(
+              Container(
                 width: MediaQuery.of(context).size.width >= 1050
                     ? MediaQuery.of(context).size.width * 0.82
                     : MediaQuery.of(context).size.width,
+                alignment: Alignment.topCenter,
                 child: screens[indexScreen],
               )
             ])),

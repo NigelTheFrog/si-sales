@@ -16,12 +16,9 @@ import 'package:pt_coronet_crown/class/personel/personel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailPersonel extends StatefulWidget {
-  String username;
-
-  DetailPersonel({
-    super.key,
-    required this.username,
-  });
+  int type;
+  String? username;
+  DetailPersonel({super.key, required this.type, this.username});
   @override
   _DetailPersonelState createState() {
     return _DetailPersonelState();
@@ -29,17 +26,19 @@ class DetailPersonel extends StatefulWidget {
 }
 
 class _DetailPersonelState extends State<DetailPersonel> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController nomorTeleponController = TextEditingController();
-  TextEditingController namaCabangController = TextEditingController();
-  TextEditingController namaJabatanController = TextEditingController();
-  TextEditingController namaDepanController = TextEditingController();
-  TextEditingController namaBelakangController = TextEditingController();
-  TextEditingController namaGrupController = TextEditingController();
+  TextEditingController emailController = TextEditingController(),
+      namaLengkapController = TextEditingController(),
+      nomorTeleponController = TextEditingController(),
+      namaCabangController = TextEditingController(),
+      namaJabatanController = TextEditingController(),
+      namaDepanController = TextEditingController(),
+      namaBelakangController = TextEditingController(),
+      namaGrupController = TextEditingController(),
+      tanggalGabungController = TextEditingController();
 
   Person? personalia;
   String cabang = "",
-      usernameController = "",
+      username = "",
       id_jabatan = "",
       _idcabang = "",
       _idgrup = "",
@@ -67,49 +66,19 @@ class _DetailPersonelState extends State<DetailPersonel> {
   }
 
   void update(BuildContext context, change) async {
-    var response;
-    if (change == 1) {
-      response = await http.post(
-          Uri.parse(
-              "http://192.168.137.1/magang/admin/personel/personeldata/ubahpersonel.php"),
-          body: {
-            'username': widget.username,
-            'nama_depan': namaDepanController.text,
-            'nama_belakang': namaBelakangController.text
-          });
-    } else if (change == 2) {
-      response = await http.post(
-          Uri.parse(
-              "http://192.168.137.1/magang/admin/personel/personeldata/ubahpersonel.php"),
-          body: {
-            'username': widget.username,
-            'email': emailController.text,
-          });
-    } else if (change == 3) {
-      response = await http.post(
-          Uri.parse(
-              "http://192.168.137.1/magang/admin/personel/personeldata/ubahpersonel.php"),
-          body: {
-            'username': widget.username,
-            'email': nomorTeleponController.text,
-          });
-    } else if (change == 4) {
-      response = await http.post(
-          Uri.parse(
-              "http://192.168.137.1/magang/admin/personel/personeldata/ubahpersonel.php"),
-          body: {
-            'username': widget.username,
-            'id_cabang': _idcabang,
-          });
-    } else if (change == 2) {
-      response = await http.post(
-          Uri.parse(
-              "http://192.168.137.1/magang/admin/personel/personeldata/ubahpersonel.php"),
-          body: {
-            'username': widget.username,
-            'id_jabatan': id_jabatan,
-          });
-    }
+    var response = await http.post(
+        Uri.parse(
+            "https://otccoronet.com/otc/admin/personel/personeldata/ubahpersonel.php"),
+        body: {
+          'username': username,
+          'nama_depan': namaDepanController.text,
+          'nama_belakang': namaBelakangController.text,
+          'email': emailController.text,
+          'nomor_telepon': nomorTeleponController.text,
+          'id_jabatan': id_jabatan,
+          'id_grup': _idcabang,
+          'type': change
+        });
 
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
@@ -117,6 +86,7 @@ class _DetailPersonelState extends State<DetailPersonel> {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Sukses Mengubah Data')));
+        build(context);
       }
     } else {
       throw Exception('Failed to read API');
@@ -126,6 +96,22 @@ class _DetailPersonelState extends State<DetailPersonel> {
   _loadData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
+      username = prefs.getString("username") ?? '';
+
+      namaDepanController.text = prefs.getString("nama_depan") ?? '';
+      namaBelakangController.text = prefs.getString("nama_belakang") ?? '';
+      namaLengkapController.text =
+          "${namaDepanController.text} ${namaBelakangController.text}";
+      emailController.text = prefs.getString("email") ?? '';
+      nomorTeleponController.text = prefs.getString("telepon") ?? '';
+      tanggalGabungController.text = prefs.getString("tanggal_gabung") ?? '';
+      namaJabatanController.text = prefs.getString("jabatan") ?? '';
+      namaCabangController.text = prefs.getString("cabang") ?? '';
+      namaGrupController.text = prefs.getString("grup") ?? '';
+      _idcabang = prefs.getString("idCabang") ?? '';
+      jabatanPersonalia = prefs.getString("idJabatan") ?? '';
+      _idgrup = prefs.getString("idGrup") ?? '';
+      _avatar = prefs.getString("avatar") ?? '';
       id_jabatan = prefs.getString("idJabatan") ?? '';
     });
   }
@@ -133,8 +119,8 @@ class _DetailPersonelState extends State<DetailPersonel> {
   Future<String> fetchData() async {
     final response = await http.post(
         Uri.parse(
-            "https://otccoronet.com/otc/account/kunjungan/detailkunjungan.php"),
-        body: {'id': widget.username});
+            "https://otccoronet.com/otc/admin/personel/personeldata/detailpersoneldata.php"),
+        body: {'username': username});
     if (response.statusCode == 200) {
       return response.body;
     } else {
@@ -147,7 +133,6 @@ class _DetailPersonelState extends State<DetailPersonel> {
       Map json = jsonDecode(value);
       personalia = Person.fromJson(json['data']);
       setState(() {
-        usernameController = widget.username;
         namaDepanController.text = personalia!.nama_depan;
         namaBelakangController.text = personalia!.nama_belakang;
         emailController.text = personalia!.email;
@@ -167,8 +152,12 @@ class _DetailPersonelState extends State<DetailPersonel> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _loadData();
-    bacadata();
+    print(widget.type == 0);
+    if (widget.type == 0) {
+      _loadData();
+    } else {
+      bacadata();
+    }
   }
 
   @override
@@ -267,19 +256,6 @@ class _DetailPersonelState extends State<DetailPersonel> {
     });
   }
 
-  Future chooseImg() async {
-    FilePickerResult fileResult =
-        await FilePicker.platform.pickFiles() as FilePickerResult;
-    if (fileResult != null) {
-      setState(() {
-        _avatar = fileResult.files.first.bytes;
-        img.Image? temp = img.decodeImage(_avatar!);
-        img.Image temp2 = img.copyResize(temp!, width: 480, height: 640);
-        _avatar_proses = Uint8List.fromList(img.encodeJpg(temp2));
-      });
-    }
-  }
-
   Future captureImg() async {
     var picked_img =
         await picker.pickImage(source: ImageSource.camera, imageQuality: 20);
@@ -302,12 +278,10 @@ class _DetailPersonelState extends State<DetailPersonel> {
                   : change == 3
                       ? Text("Edit Nomor Telepon")
                       : change == 4
-                          ? Text("Edit Cabang")
-                          : change == 5
-                              ? Text("Edit Jabatan")
-                              : Text("Edit Grup "),
-          content: Container(
-              height: 110,
+                          ? Text("Edit Jabatan")
+                          : Text("Edit Grup "),
+          content: SizedBox(
+              height: 120,
               width: 300,
               child: change == 1
                   ? Column(
@@ -351,12 +325,6 @@ class _DetailPersonelState extends State<DetailPersonel> {
               onPressed: () {
                 setState(() {});
                 update(context, change);
-                print(namaDepanController.text);
-                print(emailController.text);
-                print(nomorTeleponController.text);
-                print(_idcabang);
-                print(id_jabatan);
-
                 Navigator.pop(context);
               },
             )
@@ -370,39 +338,35 @@ class _DetailPersonelState extends State<DetailPersonel> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Padding(
-            padding: EdgeInsets.all(10),
-            child: GestureDetector(
-                onTap: () {
-                  if (kIsWeb) {
-                    chooseImg();
-                  } else {
-                    captureImg();
-                  }
-                }, // Image tapped
-                child: Container(
-                  height: 200,
-                  width: 150,
-                  child: Image.memory(base64Decode(_avatar)),
-                  // : Image.file(_avatar_proses!),
-                ))),
+        Container(
+            padding: EdgeInsets.only(top: 10, bottom: 10),
+            height: 200,
+            width: 150,
+            child: Stack(children: [
+              Align(
+                  alignment: Alignment.center,
+                  child: Image.memory(base64Decode(_avatar))),
+              if (!kIsWeb)
+                Container(
+                    padding: EdgeInsets.only(right: 5),
+                    alignment: Alignment.bottomRight,
+                    child: Tooltip(
+                        triggerMode: TooltipTriggerMode.longPress,
+                        message: "Ubah Foto",
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: Colors.grey.shade300,
+                          ),
+                          onPressed: () {},
+                        ))),
+            ])
+            // : Image.file(_avatar_proses!),
+            ),
         Text(
-          usernameController,
+          username,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        Row(
-          children: [
-            Text("${namaDepanController.text} ${namaBelakangController.text}"),
-            Tooltip(
-              child: IconButton(
-                  onPressed: () {
-                    editDialog(1);
-                  },
-                  icon: Icon(Icons.edit)),
-              message: "Ubah Nama",
-            )
-          ],
-        )
       ],
     );
   }
@@ -414,15 +378,40 @@ class _DetailPersonelState extends State<DetailPersonel> {
         Padding(
             padding: EdgeInsets.all(10),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                    width: 440,
+                    width: 310,
+                    child: TextField(
+                      controller: namaLengkapController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nama Lengkap',
+                      ),
+                      readOnly: true,
+                    )),
+                Tooltip(
+                  child: IconButton(
+                      onPressed: () {
+                        editDialog(1);
+                      },
+                      icon: Icon(Icons.edit)),
+                  message: "Ubah Nama",
+                )
+              ],
+            )),
+        Padding(
+            padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                    width: 310,
                     child: TextField(
                       controller: emailController,
                       decoration: const InputDecoration(
                         labelText: 'E-mail',
                       ),
-                      enabled: false,
+                      readOnly: true,
                     )),
                 Tooltip(
                   child: IconButton(
@@ -435,17 +424,18 @@ class _DetailPersonelState extends State<DetailPersonel> {
               ],
             )),
         Padding(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                    width: 440,
+                    width: 310,
                     child: TextField(
                       controller: nomorTeleponController,
                       decoration: const InputDecoration(
                         labelText: 'Nomor Telepon',
                       ),
-                      enabled: false,
+                      readOnly: true,
                     )),
                 Tooltip(
                   child: IconButton(
@@ -453,85 +443,76 @@ class _DetailPersonelState extends State<DetailPersonel> {
                         editDialog(3);
                       },
                       icon: Icon(Icons.edit)),
-                  message: "Ubah Nomor Telepon",
+                  message: "Nomor Telepon",
                 )
               ],
             )),
-        Padding(
-            padding: EdgeInsets.all(10),
-            child: id_jabatan == "1" || id_jabatan == "2"
-                ? Row(
+        Container(
+          padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+          width: 380,
+          child: TextField(
+            controller: namaCabangController,
+            decoration: const InputDecoration(
+              labelText: 'Cabang',
+            ),
+            readOnly: true,
+          ),
+        ),
+        Container(
+            padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+            width: 380,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
                       SizedBox(
-                          width: 440,
-                          child: TextField(
-                            controller: namaCabangController,
-                            decoration: const InputDecoration(
-                              labelText: 'Cabang',
-                            ),
-                            enabled: false,
-                          )),
-                      Tooltip(
-                        child: IconButton(
-                            onPressed: () {
-                              editDialog(4);
-                            },
-                            icon: Icon(Icons.edit)),
-                        message: "Ubah Cabang",
-                      )
-                    ],
-                  )
-                : Text("Cabang: ${namaCabangController.text}")),
-        Padding(
-            padding: EdgeInsets.all(10),
-            child: id_jabatan == "1" || id_jabatan == "2"
-                ? Row(
-                    children: [
-                      SizedBox(
-                          width: 440,
+                          width: id_jabatan == "1" || id_jabatan == "2"
+                              ? 120
+                              : 170,
                           child: TextField(
                             controller: namaJabatanController,
                             decoration: const InputDecoration(
                               labelText: 'Jabatan',
                             ),
-                            enabled: false,
+                            readOnly: true,
                           )),
-                      Tooltip(
-                        child: IconButton(
-                            onPressed: () {
-                              editDialog(5);
-                            },
-                            icon: Icon(Icons.edit)),
-                        message: "Ubah Jabatan",
-                      )
+                      if (id_jabatan == "1" || id_jabatan == "2")
+                        Tooltip(
+                          child: IconButton(
+                              onPressed: () {
+                                editDialog(5);
+                              },
+                              icon: Icon(Icons.edit)),
+                          message: "Ubah Jabatan",
+                        )
                     ],
-                  )
-                : Text("Jabatan: ${namaJabatanController.text}")),
-        Padding(
-            padding: EdgeInsets.all(10),
-            child: id_jabatan == "1" || id_jabatan == "2"
-                ? Row(
+                  ),
+                  Row(
                     children: [
                       SizedBox(
-                          width: 440,
+                          width: id_jabatan == "1" || id_jabatan == "2"
+                              ? 120
+                              : 170,
                           child: TextField(
                             controller: namaGrupController,
                             decoration: const InputDecoration(
                               labelText: 'Grup',
                             ),
-                            enabled: false,
+                            readOnly: true,
                           )),
-                      Tooltip(
-                        child: IconButton(
-                            onPressed: () {
-                              editDialog(6);
-                            },
-                            icon: Icon(Icons.edit)),
-                        message: "Ubah Grup",
-                      )
+                      if (id_jabatan == "1" || id_jabatan == "2")
+                        Tooltip(
+                          child: IconButton(
+                              onPressed: () {
+                                editDialog(6);
+                              },
+                              icon: Icon(Icons.edit)),
+                          message: "Ubah Grup",
+                        )
                     ],
                   )
-                : Text("Grup: ${namaGrupController.text}")),
+                ])),
       ],
     );
   }

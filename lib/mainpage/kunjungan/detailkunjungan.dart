@@ -53,18 +53,35 @@ class _DetailVisitState extends State<DetailVisit> {
         body: {
           'id': widget.id_visit,
           'bukti': base64Encode(_foto_proses),
+          'type': "0"
+        });
+    if (response.statusCode == 200) {
+      Map json = jsonDecode(response.body);
+      if (json['result'] == 'success') {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Check out berhasil')));
+        Navigator.popAndPushNamed(context, "/home");
+      }
+    }
+  }
+
+  void updateBukti() async {
+    final response = await http.post(
+        Uri.parse(
+            "https://otccoronet.com/otc/account/kunjungan/checkoutkunjungan.php"),
+        body: {
+          'id': widget.id_visit,
+          'bukti': base64Encode(_foto_proses),
+          'type': "1"
         });
     if (response.statusCode == 200) {
       Map json = jsonDecode(response.body);
       if (json['result'] == 'success') {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Sukses menyimpan data kunjungan')));
-        Navigator.popAndPushNamed(context, "/home");
+            SnackBar(content: Text('Sukses memperbarui bukti kunjungan')));
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sukses menyimpan data kunjungan')));
     }
   }
 
@@ -98,6 +115,7 @@ class _DetailVisitState extends State<DetailVisit> {
       img.Image temp2 = img.copyResize(temp!, width: 500, height: 480);
       setState(() {
         _foto_proses = Uint8List.fromList(img.encodeJpg(temp2));
+        updateBukti();
         showBukti(context, _foto_proses);
       });
     });
@@ -115,6 +133,7 @@ class _DetailVisitState extends State<DetailVisit> {
     // TODO: implement initState
     super.initState();
     bacadata();
+    _loadData();
   }
 
   showBukti(BuildContext context, foto) {
@@ -122,26 +141,23 @@ class _DetailVisitState extends State<DetailVisit> {
         context: context,
         builder: (context) => AlertDialog(
             content: SizedBox(
-                height: 350,
-                width: 500,
-                child: Column(
-                  children: [
-                    Image.memory(foto),
-                    if (widget.status == 0 && widget.username == username)
-                      Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(top: 10),
-                          child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                captureImg(context);
-                              },
-                              child: const Center(
-                                child: Text('Ambil foto ulang',
-                                    style: TextStyle(color: Colors.white)),
-                              )))
-                  ],
-                ))));
+                width: 350,
+                height: 326,
+                child: Column(children: [
+                  Image.memory(foto),
+                  Container(
+                      height: 50,
+                      padding: const EdgeInsets.only(top: 10),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            captureImg(context);
+                          },
+                          child: const Center(
+                            child: Text('Ambil foto ulang',
+                                style: TextStyle(color: Colors.white)),
+                          )))
+                ]))));
   }
 
   @override
@@ -163,12 +179,14 @@ class _DetailVisitState extends State<DetailVisit> {
             },
           ),
         ),
-        body: SingleChildScrollView(
-          child: Container(
+        body: Align(
+            alignment: Alignment.topCenter,
+            child: Container(
               height: MediaQuery.of(context).size.height,
               alignment: Alignment.topCenter,
               width: 720,
-              child: Column(
+              child: SingleChildScrollView(
+                  child: Column(
                 children: [
                   Container(
                       alignment: Alignment.topLeft,
@@ -226,16 +244,6 @@ class _DetailVisitState extends State<DetailVisit> {
                         Column(
                           children: [
                             Text("Bukti Kunjungan\n"),
-                            // bukti == ""
-                            //     ? GestureDetector(
-                            //         onTap: () {},
-                            //         child: SizedBox(
-                            //             width: 60,
-                            //             height: 60,
-                            //             child:
-                            //                 Image.memory(base64Decode(_foto_proses))),
-                            //       )
-                            //     :
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white),
@@ -304,6 +312,6 @@ class _DetailVisitState extends State<DetailVisit> {
                     ),
                 ],
               )),
-        ));
+            )));
   }
 }

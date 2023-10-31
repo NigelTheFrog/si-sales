@@ -95,8 +95,28 @@ class _LoginState extends State<Login> {
         main();
       } else {
         prefs.clear();
+        emptyAvatarDialog(
+            "Terjadi kegagalan dalam pengunggahan gambar wajah. Harap ambil gambar ulang");
       }
     }
+  }
+
+  void emptyAvatarDialog(content) {
+    showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: const Text('Peringatan'),
+              content: Text(content),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    captureImg();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ));
   }
 
   void doLogin() async {
@@ -107,11 +127,12 @@ class _LoginState extends State<Login> {
       Map json = jsonDecode(response.body);
       final prefs = await SharedPreferences.getInstance();
       if (json['result'] == 'success') {
+        print(json);
         if (json["avatar"] == null || json["avatar"] == "") {
           prefs.setString("username", json['username']);
           prefs.setString("nama_depan", json["nama_depan"]);
           prefs.setString("nama_belakang", json["nama_belakang"]);
-          prefs.setString("email", json["email"]);
+          prefs.setString("emrail", json["email"]);
           prefs.setString("tanggal_gabung", json["tanggal_gabung"]);
           prefs.setString("idJabatan", json["id_jabatan"].toString());
           prefs.setString("jabatan", json["jabatan"]);
@@ -120,7 +141,9 @@ class _LoginState extends State<Login> {
           prefs.setString("idGrup", json["id_grup"]);
           prefs.setString("grup", json["grup"]);
           prefs.setString("tanggalAbsen", json["tanggal_absen"]);
-          updateAccount();
+          prefs.setString("telepon", json["no_telp"]);
+          emptyAvatarDialog(
+              "Dikarenakan anda pertama kali melakukan login, maka harap lakukan pengambilan gambar wajah terlebih dahulu");
         } else {
           prefs.setString("username", json['username']);
           prefs.setString("nama_depan", json["nama_depan"]);
@@ -135,6 +158,7 @@ class _LoginState extends State<Login> {
           prefs.setString("grup", json["grup"]);
           prefs.setString("tanggalAbsen", json["tanggal_absen"]);
           prefs.setString("avatar", json["avatar"]);
+          prefs.setString("telepon", json["no_telp"]);
           main();
         }
       } else {
